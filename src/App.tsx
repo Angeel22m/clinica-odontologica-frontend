@@ -6,8 +6,7 @@ function App() {
   return (
     <>
       <h1>WELCOME A MI PROYECTO DE INGENIERIA</h1>
-        <p><Hello /></p>
-     
+        <Hello />    
     </>
   )
 }
