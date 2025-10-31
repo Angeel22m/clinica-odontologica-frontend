@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
-
+import AdminServicesPage from '../pages/AdminServicesPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -12,6 +12,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route path="/expedientes" element={<ExpedientesPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/admin/services" element={<AdminServicesPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
     
