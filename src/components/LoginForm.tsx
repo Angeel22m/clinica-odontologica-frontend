@@ -39,10 +39,10 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
+    <div className="flex items-center justify-center bg-white max-h-[90vh]">
       <form
         onSubmit={handleSubmit}
-        className="bg-light p-8 rounded-xl shadow-md w-full max-w-sm"
+        className="bg-light p-6 rounded-xl shadow-xl border border-gray-300 border-1 w-full max-w-sm"
       >
         <h2 className="text-2xl font-bold mb-6 text-primary text-center">
           Iniciar Sesión
@@ -55,7 +55,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         )}
 
         <div className="mb-4">
-          <label className="block text-primary mb-2">Correo o Usuario</label>
+          <label className="block text-primary mb-2 text-left">Correo o Usuario</label>
           <input
             type="text"
             value={usernameOrEmail}
@@ -65,7 +65,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         </div>
 
         <div className="mb-4">
-          <label className="block text-primary mb-2">Contraseña</label>
+          <label className="block text-primary mb-2 text-left">Contraseña</label>
           <input
             type="password"
             value={password}
@@ -76,7 +76,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
         <button
           type="submit"
-          className="w-full btn-primary p-2 rounded hover:bg-accent transition"
+          className="w-full btn-primary p-2 rounded hover:bg-accent transition mt-4 mb-3"
           disabled={loading}
         >
           {loading ? "Ingresando..." : "Iniciar Sesión"}
@@ -85,7 +85,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         <div className="mt-4 text-center">
           <button
             type="button"
-            className="text-accent hover:underline text-sm"
+            className="text-info hover:underline text-sm"
             onClick={() => alert("Redirigir a recuperar contraseña")}
           >
             Olvidé mi contraseña
