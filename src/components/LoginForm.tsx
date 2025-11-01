@@ -76,7 +76,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
         <button
           type="submit"
-          className="w-full btn-primary p-2 rounded hover:bg-accent transition mt-4 mb-3"
+          className="w-full btn-primary p-2 rounded-lg hover:bg-accent transition mt-4 mb-3"
           disabled={loading}
         >
           {loading ? "Ingresando..." : "Iniciar Sesión"}
