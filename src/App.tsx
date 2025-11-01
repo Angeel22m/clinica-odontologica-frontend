@@ -1,19 +1,16 @@
-import {Hello} from './components/Hello'
-import './App.css'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import listaEmpleados from "./pages/administracionEmpleados/listaEmpleados";
-function App() {
+import { Link } from 'react-router-dom'
 
+function App() {
   return (
-    <>
-      <h1>WELCOME A MI PROYECTO DE INGENIERIA</h1>
-        <Hello />   
-         <BrowserRouter>
-      <Routes>
-        <Route path="/administracionEmpleados" element={<listaEmpleados />} />
-       </Routes> 
-    </BrowserRouter> 
-    </>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-dark text-white">
+      <h1 className="text-3xl font-bold mb-6">Bienvenido al Sistema</h1>
+      <Link
+        to="/empleados"
+        className="bg-sky-500 hover:bg-sky-600 px-5 py-2 rounded-lg shadow text-white font-medium"
+      >
+        Ir a administración de empleados
+      </Link>
+    </div>
   )
 }
 
