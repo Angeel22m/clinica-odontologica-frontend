@@ -1,47 +1,98 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
+import * as Service from "../types/Service";
 
-export default function ServiceForm({ service, onClose, onSave }) {
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [price, setPrice] = useState(0)
-  const [active, setActive] = useState(true)
+interface Props {
+  service: Service | null;
+  onClose: () => void;
+  onSave: (service: Omit<Service, "id"> & Partial<Pick<Service, "id">>) => void;
+}
+
+export default function ServiceForm({ service, onClose, onSave }: Props) {
+  const [nombre, setNombre] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [precio, setPrecio] = useState<number>(0);
+  const [activo, setActivo] = useState(true);
 
   useEffect(() => {
-    if(service){
-      setName(service.name)
-      setDescription(service.description)
-      setPrice(service.price)
-      setActive(service.active)
+    if (service) {
+      setNombre(service.nombre);
+      setDescripcion(service.descripcion);
+      setPrecio(service.precio);
+      setActivo(service.activo);
+    } else {
+      // Limpiar campos si es nuevo
+      setNombre("");
+      setDescripcion("");
+      setPrecio(0);
+      setActivo(true);
     }
-  }, [service])
+  }, [service]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onSave({ id: service?.id, name, description, price, active })
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Enviar solo tipos correctos
+    onSave({
+      id: service?.id,               // undefined si es nuevo
+      nombre: nombre.trim(),
+      descripcion: descripcion.trim(),
+      precio: Math.floor(precio),          // asegurar number
+      activo: Boolean(activo),       // asegurar boolean
+    });
+  };
 
   return (
-  <div className="modal-overlay">
-    <div className="service-form-container bg-light p-6 rounded shadow-md w-full max-w-md mx-auto mt-6">
-      <h2 id="service-form-title" classname="text-xl text-primary font-bold mb-4">{service ? "Editar Servicio" : "Nuevo Servicio"}</h2>
-      <form id="service-form" onSubmit={handleSubmit}>
-        
-          <input id="service-name" className="form-input p-2 border border-primary rounded w-full" value={name} onChange={e => setName(e.target.value)} placeholder="Nombre" required />
-        
-          <input id="service-description" className="form-input p-2 border border-primary rounded w-full" value={description} onChange={e => setDescription(e.target.value)} placeholder="Descripción" required />
-        
-          <input id="service-price" className="form-input p-2 border border-primary rounded w-full" type="number" value={price} onChange={e => setPrice(Number(e.target.value))} placeholder="Precio" required />
-        
-          <label className="flex items-center gap-2">
-            <input id="service-active" className="form-checkbox" type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} /> Activo
+    <div className="modal-overlay">
+      <div className="service-form-container bg-light p-6 rounded shadow-md w-full max-w-md mx-auto mt-6">
+        <h2 className="text-xl text-primary font-bold mb-4">
+          {service ? "Editar Servicio" : "Nuevo Servicio"}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            className="form-input p-2 border border-primary rounded w-full mb-2"
+            value={nombre}
+            onChange={e => setNombre(e.target.value)}
+            placeholder="Nombre"
+            required
+          />
+          <input
+            className="form-input p-2 border border-primary rounded w-full mb-2"
+            value={descripcion}
+            onChange={e => setDescripcion(e.target.value)}
+            placeholder="Descripción"
+            required
+          />
+          <input
+            className="form-input p-2 border border-primary rounded w-full mb-2"
+            type="number"
+            value={precio}
+            onChange={e => setPrecio(Number(e.target.value))}
+            placeholder="Precio"
+            required
+          />
+          <label className="flex items-center gap-2 mb-2">
+            <input
+              type="checkbox"
+              checked={activo}
+              onChange={e => setActivo(e.target.checked)}
+            />{" "}
+            Activo
           </label>
-        
-        <div className="flex gap-2 mt-4">
-          <button id="service-submit-btn" className="btn-primary px-4 py-2 rounded hover:bg-accent" type="submit">{service ? "Guardar Cambios" : "Agregar"}</button>
-          <button id="service-cancel-btn" className="bg-accent text-light px-4 py-2 rounded hover:bg-info" type="button" onClick={onClose}>Cancelar</button>
-        </div>
-      </form>
+          <div className="flex gap-2 mt-4">
+            <button className="btn-primary px-4 py-2 rounded" type="submit">
+              {service ? "Guardar Cambios" : "Agregar"}
+            </button>
+            <button
+              className="bg-accent text-light px-4 py-2 rounded"
+              type="button"
+              onClick={onClose}
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-    </div>
-  )
+  );
 }
+
