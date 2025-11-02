@@ -2,7 +2,7 @@
 import type { Empleado } from "../types/empleado";
 
 const STORAGE_KEY = "empleados_mock_storage_v1";
-const API_URL = "http://localhost:3000/api/empleados"; // ❗ BACKEND REAL (descomentar donde corresponda)
+const API_URL = "http://localhost:3000/api/empleados"; //  BACKEND REAL (descomentar donde corresponda)
 
 /** ================================
  *  Datos iniciales (15 reales)
@@ -49,7 +49,7 @@ function ensureSeed() {
 export async function getEmpleados(): Promise<Empleado[]> {
   ensureSeed();
 
-  // ❗ BACKEND REAL — descomenta para activar
+  //  BACKEND REAL
   /*
   try {
     const res = await fetch(API_URL);
@@ -61,14 +61,14 @@ export async function getEmpleados(): Promise<Empleado[]> {
   }
   */
 
-  // ✅ FRONTEND MOCK
+  //  FRONTEND MOCK
   return readStorage();
 }
 
 /** POST crear empleado (agrega al FINAL) */
 export async function crearEmpleado(empleadoSinId: Omit<Empleado, "id">): Promise<boolean> {
   try {
-    // ❗ BACKEND REAL — descomenta para activar
+    //  BACKEND REAL — 
     /*
     const res = await fetch(API_URL, {
       method: "POST",
@@ -79,7 +79,7 @@ export async function crearEmpleado(empleadoSinId: Omit<Empleado, "id">): Promis
     return true;
     */
 
-    // ✅ FRONTEND MOCK
+    //  FRONTEND MOCK
     const list = readStorage();
     const nuevo: Empleado = {
       ...empleadoSinId,
@@ -97,7 +97,7 @@ export async function crearEmpleado(empleadoSinId: Omit<Empleado, "id">): Promis
 /** PATCH estado activo */
 export async function desactivarEmpleado(id: number, nuevoEstado: boolean): Promise<boolean> {
   try {
-    // ❗ BACKEND REAL — descomenta para activar
+    //  BACKEND REAL — descomenta para activar
     /*
     const res = await fetch(`${API_URL}/${id}/estado`, {
       method: "PATCH",
@@ -107,7 +107,7 @@ export async function desactivarEmpleado(id: number, nuevoEstado: boolean): Prom
     return res.ok;
     */
 
-    // ✅ FRONTEND MOCK
+    //  FRONTEND MOCK
     const list = readStorage();
     const idx = list.findIndex(e => e.id === id);
     if (idx === -1) return false;
@@ -116,6 +116,34 @@ export async function desactivarEmpleado(id: number, nuevoEstado: boolean): Prom
     return true;
   } catch (e) {
     console.error("desactivarEmpleado error:", e);
+    return false;
+  }
+}
+
+
+/** PUT o PATCH editar empleado */
+export async function editarEmpleado(id: number, cambios: Partial<Empleado>): Promise<boolean> {
+  try {
+    // ❗ BACKEND REAL — descomentar cuando exista API
+    /*
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cambios),
+    });
+    return res.ok;
+    */
+
+    // ✅ FRONTEND MOCK
+    const list = readStorage();
+    const idx = list.findIndex(e => e.id === id);
+    if (idx === -1) return false;
+
+    list[idx] = { ...list[idx], ...cambios };
+    writeStorage(list);
+    return true;
+  } catch (e) {
+    console.error("editarEmpleado error:", e);
     return false;
   }
 }

@@ -3,8 +3,17 @@ import ListaEmpleados from "./listaEmpleados";
 import type { Empleado } from "../../types/empleado";
 import { crearEmpleado } from "../../services/empleadosService";
 import { toast } from "react-hot-toast";
+import { editarEmpleado } from "../../services/empleadosService";
+//import {validarCorreo,
+ // validarTelefono, validarDNI, normalizarTelefono, normalizarDNI, esDuplicado } from "../../utils/validaciones";
+
+
 
 const EmpleadosPage: React.FC = () => {
+
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+const [empleadoEditar, setEmpleadoEditar] = useState<Empleado | null>(null);
+
   const [mostrarModal, setMostrarModal] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -22,6 +31,18 @@ const EmpleadosPage: React.FC = () => {
     fechaIngreso: "",
     activo: true,
   });
+
+  const [errores, setErrores] = useState({
+  nombre: "",
+  apellido: "",
+  dni: "",
+  telefono: "",
+  correo: "",
+  rol: "",
+  puesto: "",
+  salario: ""
+});
+
 
   const abrirModal = () => setMostrarModal(true);
 
@@ -42,6 +63,9 @@ const EmpleadosPage: React.FC = () => {
       activo: true,
     });
   };
+
+  
+
 
   const handleGuardar = async () => {
     if (!nuevoEmpleado.nombre.trim() || !nuevoEmpleado.apellido.trim() || !nuevoEmpleado.correo.trim()) {
@@ -76,11 +100,29 @@ const EmpleadosPage: React.FC = () => {
     }
   };
 
+  const handleGuardarEdicion = async () => {
+  if (!empleadoEditar) return;
+
+  const ok = await editarEmpleado(empleadoEditar.id, empleadoEditar);
+  if (!ok) {
+    toast.error("No se pudo actualizar el empleado ❌");
+    return;
+  }
+
+  toast.success("Empleado actualizado correctamente ✅");
+  setMostrarModalEditar(false);
+  setReloadKey(k => k + 1);
+};
+
+
   return (
     <div className="min-h-screen w-full bg-light text-gray-900">
       <ListaEmpleados
         onCrear={abrirModal}
-        onEditar={(emp) => console.log("Editar (pendiente):", emp)}
+        onEditar={(emp) => {
+    setEmpleadoEditar(emp);
+    setMostrarModalEditar(true);
+  }}
         reloadKey={reloadKey}
       />
 
@@ -202,6 +244,103 @@ const EmpleadosPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {mostrarModalEditar && empleadoEditar && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-white w-[520px] max-w-[95vw] rounded-xl shadow-lg p-6 overflow-y-auto max-h-[90vh]">
+
+      <h2 className="text-2xl font-bold mb-4 text-center">Editar Empleado</h2>
+
+      <div className="grid grid-cols-2 gap-4">
+
+        {/* Bloqueados */}
+        <input value={empleadoEditar.nombre} disabled className="border p-2 rounded bg-gray-200" />
+        <input value={empleadoEditar.apellido} disabled className="border p-2 rounded bg-gray-200" />
+        <input value={empleadoEditar.dni} disabled className="border p-2 rounded bg-gray-200" />
+        <input value={empleadoEditar.fechaNac} disabled className="border p-2 rounded bg-gray-200" />
+        <input value={empleadoEditar.fechaIngreso} disabled className="border p-2 rounded bg-gray-200" />
+
+        {/* Editables */}
+        <input
+          type="text"
+          placeholder="Teléfono"
+          className="border p-2 rounded col-span-1"
+          value={empleadoEditar.telefono}
+          onChange={(e) => setEmpleadoEditar({ ...empleadoEditar, telefono: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Dirección"
+          className="border p-2 rounded col-span-2"
+          value={empleadoEditar.direccion}
+          onChange={(e) => setEmpleadoEditar({ ...empleadoEditar, direccion: e.target.value })}
+        />
+        <input
+          type="email"
+          placeholder="Correo"
+          className="border p-2 rounded col-span-2"
+          value={empleadoEditar.correo}
+          onChange={(e) => setEmpleadoEditar({ ...empleadoEditar, correo: e.target.value })}
+        />
+        <select
+          className="border p-2 rounded col-span-1"
+          value={empleadoEditar.rol}
+          onChange={(e) => setEmpleadoEditar({ ...empleadoEditar, rol: e.target.value as Empleado["rol"] })}
+        >
+          <option value="recepcionista">Recepcionista</option>
+          <option value="doctor">Doctor</option>
+          <option value="administrador">Administrador</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Puesto"
+          className="border p-2 rounded col-span-1"
+          value={empleadoEditar.puesto}
+          onChange={(e) => setEmpleadoEditar({ ...empleadoEditar, puesto: e.target.value })}
+        />
+        <input
+          type="number"
+          placeholder="Salario"
+          className="border p-2 rounded col-span-1"
+          value={empleadoEditar.salario}
+          onChange={(e) =>
+            setEmpleadoEditar({ ...empleadoEditar, salario: Number(e.target.value || 0) })
+          }
+        />
+
+        <div className="col-span-2 flex items-center gap-2 mt-1">
+          <input
+            id="activoEditar"
+            type="checkbox"
+            checked={empleadoEditar.activo}
+            onChange={(e) => setEmpleadoEditar({ ...empleadoEditar, activo: e.target.checked })}
+          />
+          <label htmlFor="activoEditar" className="text-sm text-gray-700">Activo</label>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={() => setMostrarModalEditar(false)}
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+        >
+          Cancelar
+        </button>
+        <button
+          onClick={handleGuardarEdicion}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Guardar cambios
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
+      
     </div>
   );
 };
