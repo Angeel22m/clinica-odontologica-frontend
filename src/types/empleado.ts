@@ -1,16 +1,17 @@
-// src/types/empleado.ts
+export type Rol = "doctor" | "recepcionista" | "administrador";
+
 export interface Empleado {
-  id: number;                               // ID único
+  id: number;
   nombre: string;
   apellido: string;
-  dni: string;
-  telefono: string;
+  dni: string;            // 13 dígitos, con o sin guiones en UI (se guarda limpio)
+  telefono: string;       // 8 dígitos, se guarda normalizado
   direccion: string;
-  fechaNac: string;                          // ISO string (YYYY-MM-DD)
+  fechaNac: string;       // YYYY-MM-DD
   correo: string;
-  rol: "administrador" | "doctor" | "recepcionista";
+  rol: Rol;
   puesto: string;
   salario: number;
-  fechaIngreso: string;                      // ISO string (YYYY-MM-DD)
+  fechaIngreso: string;   // YYYY-MM-DD
   activo: boolean;
 }

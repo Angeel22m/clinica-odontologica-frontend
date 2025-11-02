@@ -7,14 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#0ea5e9",
-        secondary: "#6b7280",
-        light: "#f8fafc",
-        dark: "#1f2937",
-        accent: "#38bdf8",
+        primario: "#2D3540",
+        grisClaro: "#F2F2F2",
+        celeste: "#7ED1F2",
+        celeste2: "#04B2D9",
+        verde: "#74BF04",
+      },
+      boxShadow: {
+        card: "0 15px 35px -10px rgba(0,0,0,0.15)",
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Inter", "system-ui", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
       },
     },
   },
