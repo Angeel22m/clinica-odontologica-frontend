@@ -74,3 +74,17 @@
   animation: slide-in 0.4s ease-out;
 }
 
+@keyframes slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.animate-slide-out {
+  animation: slide-out 0.4s ease-in forwards;
+}

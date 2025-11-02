@@ -42,8 +42,8 @@ export default function ServiceForm({ service, onClose, onSave }: Props) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="service-form-container bg-light p-6 rounded shadow-md w-full max-w-md mx-auto mt-6">
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="service-form-container bg-light p-6 rounded shadow-2xl w-full max-w-md mx-auto mt-6">
         <h2 className="text-xl text-primary font-bold mb-4">
           {service ? "Editar Servicio" : "Nuevo Servicio"}
         </h2>
@@ -64,7 +64,7 @@ export default function ServiceForm({ service, onClose, onSave }: Props) {
           />
           <input
             className="form-input p-2 border border-primary rounded w-full mb-2"
-            type="number"
+            type="string"
             value={precio}
             onChange={e => setPrecio(Number(e.target.value))}
             placeholder="Precio"

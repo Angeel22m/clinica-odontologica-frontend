@@ -22,7 +22,7 @@ export const updateService = async (id: number, service: Service): Promise<Servi
   	nombre: service.nombre,
   	descripcion: service.descripcion,
   	precio: Math.floor(service.precio),
-  	activo: service.activo,
+  	activo: service.activo
   });
   return data;
 };
