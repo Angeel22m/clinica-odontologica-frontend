@@ -1,18 +1,20 @@
-import React from "react";
-import Button from "./Button";
+import Button from './Button'
 
 export default function Hero() {
   return (
-    <section className="bg-gradient-to-r from-primary to-accent text-light py-40">
-      <div className="max-w-4xl mx-auto text-center px-6">
-        <h1 className="text-5xl sm:text-6xl font-extrabold mb-6 leading-tight">
-          Sonrisas saludables, pacientes felices
-        </h1>
-        <p className="text-lg sm:text-xl mb-12 text-light/90">
-          Atención odontológica profesional, combinando salud, estética y bienestar.
-        </p>
-        <Button>Agenda tu cita</Button>
+    <section className="pt-32 text-center px-6">
+      <h1 className="text-5xl font-bold text-primary">
+        Sonríe con confianza
+      </h1>
+      <p className="mt-4 text-lg font-semibold text-info max-w-xl mx-auto">
+        En nuestra clínica odontológica, nos encargamos de tu salud dental con el mejor cuidado y tecnología.
+      </p>
+      <div className="mt-8 flex justify-center items-center gap-4">
+        <Button className="font-semibold">Agenda tu cita</Button>
+        <a href="/services" className="text-primary font-semibold hover:bg-accent rounded-md px-3 py-2">
+          Nuestros servicios →
+        </a>
       </div>
     </section>
-  );
+  )
 }
