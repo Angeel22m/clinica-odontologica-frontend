@@ -1,0 +1,82 @@
+[
+  {
+    "persona": { "id": 1, "nombre": "Carlos", "apellido": "Mendoza", "dni": "080119900001", "telefono": "9991001", "direccion": "Centro 123", "fechaNac": "1990-01-10", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 1, "correo": "c1@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 1, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 2, "nombre": "Ana", "apellido": "Lopez", "dni": "080119920002", "telefono": "9991002", "direccion": "Col. Florencia", "fechaNac": "1992-02-11", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 2, "correo": "c2@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 2, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 3, "nombre": "Luis", "apellido": "Gomez", "dni": "080119880003", "telefono": "9991003", "direccion": "Col. Kennedy", "fechaNac": "1988-03-15", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 3, "correo": "c3@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 3, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 4, "nombre": "María", "apellido": "Pérez", "dni": "080119950004", "telefono": "9991004", "direccion": "Centro 345", "fechaNac": "1995-04-20", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 4, "correo": "c4@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 4, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 5, "nombre": "José", "apellido": "Torres", "dni": "080119850005", "telefono": "9991005", "direccion": "Col. Palmira", "fechaNac": "1985-05-25", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 5, "correo": "c5@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 5, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 6, "nombre": "Sofía", "apellido": "Ramirez", "dni": "080119980011", "telefono": "9991011", "direccion": "Barrio Central", "fechaNac": "1998-11-01", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 6, "correo": "c6@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 6, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 7, "nombre": "Pedro", "apellido": "Vargas", "dni": "080119750012", "telefono": "9991012", "direccion": "Altos del Pinar", "fechaNac": "1975-12-12", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 7, "correo": "c7@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 7, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 8, "nombre": "Andrea", "apellido": "Castro", "dni": "080120000013", "telefono": "9991013", "direccion": "Res. Cima", "fechaNac": "2000-01-05", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 8, "correo": "c8@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 8, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 9, "nombre": "Fernando", "apellido": "Mora", "dni": "080119820014", "telefono": "9991014", "direccion": "El Trapiche", "fechaNac": "1982-02-28", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 9, "correo": "c9@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 9, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 10, "nombre": "Gabriela", "apellido": "Reyes", "dni": "080119910015", "telefono": "9991015", "direccion": "Blvd. Morazán", "fechaNac": "1991-03-17", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 10, "correo": "c10@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 10, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 11, "nombre": "Hugo", "apellido": "Fuentes", "dni": "080119780016", "telefono": "9991016", "direccion": "Prados de Oriente", "fechaNac": "1978-04-04", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 11, "correo": "c11@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 11, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 12, "nombre": "Isabel", "apellido": "Guerra", "dni": "080119970017", "telefono": "9991017", "direccion": "Col. San José", "fechaNac": "1997-05-09", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 12, "correo": "c12@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 12, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 13, "nombre": "Javier", "apellido": "Díaz", "dni": "080119840018", "telefono": "9991018", "direccion": "Zona Viva", "fechaNac": "1984-06-21", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 13, "correo": "c13@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 13, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 14, "nombre": "Karen", "apellido": "Silva", "dni": "080119940019", "telefono": "9991019", "direccion": "Anillo Periférico", "fechaNac": "1994-07-26", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 14, "correo": "c14@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 14, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 15, "nombre": "Leo", "apellido": "Chávez", "dni": "080119800020", "telefono": "9991020", "direccion": "Comayagüela", "fechaNac": "1980-08-19", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 15, "correo": "c15@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 15, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 16, "nombre": "Marta", "apellido": "Núñez", "dni": "080119960021", "telefono": "9991021", "direccion": "Col. Lomas", "fechaNac": "1996-09-01", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 16, "correo": "c16@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 16, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 17, "nombre": "Ricardo", "apellido": "Paz", "dni": "080119770022", "telefono": "9991022", "direccion": "Barrio El Centro", "fechaNac": "1977-10-10", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 17, "correo": "c17@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 17, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 18, "nombre": "Valeria", "apellido": "Soto", "dni": "080120010023", "telefono": "9991023", "direccion": "Res. Roble", "fechaNac": "2001-11-15", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 18, "correo": "c18@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 18, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 19, "nombre": "Wilmer", "apellido": "Zelaya", "dni": "080119890024", "telefono": "9991024", "direccion": "Col. Satélite", "fechaNac": "1989-12-20", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 19, "correo": "c19@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 19, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+  {
+    "persona": { "id": 20, "nombre": "Yessenia", "apellido": "Baca", "dni": "080119930025", "telefono": "9991025", "direccion": "Zona Universitaria", "fechaNac": "1993-01-25", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 20, "correo": "c20@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 20, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  }
+]
