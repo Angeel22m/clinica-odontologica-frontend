@@ -1,11 +1,23 @@
 export type Rol = "ADMIN" | "DOCTOR" | "RECEPCIONISTA" | "CLIENTE";
 
-export type User = {
+// export type User = {
+//   id: number;
+//   correo: string;
+//   rol: Rol;
+//   activo: boolean;
+//   personaId: number;
+//   createdAt: string; // ISO
+//   updatedAt: string; // ISO
+// };
+
+export interface User {
   id: number;
   correo: string;
-  rol: Rol;
+  password: string;
+  rol: "ADMIN" | "DOCTOR" | "RECEPCIONISTA" | "CLIENTE";
   activo: boolean;
   personaId: number;
-  createdAt: string; // ISO
-  updatedAt: string; // ISO
-};
+  createdAt: string;
+  updatedAt: string;
+}
+

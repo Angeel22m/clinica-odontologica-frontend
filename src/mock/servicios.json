@@ -1,0 +1,9 @@
+[
+  { "id": 1, "nombre": "Limpieza dental", "descripcion": "Limpieza profesional básica", "precio": 500, "activo": true },
+  { "id": 2, "nombre": "Extracción de muela", "descripcion": "Extracción dental simple", "precio": 1200, "activo": true },
+  { "id": 3, "nombre": "Blanqueamiento dental", "descripcion": "Tratamiento estético", "precio": 2000, "activo": true },
+  { "id": 4, "nombre": "Ortodoncia", "descripcion": "Colocación de brackets", "precio": 5000, "activo": true },
+  { "id": 5, "nombre": "Consulta general", "descripcion": "Revisión general dental", "precio": 300, "activo": true },
+  { "id": 6, "nombre": "Endodoncia", "descripcion": "Tratamiento de conducto", "precio": 2500, "activo": true },
+  { "id": 7, "nombre": "Implante dental", "descripcion": "Colocación de implante", "precio": 8000, "activo": true }
+]
