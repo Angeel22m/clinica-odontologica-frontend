@@ -6,12 +6,14 @@ import NotFoundPage from '../pages/NotFoundPage';
 import AdminServicesPage from '../pages/AdminServicesPage';
 import LoginPage from '../pages/LoginPage';
 import LandingPage from '../pages/LandingPage';
+import RegisterPage from '../pages/RegisterPage'
 
 const AppRoutes: React.FC = () => {
   return (
     
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/expedientes" element={<ExpedientesPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
