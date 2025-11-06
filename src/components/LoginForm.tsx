@@ -90,14 +90,15 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
           {loading ? "Ingresando..." : "Iniciar Sesión"}
         </button>
 
-        <div className="mt-4 text-center">
-          <button
+        <div className="flex justify-center gap-12 mt-4 text-center">
+          <a
             type="button"
-            className="text-info hover:underline text-sm"
+            className="text-info hover:underline text-sm cursor-pointer"
             onClick={() => alert("Redirigir a recuperar contraseña")}
           >
             Olvidé mi contraseña
-          </button>
+          </a>
+          <a className="text-info hover:underline text-sm cursor-pointer">Registrarse</a>
         </div>
       </form>
     </div>
