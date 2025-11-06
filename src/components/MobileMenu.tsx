@@ -5,15 +5,12 @@ export default function MobileMenu({ open, onClose, navigation }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end p-6 overlay-dark">
-      {/* Fondo semitransparente */}
       <div
         className="fixed inset-0 bg-black bg-opacity-25"
         onClick={onClose}
       ></div>
 
-      {/* Panel flotante a la derecha */}
       <div className="fixed top-0 right-0 bg-light rounded-l shadow-xl w-72 p-6 flex flex-col gap-6 z-50">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <a href="#" className="flex items-center gap-2">
             <img
@@ -32,7 +29,6 @@ export default function MobileMenu({ open, onClose, navigation }) {
           </button>
         </div>
 
-        {/* Items del menú */}
         <div className="flex flex-col gap-4">
           {navigation.map((item) => (
             <a

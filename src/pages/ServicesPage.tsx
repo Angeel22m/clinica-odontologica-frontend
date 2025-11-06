@@ -11,14 +11,13 @@ const PublicServiciosPage = () => {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/servicios"); // tu endpoint
+        const response = await axios.get("http://localhost:3000/servicios");
 	console.log(response.data)
-        // Asegurarnos de que servicios sea un array
         const data = Array.isArray(response.data)
           ? response.data
           : Array.isArray(response.data.data)
           ? response.data.data
-          : []; // si no es un array, usamos uno vacío
+          : []; 
 
         setServicios(data);
       } catch (err) {
@@ -76,7 +75,7 @@ const PublicServiciosPage = () => {
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overlay-dark">
     <div className="bg-light rounded-2xl p-6 max-w-md w-full relative border-1 shadow-xl">
       <button
-        className="absolute top-3 right-3 text-primary text-2xl"
+        className="absolute top-3 right-3 text-primary text-2xl cursor-pointer"
         onClick={() => setModalOpen(false)}
       >
         x
@@ -84,7 +83,6 @@ const PublicServiciosPage = () => {
       <h2 className="text-2xl font-bold mb-4 text-primary">
         {servicioSeleccionado?.nombre}
       </h2>
-      {/* Aquí puedes agregar el formulario o información */}
       <p className="text-primary mb-4">{servicioSeleccionado?.descripcion}</p>
       <div className="flex justify-center">
       <button

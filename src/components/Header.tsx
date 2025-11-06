@@ -15,7 +15,6 @@ export default function Header() {
   return (
     <header className="absolute inset-x-0 top-0 z-50">
       <nav className="flex items-center justify-between p-6 lg:px-8 shadow-sm/10 rounded-sm">
-        {/* Logo */}
         <div className="flex lg:flex-1">
           <a href="/landing" className="-m-1.5 p-1.5 flex items-center gap-2">
             <img
@@ -26,7 +25,6 @@ export default function Header() {
           </a>
         </div>
 
-        {/* Botón menú móvil */}
         <div className="flex lg:hidden">
           <button
             type="button"
@@ -37,7 +35,6 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Navegación escritorio */}
         <div className="hidden lg:flex lg:gap-x-12">
           {navigation.map((item) => (
             <a key={item.name} href={item.href} className="text-primary font-medium hover:text-accent">
@@ -53,7 +50,6 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Menú móvil */}
       <MobileMenu
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
