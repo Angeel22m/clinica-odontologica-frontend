@@ -17,7 +17,7 @@ export default function LoginPage() {
       if (data.code === 0) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-	window.location.href = "/dashboard";
+	window.location.href = "/home";
         console.log("Inicio de sesión exitoso");
 
         return { success: true };
