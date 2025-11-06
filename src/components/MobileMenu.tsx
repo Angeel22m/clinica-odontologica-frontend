@@ -1,8 +1,10 @@
+import logo from '../assets/logo.png'
+
 export default function MobileMenu({ open, onClose, navigation }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end p-6">
+    <div className="fixed inset-0 z-50 flex justify-end p-6 overlay-dark">
       {/* Fondo semitransparente */}
       <div
         className="fixed inset-0 bg-black bg-opacity-25"
@@ -16,10 +18,10 @@ export default function MobileMenu({ open, onClose, navigation }) {
           <a href="#" className="flex items-center gap-2">
             <img
               alt=""
-              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
+              src={logo}
               className="h-8 w-auto"
             />
-            <span className="text-primary font-semibold">Your Company</span>
+
           </a>
           <button
             type="button"
@@ -44,7 +46,7 @@ export default function MobileMenu({ open, onClose, navigation }) {
           ))}
 
           <button
-            className="mt-4 px-4 py-2 btn-primary rounded-full hover:bg-accent transition-colors"
+            className="mt-4 px-4 py-2 btn-primary rounded-md hover:bg-accent transition-colors"
             onClick={onClose}
           >
             Log in

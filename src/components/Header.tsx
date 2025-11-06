@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import MobileMenu from './MobileMenu'
+import logo from '../assets/logo.png'
 
 const navigation = [
   { name: 'Servicios', href: '/services' },
@@ -16,13 +17,12 @@ export default function Header() {
       <nav className="flex items-center justify-between p-6 lg:px-8 shadow-sm/10 rounded-sm">
         {/* Logo */}
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5 flex items-center gap-2">
+          <a href="/landing" className="-m-1.5 p-1.5 flex items-center gap-2">
             <img
-              alt=""
-              src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-              className="h-8 w-auto"
+              alt="Logo"
+              src={logo}
+              className="h-10 w-auto"
             />
-            <span className="text-primary font-semibold">Your Company</span>
           </a>
         </div>
 
