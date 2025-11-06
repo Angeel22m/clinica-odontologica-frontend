@@ -6,6 +6,7 @@ import NotFoundPage from '../pages/NotFoundPage';
 import AdminServicesPage from '../pages/AdminServicesPage';
 import LoginPage from '../pages/LoginPage';
 import LandingPage from '../pages/LandingPage';
+import PublicServicesPage from '../pages/ServicesPage'
 
 const AppRoutes: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/admin/services" element={<AdminServicesPage />} />
       <Route path="*" element={<NotFoundPage />} />
       <Route path="/landing" element={<LandingPage />} />
+      <Route path="/services" element={<PublicServicesPage />} />
     </Routes>
     
   );

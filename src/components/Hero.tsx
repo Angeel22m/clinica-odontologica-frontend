@@ -10,7 +10,7 @@ export default function Hero() {
         En nuestra clínica odontológica, nos encargamos de tu salud dental con el mejor cuidado y tecnología.
       </p>
       <div className="mt-8 flex justify-center items-center gap-4">
-        <Button className="font-semibold">Agenda tu cita</Button>
+        <Button className="font-semibold cursor-pointer">Agenda tu cita</Button>
         <a href="/services" className="text-primary font-semibold hover:bg-accent rounded-md px-3 py-2">
           Nuestros servicios →
         </a>
