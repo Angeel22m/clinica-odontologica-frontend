@@ -13,12 +13,11 @@ export default function AdminServicesPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [notification, setNotification] = useState("");
 
-  // Cargar servicios al montar
   useEffect(() => {
     const loadServices = async () => {
       try {
         const data = await fetchServices();
-        setServices(data.sort((a, b) => a.id - b.id)); // Ordenar por id
+        setServices(data.sort((a, b) => a.id - b.id)); 
       } catch (error) {
         console.error("Error al obtener servicios:", error);
         setNotification("Error al cargar los servicios");
@@ -27,11 +26,9 @@ export default function AdminServicesPage() {
     loadServices();
   }, []);
 
-  // Guardar o actualizar servicio
   const handleSave = async (service: Omit<ServiceType.Service, "id"> & Partial<Pick<ServiceType.Service, "id">>) => {
     try {
       if (service.id) {
-        // Actualizar servicio
         await updateService(service.id, {
           nombre: service.nombre,
           descripcion: service.descripcion,
@@ -40,17 +37,21 @@ export default function AdminServicesPage() {
         });
         setNotification("Servicio actualizado correctamente");
       } else {
-        // Crear nuevo servicio
+        const {message, code} = 
         await createService({
           nombre: service.nombre,
           descripcion: service.descripcion,
           precio: Math.floor(service.precio),
           activo: Boolean(service.activo),
         });
+        console.log(code)
+        if (code === 3) {
+          setNotification(message);
+          return;
+        }
         setNotification("Servicio agregado correctamente");
       }
 
-      // Refrescar lista desde backend y ordenar
       const updated = await fetchServices();
       setServices(updated.sort((a, b) => a.id - b.id));
 
@@ -63,18 +64,16 @@ export default function AdminServicesPage() {
     }
   };
 
-  // Eliminar servicio
   const handleDelete = async (id: number) => {
     try {
-      const { data } = await deleteService(id); // data = { message, code }
+      const { data } = await deleteService(id);
       console.log(data.code)
       if (data.code === 5) {
-        setNotification(data.message); // No se puede eliminar
+        setNotification(data.message); 
         return;
       }
       setNotification("Servicio eliminado correctamente");
 
-      // Refrescar lista desde backend
       const updated = await fetchServices();
       setServices(updated.sort((a, b) => a.id - b.id));
 
@@ -87,7 +86,6 @@ export default function AdminServicesPage() {
     }
   };
 
-  // Limpiar notificación después de 3s
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => setNotification(""), 3000);
@@ -115,7 +113,6 @@ export default function AdminServicesPage() {
         onDelete={service => { setSelectedService(service); setShowConfirm(true); }}
       />
 
-      {/* Modal ServiceForm */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <ServiceForm
@@ -126,7 +123,6 @@ export default function AdminServicesPage() {
         </div>
       )}
 
-      {/* Modal ConfirmDialog */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <ConfirmDialog
@@ -137,7 +133,6 @@ export default function AdminServicesPage() {
         </div>
       )}
 
-      {/* Notificación */}
       {notification && (
         <Notification message={notification} onClose={() => setNotification("")} />
       )}
