@@ -1,10 +1,16 @@
 import { useState } from "react";
 
-interface LoginFormProps {
-  onLogin?: (usernameOrEmail: string, password: string) => Promise<boolean>;
+interface LoginResult {
+  success: boolean;
+  error?: string;
 }
 
-export default function LoginForm({ onLogin }: LoginFormProps) {
+interface LoginFormProps {
+  onLogin?: (usernameOrEmail: string, password: string) => Promise<LoginResult>;
+  errorMessage?: string;
+}
+
+export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps) {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,17 +29,19 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
     try {
       if (onLogin) {
-        const success = await onLogin(usernameOrEmail, password);
-        if (!success) {
-          setError("Credenciales inválidas o usuario no existente");
-        }
+        const result = await onLogin(usernameOrEmail, password);
+        if (!result.success) {
+          setError(result.error || "Credenciales inválidas o usuario no existente");
+        
       } else {
-        // Login simulado si no hay backend
-        alert("Inicio de sesión simulado exitoso");
+          setError("");
       }
-    } catch {
+     } else {
+        alert("Inicio de sesion simulado exitoso");
+      }
+     } catch {
       setError("No se puede conectar con el servidor. Intente más tarde.");
-    } finally {
+     } finally {
       setLoading(false);
     }
   };
@@ -48,9 +56,9 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           Iniciar Sesión
         </h2>
 
-        {error && (
+        {(error || errorMessage) && (
           <div className="bg-info text-light p-2 rounded mb-4 text-sm">
-            {error}
+            {error || errorMessage}
           </div>
         )}
 

@@ -1,8 +1,11 @@
 import LoginForm from "../components/LoginForm";
 import axios from "axios";
+import { useState } from "react";
 
 export default function LoginPage() {
-  const handleLogin = async (user: string, pass: string): Promise<boolean> => {
+  const [serverError, setServerError] = useState("");
+  
+  const handleLogin = async (user: string, pass: string): Promise<{ success: boolean; error?: string}> => {
     try {
       const response = await axios.post("http://localhost:3000/auth/login", {
         correo: user,
@@ -12,24 +15,24 @@ export default function LoginPage() {
       const data = response.data;
 
       if (data.code === 0) {
-        // Guardamos el token JWT en localStorage
         localStorage.setItem("token", data.token);
-
-        // Podés guardar el usuario si querés:
         localStorage.setItem("user", JSON.stringify(data.user));
-
+	window.location.href = "/dashboard";
         console.log("Inicio de sesión exitoso");
-        // Redirigir a otra página (si usás react-router-dom)
-        // window.location.href = "/dashboard";
 
-        return true;
+        return { success: true };
       } else {
+        const msg = data.message || "Error al iniciar sesión";
+      	setServerError(msg);
         console.error("Error:", data.message);
-        return false;
+        return { success: false, error: msg };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al iniciar sesión:", error);
-      return false;
+      const message = 
+        error.response?.data?.message || "No se pudo conectar con el servidor. Intente más tarde";
+      setServerError(message);
+      return { success: false, error: message };
     }
   };
 
@@ -43,7 +46,7 @@ export default function LoginPage() {
           Bienvenido, por favor inicia sesión
         </p>
 
-        <LoginForm onLogin={handleLogin} />
+        <LoginForm onLogin={handleLogin} errorMessage={serverError}/>
       </div>
     </div>
   );
