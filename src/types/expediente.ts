@@ -43,3 +43,10 @@ export interface ClinicalRecord {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface UploadSuccessData {
+  fileName: string;
+  dbId: number;
+  signedUrl: string;
+  message: string;
+}
