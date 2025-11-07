@@ -1,0 +1,126 @@
+import type { Expediente, ClinicalRecord,UpdateExpedienteDto,NewClinicalRecord } from '../types/expediente';
+import { api } from './axios';
+import { AxiosError } from 'axios';
+
+/**
+ * Obtiene todos los expedientes
+ */
+export const fetchExpedientes = async (): Promise<Expediente[]> => {
+  try {
+    const { data } = await api.get<Expediente[]>('/expediente');
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error('Error al cargar expedientes:', error.response?.data || error.message);
+    } else {
+      console.error('Error desconocido al cargar expedientes', error);
+    }
+    throw error;
+  }
+};
+
+
+export const getExpedienteById = async (id: number): Promise<Expediente> => {
+  if (!id) throw new Error("No se proporcionó un ID de expediente");
+  const response = await api.get<Expediente>(`/expediente/${id}`);
+  return response.data;
+};
+
+export const addDetalleConsulta = async (data: NewClinicalRecord): Promise<ClinicalRecord> => {
+  const response = await api.post(`/expediente/detalle/${data.expedienteId}`, data);
+  return response.data.data; // aquí accedemos a `data` dentro del response
+};
+
+
+/**
+ * Obtiene el historial clínico de un paciente por su ID
+ */
+export const fetchPatientHistory = async (pacienteId: number): Promise<ClinicalRecord[]> => {
+  try {
+    const { data } = await api.get<ClinicalRecord[]>(`/expediente/historial/${pacienteId}`);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error(`Error al cargar historial para paciente ${pacienteId}:`, error.response?.data || error.message);
+    } else {
+      console.error(`Error desconocido al cargar historial para paciente ${pacienteId}`, error);
+    }
+    throw error;
+  }
+};
+
+export const uploadFileToExpediente = async (
+  file: File,
+  expedienteId: number,
+  creadoPorId: number,
+  onProgress?: (percent: number) => void, // 💡 Nuevo parámetro para el progreso
+): Promise<{ fileName: string; dbId: number; signedUrl: string; message: string }> => {
+  try {
+    // 1. Crear el objeto FormData
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('expedienteId', expedienteId.toString());
+    formData.append('creadoPorId', creadoPorId.toString());
+
+    // 2. Definir la URL de la petición POST
+    const url = `/expediente/archivo/upload`;
+
+    // 3. Realizar la petición POST con Axios
+    const { data } = await api.post(url, formData, {
+      // 💡 IMPLEMENTACIÓN DE onUploadProgress
+      onUploadProgress: (progressEvent: any) => {
+        if (progressEvent.lengthComputable) {
+          // Calcula el porcentaje de subida
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          
+          // Llama al callback si se proporcionó
+          if (onProgress) {
+            onProgress(percent); 
+          }
+        }
+      },
+    });
+
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error('Error al subir el archivo:', error.response?.data || error.message);
+      // Relanza el error con un mensaje más claro para el componente
+      throw new Error(error.response?.data?.message || 'Error desconocido al subir el archivo.');
+    } else {
+      console.error('Error desconocido en la subida', error);
+      throw new Error('Error de red desconocido.');
+    }
+  }
+};
+
+export const fetchExpedientesByDoctor = async (doctorId: number): Promise<Expediente[]> => {
+  try {
+    const { data } = await api.get<Expediente[]>(`/expediente/doctor/${doctorId}`);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error(`Error al cargar historial de expedientes para el doctor ${doctorId}:`, error.response?.data || error.message);
+    } else {
+      console.error(`Error desconocido al cargar historial de expedientes para el doctor ${doctorId}`, error);
+    }
+    throw error;
+  }
+};
+
+/**
+ * Actualiza un expediente por ID
+ */
+export const updateExpediente = async (id: number, payload: UpdateExpedienteDto): Promise<Expediente> => {
+  try {
+    const { data } = await api.put<Expediente>(`/expediente/${id}`, payload);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error(`Error al actualizar expediente ${id}:`, error.response?.data || error.message);
+    } else {
+      console.error(`Error desconocido al actualizar expediente ${id}`, error);
+    }
+    throw error;
+  }
+};
