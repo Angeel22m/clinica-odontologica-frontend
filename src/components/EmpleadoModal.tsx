@@ -92,8 +92,15 @@ export default function EmpleadoModal({
       onSaved();
       onClose();
     } catch (error: any) {
-      alert(error.response?.data?.message || "Error al guardar empleado");
-    }
+  const mensaje = error.response?.data?.message;
+
+  if (Array.isArray(mensaje)) {
+    alert(mensaje.join("\n"));
+  } else {
+    alert(mensaje || "Error al guardar empleado");
+    console.error("Error al guardar empleado:", error);
+  }
+}
   };
 
   if (!visible) return null;
