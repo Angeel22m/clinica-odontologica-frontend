@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 interface LoginResult {
   success: boolean;
   error?: string;
@@ -98,7 +98,8 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
           >
             Olvidé mi contraseña
           </a>
-          <a className="text-info hover:underline text-sm cursor-pointer">Registrarse</a>
+          <Link to="/register" className="text-info hover:underline text-sm cursor-pointer">Registrarse</Link>
+          
         </div>
       </form>
     </div>

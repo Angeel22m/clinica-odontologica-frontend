@@ -15,7 +15,7 @@ type ExpedienteConNombres = Expediente & {
   doctorNombre: string;
 };
 
-const ExpedientesPage: React.FC<Props> = ({ doctorId }) => {
+const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
   const [expedientes, setExpedientes] = useState<ExpedienteConNombres[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -83,4 +83,4 @@ const ExpedientesPage: React.FC<Props> = ({ doctorId }) => {
   );
 };
 
-export default ExpedientesPage;
+export default ExpedientesPagePorDoctor;
