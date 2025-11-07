@@ -4,6 +4,7 @@ import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import ExpedientePorDoctor from '../pages/ExpedientesPorDoctor';
+import HistorialdelPaciente from '../pages/HistorialdelPaciente';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/expedientes/doctor" element={<ExpedientePorDoctor />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="*" element={<NotFoundPage />} />
+      <Route path="/Historial" element={<HistorialdelPaciente />} />
     </Routes>
     
   );

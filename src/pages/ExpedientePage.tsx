@@ -7,7 +7,7 @@ import PatientDetails from '../components/PatientDetails';
 import LogoutButton from '../components/LogoutButton';
 
 const ExpedientesPage: React.FC = () => {
-  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
+  const [expedientes, setExpediente] = useState<Expediente[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [history, setHistory] = useState<ClinicalRecord[] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +17,7 @@ const ExpedientesPage: React.FC = () => {
   useEffect(() => {
     setIsLoadingList(true);
     fetchExpedientes().then(data => {
-      setExpedientes(data);
+      setExpediente(data);
       setIsLoadingList(false);
       if (data.length > 0) setSelectedPatientId(data[0].pacienteId);
     }).catch(() => setIsLoadingList(false));

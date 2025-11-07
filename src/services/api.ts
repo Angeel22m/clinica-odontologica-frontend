@@ -35,6 +35,23 @@ export const fetchPatientHistory = async (pacienteId: number): Promise<ClinicalR
     throw error;
   }
 };
+
+
+export const fetchExpedienteById = async (id: number): Promise<Expediente> => {
+  try {
+    const { data } = await api.get<Expediente>(`/expediente/${id}`);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error(`Error al cargar expediente con ID ${id}:`, error.response?.data || error.message);
+    } else {
+      console.error('Error desconocido al cargar expediente', error);
+    }
+    throw error;
+  }
+};
+
+
 /**
  * Sube un archivo al servidor para un expediente específico.
  * @param file El objeto File a subir.

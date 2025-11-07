@@ -21,11 +21,16 @@ const formatDate = (isoString: string) => {
 const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) => {
   const [ascending, setAscending] = useState(false); // false = descendente por defecto
 
+
+  // Ordenar el historial según la preferencia del usuario
   const sortedHistory = [...history].sort((a, b) =>
     ascending
       ? new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
       : new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
   );
+
+  
+
 
   const { paciente, doctor } = expediente;
 
@@ -79,7 +84,8 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
           <p>Este paciente no tiene registros clínicos.</p>
         </div>
       )}
-
+      
+      {/* Mostrar el historial de consultas*/}
       <div className="space-y-6">
         {sortedHistory.map((record) => (
           <div
