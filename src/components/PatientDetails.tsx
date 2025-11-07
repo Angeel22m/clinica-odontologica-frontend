@@ -37,7 +37,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
           <div>
             <h2 className="text-3xl font-bold text-primary">{paciente.nombre} {paciente.apellido}</h2>
             <p className="text-md text-secondary">
-              Expediente N°: {expediente.id} | Paciente ID: {expediente.pacienteId}
+              
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
         <h3 className="text-2xl font-semibold text-primary">Historial de Consultas</h3>
         <button
           onClick={() => setAscending(!ascending)}
-          className="flex items-center gap-2 px-3 py-2 bg-accent text-white rounded-lg hover:bg-accent/80 transition"
+          className="btn-accent"
         >
           <ArrowUpDown className="w-4 h-4" />
           {ascending ? 'Más antiguas primero' : 'Más recientes primero'}
@@ -89,7 +89,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
             <div className="flex justify-between items-start border-b pb-2 mb-3">
               <h4 className="text-xl font-bold text-accent flex items-center">
                 <Stethoscope className="w-5 h-5 mr-2 text-accent" />
-                Consulta #{record.id}
+                Consulta
               </h4>
               <p className="text-sm text-secondary flex items-center">
                 <Calendar className="w-4 h-4 mr-1" />
@@ -109,7 +109,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
             </div>
 
             <p className="mt-3 pt-3 border-t text-xs text-secondary">
-              Registrado por el Doctor {record.doctor.persona.nombre} {record.doctor.persona.apellido} | Creado: {formatDate(record.createdAt)}
+              Registrado por el Doctor {record.doctor?.persona.nombre} {record.doctor?.persona.apellido} | Creado: {formatDate(record.createdAt)}
             </p>
           </div>
         ))}
