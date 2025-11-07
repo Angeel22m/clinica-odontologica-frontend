@@ -1,4 +1,4 @@
-import type { Expediente, ClinicalRecord } from '../types/expediente';
+import type { Expediente, ClinicalRecord,UpdateExpedienteDto,NewClinicalRecord } from '../types/expediente';
 import { api } from './axios';
 import { AxiosError } from 'axios';
 
@@ -19,6 +19,19 @@ export const fetchExpedientes = async (): Promise<Expediente[]> => {
   }
 };
 
+
+export const getExpedienteById = async (id: number): Promise<Expediente> => {
+  if (!id) throw new Error("No se proporcionó un ID de expediente");
+  const response = await api.get<Expediente>(`/expediente/${id}`);
+  return response.data;
+};
+
+export const addDetalleConsulta = async (data: NewClinicalRecord): Promise<ClinicalRecord> => {
+  const response = await api.post(`/expediente/detalle/${data.expedienteId}`, data);
+  return response.data.data; // aquí accedemos a `data` dentro del response
+};
+
+
 /**
  * Obtiene el historial clínico de un paciente por su ID
  */
@@ -35,14 +48,7 @@ export const fetchPatientHistory = async (pacienteId: number): Promise<ClinicalR
     throw error;
   }
 };
-/**
- * Sube un archivo al servidor para un expediente específico.
- * @param file El objeto File a subir.
- * @param expedienteId El ID del expediente al que se adjuntará el archivo.
- * @param creadoPorId El ID del usuario creador.
- * @param onProgress Callback opcional para reportar el porcentaje de subida (0-100). 💡 NUEVO
- * @returns Los datos de respuesta del servidor (metadata del archivo subido).
- */
+
 export const uploadFileToExpediente = async (
   file: File,
   expedienteId: number,
@@ -85,5 +91,36 @@ export const uploadFileToExpediente = async (
       console.error('Error desconocido en la subida', error);
       throw new Error('Error de red desconocido.');
     }
+  }
+};
+
+export const fetchExpedientesByDoctor = async (doctorId: number): Promise<Expediente[]> => {
+  try {
+    const { data } = await api.get<Expediente[]>(`/expediente/doctor/${doctorId}`);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error(`Error al cargar historial de expedientes para el doctor ${doctorId}:`, error.response?.data || error.message);
+    } else {
+      console.error(`Error desconocido al cargar historial de expedientes para el doctor ${doctorId}`, error);
+    }
+    throw error;
+  }
+};
+
+/**
+ * Actualiza un expediente por ID
+ */
+export const updateExpediente = async (id: number, payload: UpdateExpedienteDto): Promise<Expediente> => {
+  try {
+    const { data } = await api.put<Expediente>(`/expediente/${id}`, payload);
+    return data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      console.error(`Error al actualizar expediente ${id}:`, error.response?.data || error.message);
+    } else {
+      console.error(`Error desconocido al actualizar expediente ${id}`, error);
+    }
+    throw error;
   }
 };
