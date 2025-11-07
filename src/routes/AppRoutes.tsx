@@ -4,6 +4,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import ExpedientePorDoctor from '../pages/ExpedientesPorDoctor';
+import HistorialdelPaciente from '../pages/HistorialdelPaciente';
+
 import RegisterPage from '../pages/RegisterPage'
 import AdminServicesPage from '../pages/AdminServicesPage';
 import LoginPage from '../pages/LoginPage';
@@ -22,6 +25,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/admin/services" element={<AdminServicesPage />} />
       <Route path="*" element={<NotFoundPage />} />
+      <Route path="/Historial" element={<HistorialdelPaciente />} />
       <Route path="/landing" element={<LandingPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
       <Route path="/expedientes/doctor" element={<ExpedientesPagePorDoctor doctorId={1} />} />
