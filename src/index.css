@@ -117,7 +117,8 @@
 .bg-success {
   background-color: var(--color-success);
 }
-
+.overlay-dark {
+  background-color: rgba(0,0,0,0.6);
 
 @keyframes slide-in {
   from {
@@ -143,8 +144,4 @@
     opacity: 0;
     transform: translateX(100%);
   }
-}
-
-.animate-slide-out {
-  animation: slide-out 0.4s ease-in forwards;
 }
