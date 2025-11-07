@@ -7,6 +7,7 @@ import NotFoundPage from '../pages/NotFoundPage';
 
 import AdminServicesPage from '../pages/AdminServicesPage';
 import LoginPage from '../pages/LoginPage';
+import HomePage from '../pages/HomePage';
 import LandingPage from '../pages/LandingPage';
 import PublicServicesPage from '../pages/ServicesPage'
 
@@ -14,6 +15,7 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/home" element={<HomePage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/expedientes" element={<ExpedientesPage />} />
