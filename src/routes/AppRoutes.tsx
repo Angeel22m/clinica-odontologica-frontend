@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
-import ExpedientePorDoctorPage from "../pages/ExpedientePorDoctorPage"
+import AdminServicesPage from '../pages/AdminServicesPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -13,6 +13,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/expedientes" element={<ExpedientesPage />} />
       <Route path="/expedientes/doctor" element={<ExpedientePorDoctorPage doctorId={1}/>} />
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/admin/services" element={<AdminServicesPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
     
