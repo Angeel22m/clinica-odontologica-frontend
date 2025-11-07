@@ -5,41 +5,22 @@ import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
-import PacientesPage from '../pages/pacientes/PacientesPage';
-import PacienteFormPage from '../pages/pacientes/pacienteFormPage';
-
-// Placeholders opcionales a futuro:
-import PacienteDetallePage from '../pages/pacientes/PacienteDetallePage';
-
-
-import ExpedientePorDoctorPage from "../pages/ExpedientePorDoctorPage"
 import AdminServicesPage from '../pages/AdminServicesPage';
+import LoginPage from '../pages/LoginPage';
+import LandingPage from '../pages/LandingPage';
+import RegisterPage from '../pages/RegisterPage'
 
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Home seguir redirigiendo a expedientes */}
-      <Route path="/" element={<Navigate to="/expedientes" />} />
-
-      {/* Rutas existentes */}
+      <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/expedientes" element={<ExpedientesPage />} />
-      <Route path="/expedientes/doctor" element={<ExpedientePorDoctorPage doctorId={1}/>} />
       <Route path="/dashboard" element={<DashboardPage />} />
-
-      {/* Pacientes */}
-      <Route path="/pacientes" element={<PacientesPage />} />
-      <Route path="/pacientes/nuevo" element={<PacienteFormPage />} />
-      <Route path="/pacientes/:id" element={<PacienteDetallePage />} />
-
-      {/*Citas deshabilitadas para este sprint */}
-      {/*
-        <Route path="/pacientes/:id/citas" element={<PacienteCitasPage />} />
-        <Route path="/pacientes/:id/citas/nueva" element={<NuevaCitaPage />} />
-      */}
-
-      {/* 404 */}
       <Route path="/admin/services" element={<AdminServicesPage />} />
       <Route path="*" element={<NotFoundPage />} />
+      <Route path="/landing" element={<LandingPage />} />
     </Routes>
   );
 };
