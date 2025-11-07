@@ -1,8 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
+
 import AdminServicesPage from '../pages/AdminServicesPage';
 import LoginPage from '../pages/LoginPage';
 import LandingPage from '../pages/LandingPage';
@@ -10,7 +12,6 @@ import PublicServicesPage from '../pages/ServicesPage'
 
 const AppRoutes: React.FC = () => {
   return (
-    
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -22,7 +23,6 @@ const AppRoutes: React.FC = () => {
       <Route path="/landing" element={<LandingPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
     </Routes>
-    
   );
 };
 
