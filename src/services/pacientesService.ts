@@ -1,108 +1,55 @@
-import pacientesSeed from "../mock/pacientes.json";
-import type { Paciente, NuevoPaciente } from "../types/Paciente";
+// src/services/pacientesService.ts
+const BASE_URL = "http://localhost:3000";
 
-const STORAGE_KEY = "pacientes_mock";
-
-function load(): Paciente[] {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) return JSON.parse(raw) as Paciente[];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(pacientesSeed));
-  return pacientesSeed as Paciente[];
-}
-
-function save(data: Paciente[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function nextId(data: Paciente[]) {
-  return data.length ? Math.max(...data.map((p) => p.persona.id)) + 1 : 1;
-}
-
-export async function getPacientes(): Promise<Paciente[]> {
-  return load();
-}
-
-export async function getPacienteById(id: number): Promise<Paciente | null> {
-  const data = load();
-  return data.find((p) => p.persona.id === id) || null;
-}
-
-export async function buscarPacientes(query: string): Promise<Paciente[]> {
-  const s = query.toLowerCase();
-  const data = load();
-  return data.filter((p) => {
-    const nombre = p.persona.nombre.toLowerCase();
-    const apellido = p.persona.apellido.toLowerCase();
-    const correo = p.user?.correo?.toLowerCase() || "";
-    const dni = p.persona.dni;
-    return (
-      nombre.includes(s) ||
-      apellido.includes(s) ||
-      correo.includes(s) ||
-      dni.includes(query)
-    );
-  });
+export interface Paciente {
+  id: number;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  telefono?: string;
+  correo?: string;
+  direccion?: string;
+  fechaNac?: string;
 }
 
 /**
- * Crea paciente + usuario con password generada (apellido + año fechaNac).
- * Retorna el paciente creado para poder mostrar credenciales en UI.
+ * Obtiene la lista de pacientes desde /expediente
+ * y la transforma al formato que usa el frontend.
  */
-export async function crearPaciente(data: NuevoPaciente): Promise<Paciente> {
-  const all = load();
+export async function getPacientes(): Promise<Paciente[]> {
+  try {
+    const res = await fetch(`${BASE_URL}/expediente`);
+    const json = await res.json();
 
-  // Duplicados básicos
-  const dniNorm = data.dni.replace(/\D/g, "");
-  const telNorm = data.telefono.replace(/\D/g, "");
-  const correoNorm = data.correo.trim().toLowerCase();
+    // Manejar dos posibles formatos:
+    const expedientes = Array.isArray(json) ? json : json.data;
 
-  if (all.some((p) => p.persona.dni === dniNorm)) {
-    throw new Error("Ya existe un paciente con ese DNI");
+    if (!Array.isArray(expedientes)) return [];
+
+    // Transformamos expedientes a pacientes
+    return expedientes
+      .filter((exp) => exp.paciente) // Nos aseguramos que exista paciente
+      .map((exp) => {
+        const p = exp.paciente;
+        return {
+          id: p.id ?? exp.pacienteId ?? 0,
+          nombre: p.nombre,
+          apellido: p.apellido,
+          dni: p.dni,
+          telefono: p.telefono || "",
+          correo: p.correo || "",
+          direccion: p.direccion || "",
+          fechaNac: p.fechaNac || "",
+        };
+      });
+  } catch (err) {
+    console.error("Error cargando pacientes:", err);
+    return [];
   }
-  if (all.some((p) => (p.user?.correo || "").toLowerCase() === correoNorm)) {
-    throw new Error("Ya existe un usuario con ese correo");
-  }
+}
 
-  const id = nextId(all);
-  const now = new Date().toISOString();
-  const year = new Date(data.fechaNac).getFullYear();
-  const pass = `${data.apellido.toLowerCase()}${year}`;
 
-  const nuevo: Paciente = {
-    persona: {
-      id,
-      nombre: data.nombre,
-      apellido: data.apellido,
-      dni: dniNorm,
-      telefono: telNorm,
-      direccion: data.direccion || "",
-      fechaNac: data.fechaNac,
-      createdAt: now,
-      updatedAt: now,
-    },
-    user: {
-      id,
-      correo: correoNorm,
-      password: pass,
-      rol: "CLIENTE",
-      activo: true,
-      personaId: id,
-      createdAt: now,
-      updatedAt: now,
-    },
-  };
-
-  all.push(nuevo);
-  save(all);
-  return nuevo;
-
-  /* BACKEND REAL (ejemplo):
-  const res = await fetch("/api/pacientes", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Error al crear paciente");
-  return res.json();
-  */
+export async function getPacienteById(id: number): Promise<Paciente | null> {
+  const pacientes = await getPacientes();
+  return pacientes.find((p) => p.id === id) || null;
 }

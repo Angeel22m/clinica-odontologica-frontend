@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { getPacienteById } from "../../services/pacientesService";
-import type { Paciente } from "../../types/Paciente";
+import { getPacienteById } from "../services/pacientesService";
+import type { Paciente } from "../types/Paciente";
 
 const PacienteDetalle: React.FC = () => {
   const { id } = useParams();

@@ -10,8 +10,10 @@ import PacienteFormPage from '../pages/pacientes/pacienteFormPage';
 
 // Placeholders opcionales a futuro:
 import PacienteDetallePage from '../pages/pacientes/PacienteDetallePage';
-import PacienteCitasPage from '../pages/pacientes/PacienteCitasPage';
-import NuevaCitaPage from '../pages/pacientes/NuevaCitaPage';
+
+// Deshabilitados temporalmente
+// import PacienteCitasPage from '../pages/pacientes/PacienteCitasPage';
+// import NuevaCitaPage from '../pages/pacientes/NuevaCitaPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -27,8 +29,12 @@ const AppRoutes: React.FC = () => {
       <Route path="/pacientes" element={<PacientesPage />} />
       <Route path="/pacientes/nuevo" element={<PacienteFormPage />} />
       <Route path="/pacientes/:id" element={<PacienteDetallePage />} />
-      <Route path="/pacientes/:id/citas" element={<PacienteCitasPage />} />
-      <Route path="/pacientes/:id/citas/nueva" element={<NuevaCitaPage />} />
+
+      {/*Citas deshabilitadas para este sprint */}
+      {/*
+        <Route path="/pacientes/:id/citas" element={<PacienteCitasPage />} />
+        <Route path="/pacientes/:id/citas/nueva" element={<NuevaCitaPage />} />
+      */}
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getPacientes } from "../../services/pacientesService";
 import type { Paciente } from "../../types/Paciente";
 
@@ -12,20 +12,31 @@ const PacientesPage: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       const data = await getPacientes();
-      setPacientes(data);
+      setPacientes(data ?? []);
       setLoading(false);
     };
     load();
   }, []);
 
+  // ✅ Detectar si una columna tiene datos reales
+  const colHas = {
+    dni: pacientes.some((p) => !!p.dni?.trim()),
+    telefono: pacientes.some((p) => !!p.telefono?.trim()),
+    correo: pacientes.some((p) => !!p.correo?.trim()),
+    direccion: pacientes.some((p) => !!p.direccion?.trim()),
+    fechaNac: pacientes.some((p) => !!p.fechaNac?.trim()),
+  };
+
   const filtered = useMemo(() => {
     if (!q.trim()) return pacientes;
+
     const s = q.toLowerCase();
-    return pacientes.filter((p) => {
-      const nombre = p.persona.nombre.toLowerCase();
-      const apellido = p.persona.apellido.toLowerCase();
-      const correo = p.user?.correo?.toLowerCase() || "";
-      const dni = p.persona.dni;
+
+    return (pacientes ?? []).filter((p) => {
+      const nombre = (p.nombre ?? "").toLowerCase();
+      const apellido = (p.apellido ?? "").toLowerCase();
+      const correo = (p.correo ?? "").toLowerCase();
+      const dni = p.dni ?? "";
       return (
         nombre.includes(s) ||
         apellido.includes(s) ||
@@ -40,11 +51,9 @@ const PacientesPage: React.FC = () => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-light border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-primary">
-              Gestión de Pacientes
-            </h1>
-          </div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-primary">
+            Gestión de Pacientes con Expediente Creado
+          </h1>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             <input
@@ -54,12 +63,12 @@ const PacientesPage: React.FC = () => {
               placeholder="Buscar por nombre, apellido, DNI o correo"
               className="flex-1 md:w-[420px] border border-primary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
             />
-            <Link
-              to="/pacientes/nuevo"
+            <button
+              onClick={() => navigate("/pacientes/nuevo")}
               className="whitespace-nowrap bg-accent hover:bg-accent/90 text-white font-medium px-4 py-2 rounded-lg shadow"
             >
               Nuevo Paciente
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -87,57 +96,50 @@ const PacientesPage: React.FC = () => {
                     <th className="py-3 px-4">ID</th>
                     <th className="py-3 px-4">Nombre</th>
                     <th className="py-3 px-4">Apellido</th>
-                    <th className="py-3 px-4">DNI</th>
-                    <th className="py-3 px-4">Teléfono</th>
-                    <th className="py-3 px-4">Correo</th>
-                    <th className="py-3 px-4">Estado</th>
+                    {colHas.dni && <th className="py-3 px-4">DNI</th>}
+                    {colHas.telefono && <th className="py-3 px-4">Teléfono</th>}
+                    {colHas.correo && <th className="py-3 px-4">Correo</th>}
+                    {colHas.direccion && (
+                      <th className="py-3 px-4">Dirección</th>
+                    )}
+                    {colHas.fechaNac && (
+                      <th className="py-3 px-4">Nacimiento</th>
+                    )}
                     <th className="py-3 px-4 text-center">Acciones</th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-100 text-sm">
                   {filtered.map((p) => (
-                    <tr key={p.persona.id} className="hover:bg-gray-50">
-                      <td className="py-3 px-4">{p.persona.id}</td>
-                      <td className="py-3 px-4">{p.persona.nombre}</td>
-                      <td className="py-3 px-4">{p.persona.apellido}</td>
-                      <td className="py-3 px-4">{p.persona.dni}</td>
-                      <td className="py-3 px-4">{p.persona.telefono}</td>
-                      <td className="py-3 px-4">{p.user?.correo || "-"}</td>
-                      <td className="py-3 px-4">
-                        {p.user?.activo ? (
-                          <span className="text-green-600 font-medium">Activo</span>
-                        ) : (
-                          <span className="text-red-600 font-medium">Inactivo</span>
-                        )}
-                      </td>
+                    <tr key={p.id} className="hover:bg-gray-50">
+                      <td className="py-3 px-4">{p.id}</td>
+                      <td className="py-3 px-4">{p.nombre || "-"}</td>
+                      <td className="py-3 px-4">{p.apellido || "-"}</td>
+                      {colHas.dni && <td className="py-3 px-4">{p.dni}</td>}
+                      {colHas.telefono && (
+                        <td className="py-3 px-4">{p.telefono}</td>
+                      )}
+                      {colHas.correo && (
+                        <td className="py-3 px-4">{p.correo}</td>
+                      )}
+                      {colHas.direccion && (
+                        <td className="py-3 px-4">{p.direccion}</td>
+                      )}
+                      {colHas.fechaNac && (
+                        <td className="py-3 px-4">{p.fechaNac}</td>
+                      )}
+
+                      {/* Acciones */}
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-center gap-2 flex-wrap">
                           <button
-                            onClick={() => navigate(`/pacientes/${p.persona.id}`)}
+                            onClick={() => navigate(`/pacientes/${p.id}`)}
                             className="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-white transition"
                           >
                             Ver
                           </button>
-                          <button
-                            onClick={() => navigate(`/pacientes/${p.persona.id}`)}
-                            className="px-3 py-1.5 rounded-lg border border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white transition"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={() => navigate(`/pacientes/${p.persona.id}/citas`)}
-                            className="px-3 py-1.5 rounded-lg border border-sky-500 text-sky-600 hover:bg-sky-500 hover:text-white transition"
-                          >
-                            Ver Citas
-                          </button>
-                          <button
-                            onClick={() =>
-                              navigate(`/pacientes/${p.persona.id}/citas/nueva`)
-                            }
-                            className="px-3 py-1.5 rounded-lg border border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white transition"
-                          >
-                            Crear Cita
-                          </button>
+
+                          
                         </div>
                       </td>
                     </tr>
