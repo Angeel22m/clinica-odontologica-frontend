@@ -13,7 +13,7 @@ export default function LoginPage() {
       });
 
       const data = response.data;
-
+      console.log(response.data);
       if (data.code === 0) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));

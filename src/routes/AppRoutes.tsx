@@ -4,7 +4,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
-import ExpedientePorDoctor from '../pages/ExpedientesPorDoctor';
 import HistorialdelPaciente from '../pages/HistorialdelPaciente';
 
 import RegisterPage from '../pages/RegisterPage'
@@ -14,6 +13,7 @@ import HomePage from '../pages/HomePage';
 import LandingPage from '../pages/LandingPage';
 import PublicServicesPage from '../pages/ServicesPage'
 import ExpedientesPagePorDoctor from '../pages/ExpedientePorDoctorPage'
+import EmpleadosPage from '../pages/administracionEmpleados/empleadosPage'
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -28,7 +28,9 @@ const AppRoutes: React.FC = () => {
       <Route path="/Historial" element={<HistorialdelPaciente />} />
       <Route path="/landing" element={<LandingPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
+      <Route path="/empleados" element={<EmpleadosPage />} />
       <Route path="/expedientes/doctor" element={<ExpedientesPagePorDoctor doctorId={1} />} />
+
     </Routes>
   );
 };

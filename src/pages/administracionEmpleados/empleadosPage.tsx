@@ -22,49 +22,77 @@ export default function EmpleadosPage() {
   }, []);
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold mb-2">Administración de Empleados</h1>
-      <p className="text-gray-500 mb-6">
+    <div className="p-8 bg-light min-h-screen text-primary">
+  {/* Encabezado */}
+  <div className="flex justify-between items-center mb-8">
+    <div>
+      <h1 className="text-4xl font-bold mb-2 text-primary">
+        Administración de Empleados
+      </h1>
+      <p className="text-primary/70">
         Crea, edita y gestiona los empleados de la clínica.
       </p>
+    </div>
 
-      <div className="flex justify-between mb-4">
-        <input
-          className="w-2/3 border rounded-lg px-4 py-2"
-           placeholder="Buscar por nombre, apellido o DNI"
-           value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-      />    
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
-          onClick={() => {
-            setEmpleadoEdit(null);
-            setModalOpen(true);
-          }}
-        >
-          Nuevo empleado
-        </button>
-      </div>
+    <button
+      className="btn-nueva-consulta shadow-md"
+      onClick={() => {
+        setEmpleadoEdit(null);
+        setModalOpen(true);
+      }}
+    >
+      + Nuevo empleado
+    </button>
+  </div>
 
-      <ListaEmpleados
-  empleados={empleados}
-  filtro={filtro}
-  onEditar={(e) => {
-    setEmpleadoEdit(e);
-    setModalOpen(true);
-  }}
-/>
+  {/* Contenedor principal */}
+  <div className="bg-light border border-primary/10 shadow-md rounded-xl p-6">
+    <div className="flex justify-between mb-4">
+      <input
+        className="w-2/3 border border-primary/20 rounded-lg px-4 py-2 text-primary bg-light focus:outline-none focus:border-info focus:ring-2 focus:ring-info/40 transition-all duration-300"
+        placeholder="Buscar por nombre, apellido o DNI"
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
+      />
 
+      <button
+        className="btn-accent shadow-sm"
+        onClick={() => {
+          setEmpleadoEdit(null);
+          setModalOpen(true);
+        }}
+      >
+        Nuevo empleado
+      </button>
+    </div>
 
-      {modalOpen && (
+    <ListaEmpleados
+      empleados={empleados}
+      filtro={filtro}
+      onEditar={(e) => {
+        setEmpleadoEdit(e);
+        setModalOpen(true);
+      }}
+    />
+  </div>
+
+  {/* Modal */}
+  {modalOpen && (
+    <div className="overlay-dark fixed inset-0 flex justify-center items-center">
+      <div className="bg-light rounded-xl p-6 shadow-xl animate-slide-in w-[90%] max-w-lg border border-primary/10">
         <EmpleadoModal
           empleadoSeleccionado={empleadoEdit}
           onClose={() => setModalOpen(false)}
           onSaved={() => {
             setModalOpen(true);
             cargar();
-          } } visible={true}        />
-      )}
+          }}
+          visible={true}
+        />
+      </div>
     </div>
+  )}
+</div>
+
   );
 }
