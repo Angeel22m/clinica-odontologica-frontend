@@ -13,6 +13,7 @@ import PacienteDetallePage from '../pages/pacientes/PacienteDetallePage';
 
 
 import ExpedientePorDoctorPage from "../pages/ExpedientePorDoctorPage"
+import AdminServicesPage from '../pages/AdminServicesPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -37,6 +38,7 @@ const AppRoutes: React.FC = () => {
       */}
 
       {/* 404 */}
+      <Route path="/admin/services" element={<AdminServicesPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
