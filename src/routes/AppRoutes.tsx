@@ -11,9 +11,8 @@ import PacienteFormPage from '../pages/pacientes/pacienteFormPage';
 // Placeholders opcionales a futuro:
 import PacienteDetallePage from '../pages/pacientes/PacienteDetallePage';
 
-// Deshabilitados temporalmente
-// import PacienteCitasPage from '../pages/pacientes/PacienteCitasPage';
-// import NuevaCitaPage from '../pages/pacientes/NuevaCitaPage';
+
+import ExpedientePorDoctorPage from "../pages/ExpedientePorDoctorPage"
 
 const AppRoutes: React.FC = () => {
   return (
@@ -23,6 +22,7 @@ const AppRoutes: React.FC = () => {
 
       {/* Rutas existentes */}
       <Route path="/expedientes" element={<ExpedientesPage />} />
+      <Route path="/expedientes/doctor" element={<ExpedientePorDoctorPage doctorId={1}/>} />
       <Route path="/dashboard" element={<DashboardPage />} />
 
       {/* Pacientes */}
