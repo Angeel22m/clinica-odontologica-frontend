@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "personaId": 21,
+    "nombre": "Laura",
+    "apellido": "Hernandez",
+    "puesto": "DOCTOR",
+    "activo": true
+  },
+  {
+    "id": 2,
+    "personaId": 22,
+    "nombre": "Miguel",
+    "apellido": "Santos",
+    "puesto": "DOCTOR",
+    "activo": true
+  },
+  {
+    "id": 3,
+    "personaId": 25,
+    "nombre": "Elena",
+    "apellido": "Suarez",
+    "puesto": "DOCTOR",
+    "activo": true
+  }
+]
