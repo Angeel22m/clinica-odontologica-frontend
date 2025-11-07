@@ -57,3 +57,6 @@
 .bg-success {
   background-color: var(--color-success);
 }
+.overlay-dark {
+  background-color: rgba(0,0,0,0.6);
+}
