@@ -1,7 +1,7 @@
-export interface Service {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    status: "Activo" | "Inactivo"
+export default interface Service {
+    id?: number;
+    nombre: string;
+    descripcion: string;
+    precio: number;
+    activo: boolean; 
 }
