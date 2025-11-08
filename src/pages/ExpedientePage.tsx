@@ -7,7 +7,7 @@ import PatientDetails from '../components/PatientDetails';
 import LogoutButton from '../components/LogoutButton';
 
 const ExpedientesPage: React.FC = () => {
-  const [expedientes, setExpedientes] = useState<Expediente[]>([]);
+  const [expedientes, setExpediente] = useState<Expediente[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [history, setHistory] = useState<ClinicalRecord[] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +17,7 @@ const ExpedientesPage: React.FC = () => {
   useEffect(() => {
     setIsLoadingList(true);
     fetchExpedientes().then(data => {
-      setExpedientes(data);
+      setExpediente(data);
       setIsLoadingList(false);
       if (data.length > 0) setSelectedPatientId(data[0].pacienteId);
     }).catch(() => setIsLoadingList(false));
@@ -50,12 +50,15 @@ const ExpedientesPage: React.FC = () => {
   }, [expedientes, searchTerm]);
 
   const selectedExpediente = expedientes.find(e => e.pacienteId === selectedPatientId);
+  const handleLogout = () => {
+    console.log("Logout"); // Reemplazar por lógica real
+  };
 
   return (
     <div className="h-screen bg-light font-sans p-4 md:p-8 flex flex-col">
   {/* Header fijo */}
   <header className="mb-4 text-center sticky top-0 bg-light z-20">
-    <LogoutButton onLogout={() => console.log('Logout')} />
+    <LogoutButton onLogout={handleLogout} />
     <h1 className="text-4xl font-extrabold text-primary tracking-tight">
       Sistema de Expedientes Clínicos
     </h1>

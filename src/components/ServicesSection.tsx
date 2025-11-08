@@ -38,7 +38,7 @@ const ServicesSection = () => {
         </div>
 
         <a
-  href="/servicios" // o "#servicios" si es ancla en la misma página
+  href="/services" // o "#servicios" si es ancla en la misma página
   className="inline-block px-6 py-3 btn-primary rounded-md hover:bg-accent transition-colors"
 >
   Ver todos los servicios

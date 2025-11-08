@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
     nombre: "",
@@ -173,20 +173,14 @@ export default function RegisterForm() {
           <button
             type="button"
             onClick={() => (window.location.href = "/landing")}
-            className="flex-1 border border-primary text-primary p-2.5 rounded-xl hover:bg-primary hover:text-light transition text-base font-semibold"
+            className="flex-1 border border-primary text-ligth p-2.5 rounded-xl hover:bg-primary hover:text-light transition text-base font-semibold"
           >
             Cancelar
           </button>
         </div>
 
         <div className="mt-4 text-center">
-          <button
-            type="button"
-            className="text-info hover:underline text-sm"
-            onClick={() => alert("Redirigir a iniciar sesión")}
-          >
-            ¿Ya tienes cuenta? Inicia sesión aquí
-          </button>
+          <Link to="/login" className="text-info hover:underline text-sm cursor-pointer">¿Ya tienes cuenta? Inicia sesión aquí</Link>          
         </div>
       </form>
     </div>

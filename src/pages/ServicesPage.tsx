@@ -65,7 +65,7 @@ const PublicServiciosPage = () => {
                   Precio: ${servicio.precio}
                 </p>
                 
-                <a className="mt-4 bg-accent text-light py-2 px-4 rounded-xl hover:bg-info trainsition-colores cursor-pointer" onClick={()=>{setServicioSeleccionado(servicio);setModalOpen(true);}}>Agendar cita</a>
+                <a className="btn-primary" onClick={()=>{setServicioSeleccionado(servicio);setModalOpen(true);}}>Agendar cita</a>
               </div>
             ))}
           </div>
@@ -86,7 +86,7 @@ const PublicServiciosPage = () => {
       <p className="text-primary mb-4">{servicioSeleccionado?.descripcion}</p>
       <div className="flex justify-center">
       <button
-        className="bg-success text-light py-2 px-4 rounded-xl hover:bg-green-600 transition-colors"
+        className="btn-primary text-light py-2 px-4 rounded-xl hover:bg-green-600 transition-colors"
         onClick={() => {
           console.log("Cita agendada para", servicioSeleccionado.id);
           setModalOpen(false);
