@@ -97,7 +97,8 @@ export default function EmpleadoModal({
   if (Array.isArray(mensaje)) {
     alert(mensaje.join("\n"));
   } else {
-    alert(mensaje || "Error al guardar empleado");
+    console.log(error.response.data)
+    alert(mensaje);
     console.error("Error al guardar empleado:", error);
   }
 }
