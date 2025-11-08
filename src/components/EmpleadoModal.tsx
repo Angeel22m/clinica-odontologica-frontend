@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { CrearEmpleadoDTO, ActualizarEmpleadoDTO, EmpleadoResponse } from "../types/empleado";
 import { crearEmpleado, actualizarEmpleado } from "../services/empleadosService";
 
+
 type Props = {
   visible: boolean;
   onClose: () => void;
@@ -65,7 +66,7 @@ export default function EmpleadoModal({
         fechaIngreso: "",
         activo: true,
         usuarioActivo: true,
-      });
+      },);
     }
   }, [empleadoSeleccionado]);
 
@@ -98,6 +99,7 @@ export default function EmpleadoModal({
     alert(mensaje.join("\n"));
   } else {
     alert(mensaje || "Error al guardar empleado");
+    console.log(error.reponse.data)
     console.error("Error al guardar empleado:", error);
   }
 }

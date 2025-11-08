@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { obtenerEmpleados } from "../../services/empleadosService";
 import {ListaEmpleados} from "../../components/listaEmpleados";
 import EmpleadoModal from "../../components/EmpleadoModal";
+import LogoutButton from "../../components/LogoutButton"
 import type { EmpleadoResponse } from "../../types/empleado";
 
 
@@ -15,6 +16,9 @@ export default function EmpleadosPage() {
   const cargar = async () => {
     const data = await obtenerEmpleados();
     setEmpleados(data);
+  };
+  const handleLogout = () => {
+    console.log("Logout"); // Reemplazar por lógica real
   };
 
   useEffect(() => {
@@ -34,15 +38,7 @@ export default function EmpleadosPage() {
       </p>
     </div>
 
-    <button
-      className="btn-nueva-consulta shadow-md"
-      onClick={() => {
-        setEmpleadoEdit(null);
-        setModalOpen(true);
-      }}
-    >
-      + Nuevo empleado
-    </button>
+    <LogoutButton onLogout={handleLogout} />
   </div>
 
   {/* Contenedor principal */}
@@ -65,7 +61,7 @@ export default function EmpleadosPage() {
         Nuevo empleado
       </button>
     </div>
-
+    
     <ListaEmpleados
       empleados={empleados}
       filtro={filtro}

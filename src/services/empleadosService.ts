@@ -19,7 +19,7 @@ export const crearEmpleado = async (data: CrearEmpleadoDTO) => {
     rol: data.puesto, // backend lo usa como rol
   };
   delete (payload as any).usuarioActivo;
-  return await api.post(BASE_URL, payload);
+  return await api.put(BASE_URL, payload);
 };
 
 export const actualizarEmpleado = async (id: number, data: ActualizarEmpleadoDTO) => {

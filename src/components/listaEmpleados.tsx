@@ -1,5 +1,5 @@
 import type { EmpleadoResponse } from "../types/empleado";
-
+import '../index.css';
 type Props = {
   empleados: EmpleadoResponse[];
   filtro: string;
@@ -26,9 +26,9 @@ export const ListaEmpleados = ({ empleados, filtro, onEditar }: Props) => {
     `L ${n}`;
 
   return (
-    <div className="bg-light border border-primary/10 rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-light border border-primary/10  max-h-96 overflow-y-auto shadow-md rounded-lg">
   <table className="w-full text-left border-collapse">
-    <thead className="bg-primary/10 text-primary text-sm font-semibold">
+    <thead className="bg-primary text-light text-sm font-semibold sticky top-0  uppercase">
       <tr>
         <th className="py-3 px-4">Nombre</th>
         <th className="py-3 px-4">Apellido</th>
