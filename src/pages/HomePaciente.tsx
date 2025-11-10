@@ -6,12 +6,12 @@ export default function HomePaciente() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold text-primary mb-6">
+      <h1 className="text-2xl font-semibold text-primary mt-4 mb-6">
         Bienvenido, [Nombre del Paciente]
       </h1>
 
       {/* Contenido principal */}
-      <div className="bg-white shadow rounded-xl p-6">
+      <div className="bg-white shadow-md rounded-xl p-6">
         <h2 className="text-xl font-medium mb-4">Tus citas</h2>
         {/* Aquí podrías listar las próximas citas o historial */}
         
