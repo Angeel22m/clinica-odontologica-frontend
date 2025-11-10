@@ -67,6 +67,7 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
           <input
             type="text"
             value={usernameOrEmail}
+            placeholder="email@ejemplo.com"
             onChange={(e) => setUsernameOrEmail(e.target.value)}
             className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-accent"
           />
@@ -77,6 +78,7 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
           <input
             type="password"
             value={password}
+            placeholder="********"
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border border-primary rounded focus:outline-none focus:ring-2 focus:ring-accent"
           />

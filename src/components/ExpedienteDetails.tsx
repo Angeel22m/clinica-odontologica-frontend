@@ -99,19 +99,31 @@ export const ExpedienteDetalle: React.FC<{ expedienteId: number; onBack: () => v
 <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-primary">
   <div className="flex items-center gap-2">
     <Heart className="w-4 h-4 text-accent" />
-    <span className="font-semibold">Alergias:</span> {expediente.alergias || 'N/A'}
+    <span className="font-semibold">Alergias:</span>
+    <div className="w-24 break-words">
+    {expediente.alergias || 'N/A'}
+    </div>
   </div>
   <div className="flex items-center gap-2">
     <BriefcaseMedical className="w-4 h-4 text-info" />
-    <span className="font-semibold">Enfermedades:</span> {expediente.enfermedades || 'N/A'}
+    <span className="font-semibold">Enfermedades:</span> 
+    <div className="w-32 break-words">
+    {expediente.enfermedades || 'N/A'}
+    </div>
   </div>
   <div className="flex items-center gap-2">
     <Pill className="w-4 h-4 text-success" />
-    <span className="font-semibold">Medicamentos:</span> {expediente.medicamentos || 'N/A'}
+    <span className="font-semibold">Medicamentos:</span>
+    <div className="w-28 break-words">
+    {expediente.medicamentos || 'N/A'}
+    </div>
   </div>
   <div className="flex items-center gap-2">
     <Stethoscope className="w-4 h-4 text-primary" />
-    <span className="font-semibold">Doctor:</span> {expediente.doctorNombre || 'N/A'}
+    <span className="font-semibold">Doctor:</span>
+    <div className="w-28 break-words">
+    {expediente.doctorNombre || 'N/A'}
+    </div>
   </div>
 </div>
 

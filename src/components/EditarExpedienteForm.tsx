@@ -38,13 +38,13 @@ const EditExpedienteForm: React.FC<EditExpedienteFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage("Expediente actualizado correctamente");
 
     try {
       await updateExpediente(expedienteId, formData);
-      setMessage("Expediente actualizado correctamente ");
       onSuccess?.();
-      setTimeout(onClose, 1000);
+      setTimeout(()=>{onClose}, 1500);
+      setMessage("")
     } catch (error) {
       console.error(error);
       setMessage("Error al actualizar el expediente ");

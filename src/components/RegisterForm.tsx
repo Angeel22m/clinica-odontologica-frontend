@@ -41,20 +41,20 @@ export default function RegisterForm() {
           nombre: formData.nombre,
           apellido: formData.apellido,
           dni: formData.dni,
-          telefono: formData.telefono || undefined,
-          direccion: formData.direccion || undefined,
-          fechaNac: formData.fechaNac || undefined,
+          telefono: formData.telefono,
+          direccion: formData.direccion,
+          fechaNac: formData.fechaNac,
           correo: formData.correo,
           password: formData.password,
         }),
       });
 
       const data = await response.json();
-
       if (!response.ok || data.code !== 10) {
         setError(data.message || "Error en el registro");
       } else {
         setSuccess("Usuario registrado con éxito");
+        window.location.href = "/login";
         setFormData({
           nombre: "",
           apellido: "",
@@ -98,11 +98,11 @@ export default function RegisterForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
           {[
-            { name: "nombre", label: "Nombre", type: "text" },
-            { name: "apellido", label: "Apellido", type: "text" },
-            { name: "dni", label: "DNI", type: "text" },
-            { name: "telefono", label: "Teléfono", type: "tel" },
-            { name: "direccion", label: "Dirección", type: "text" },
+            { name: "nombre", label: "Nombre", type: "text", placeholder: "Nombre" },
+            { name: "apellido", label: "Apellido", type: "text", placeholder: "Apellido" },
+            { name: "dni", label: "DNI", type: "text", placeholder: "XXXX-XXXX-XXXXX" },
+            { name: "telefono", label: "Teléfono", type: "tel", placeholder: "+504 XXXX-XXXX" },
+            { name: "direccion", label: "Dirección", type: "text", placeholder: "Direccion completa" },
             { name: "fechaNac", label: "Fecha de nacimiento", type: "date" },
           ].map((field) => (
             <div key={field.name} className="flex flex-col">
@@ -118,6 +118,8 @@ export default function RegisterForm() {
                 type={field.type}
                 value={formData[field.name as keyof typeof formData]}
                 onChange={handleChange}
+                placeholder={field.placeholder}
+                required
                 className="p-1.5 border border-primary rounded-lg focus:ring-2 focus:ring-accent focus:outline-none"
               />
             </div>
@@ -132,6 +134,7 @@ export default function RegisterForm() {
             id="correo"
             name="correo"
             type="email"
+            placeholder="email@ejemplo.com"
             value={formData.correo}
             onChange={handleChange}
             className="p-1.5 border border-primary rounded-lg focus:ring-2 focus:ring-accent focus:outline-none"
@@ -140,8 +143,8 @@ export default function RegisterForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 mt-5">
           {[
-            { name: "password", label: "Contraseña", type: "password" },
-            { name: "confirmPassword", label: "Confirmar contraseña", type: "password" },
+            { name: "password", label: "Contraseña", type: "password", placeholder: "********" },
+            { name: "confirmPassword", label: "Confirmar contraseña", type: "password", placeholder: "********" },
           ].map((field) => (
             <div key={field.name} className="flex flex-col">
               <label
@@ -154,6 +157,7 @@ export default function RegisterForm() {
                 id={field.name}
                 name={field.name}
                 type={field.type}
+                placeholder={field.placeholder}
                 value={formData[field.name as keyof typeof formData]}
                 onChange={handleChange}
                 className="p-1.5 border border-primary rounded-lg focus:ring-2 focus:ring-accent focus:outline-none"
@@ -173,7 +177,7 @@ export default function RegisterForm() {
           <button
             type="button"
             onClick={() => (window.location.href = "/landing")}
-            className="flex-1 border border-primary text-ligth p-2.5 rounded-xl hover:bg-primary hover:text-light transition text-base font-semibold"
+            className="flex-1 border border-primary text-ligth p-2.5 rounded-xl hover:bg-primary hover:text-light transition text-base font-semibold cursor-pointer"
           >
             Cancelar
           </button>

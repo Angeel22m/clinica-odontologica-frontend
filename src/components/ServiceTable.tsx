@@ -24,7 +24,7 @@ export default function ServiceTable({ services, onEdit, onDelete }) {
             <td className={`service-status p-2 font-semibold ${service.activo ? "text-success" : "text-accent"}`}>{service.activo ? "Activo" : "Inactivo"}</td>
             <td className="p-2 flex space-x-2">
               <button className="button button-edit btn-primary px-2 py-1 rounded mr-2" id={`edit-service-${service.id}`} onClick={() => onEdit(service)}>Editar</button>
-              <button className="button button-delete bg-accent text-light px-2 py-1 rounded mr-2" id={`delete-service-${service.id}`} onClick={() => onDelete(service)}>Eliminar</button>
+              <button className="button button-delete bg-accent text-light px-2 py-1 rounded mr-2 cursor-pointer" id={`delete-service-${service.id}`} onClick={() => onDelete(service)}>Eliminar</button>
             </td>
           </tr>
         ))}
