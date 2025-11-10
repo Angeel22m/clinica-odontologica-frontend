@@ -69,8 +69,7 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
           <div>
             <button
               onClick={() => setSelectedId(null)}
-              className="flex items-center gap-2 mb-6 text-accent hover:text-info transition"
-            >
+              className="flex items-center gap-2 mb-6 text-accent hover:text-info transition cursor-pointer hover:scale-[1.03] transition duration-200 ease-in-out">
               <ArrowLeftCircle className="w-6 h-6" />
               <span className="font-medium">Volver a lista</span>
             </button>

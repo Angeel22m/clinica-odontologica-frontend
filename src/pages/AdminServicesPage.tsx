@@ -29,12 +29,20 @@ export default function AdminServicesPage() {
   const handleSave = async (service: Omit<ServiceType.Service, "id"> & Partial<Pick<ServiceType.Service, "id">>) => {
     try {
       if (service.id) {
-        await updateService(service.id, {
+        const {message, code} = await updateService(service.id, {
           nombre: service.nombre,
           descripcion: service.descripcion,
           precio: Math.floor(service.precio),
           activo: Boolean(service.activo),
         });
+        if (code === 2) {
+          setNotification(message);
+          return;
+        }
+        if (code === 6) {
+          setNotification(message);
+          return;
+        }
         setNotification("Servicio actualizado correctamente");
       } else {
         const {message, code} = 
@@ -72,7 +80,7 @@ export default function AdminServicesPage() {
         setNotification(data.message); 
         return;
       }
-      setNotification("Servicio eliminado correctamente");
+      setNotification(data.message);
 
       const updated = await fetchServices();
       setServices(updated.sort((a, b) => a.id - b.id));
