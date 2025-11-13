@@ -50,15 +50,12 @@ const ExpedientesPage: React.FC = () => {
   }, [expedientes, searchTerm]);
 
   const selectedExpediente = expedientes.find(e => e.pacienteId === selectedPatientId);
-  const handleLogout = () => {
-    console.log("Logout"); // Reemplazar por lógica real
-  };
 
   return (
     <div className="h-screen bg-light font-sans p-4 md:p-8 flex flex-col">
   {/* Header fijo */}
   <header className="mb-4 text-center sticky top-0 bg-light z-20">
-    <LogoutButton onLogout={handleLogout} />
+    <LogoutButton  />
     <h1 className="text-4xl font-extrabold text-primary tracking-tight">
       Sistema de Expedientes Clínicos
     </h1>
