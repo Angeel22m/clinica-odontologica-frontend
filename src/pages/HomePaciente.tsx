@@ -71,8 +71,8 @@ export default function HomePaciente() {
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="p-6 max-w-7xl mx-auto">
-      <div className="text-success text-3xl font-bold mb-2" >{`Hola, ${JSON.parse(localStorage.getItem('user')).persona.nombre}`}</div>
+      <main className="p-5 max-w-7xl mx-auto">
+      <div className="text-success text-3xl font-bold mb-3" >{`Hola, ${JSON.parse(localStorage.getItem('user')).persona.nombre}`}</div>
         <div className="grid md:grid-cols-2 gap-6">
           {/* Citas pendientes */}
           <section className="bg-white shadow-xl rounded-xl p-6 max-h-[500px] overflow-y-auto">
@@ -98,16 +98,9 @@ export default function HomePaciente() {
                   </div>
                   
                   <div className="mt-1 text-sm text-gray-600">
-                    Fecha:{" "}
+                    Fecha y Hora:{" "}
                     <span className="font-medium text-dark">
-                      {new Date(cita.fecha).toLocaleDateString()}
-                    </span>
-                  </div>
-                  
-                  <div className="mt-1 text-sm text-gray-600">
-                    Hora:{" "}
-                    <span className="font-medium text-dark">
-                      {cita.hora}
+                      {new Date(cita.fecha).toLocaleDateString()} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
                     </span>
                   </div>
                   
