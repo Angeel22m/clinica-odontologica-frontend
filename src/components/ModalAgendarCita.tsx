@@ -1,273 +1,273 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
-export default function ModalAgendarCita({ onClose }) {
+export default function ModalAgendarCita({ onClose, pacienteId }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    tipoAtencion: "",
+    servicioId: "",
     fecha: "",
     hora: "",
-    doctor: "",
+    doctorId: "",
     comentarios: "",
   });
+  
+  
 
+  const [servicios, setServicios] = useState([]);
+  const [doctoresDisponibles, setDoctoresDisponibles] = useState([]);
   const [horasDisponibles, setHorasDisponibles] = useState([]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // Función fake para simular horarios según tipo de atención y día
-  const generarHorasDisponibles = (tipo, fecha) => {
-    if (!tipo || !fecha) return [];
-
-    const dia = new Date(fecha).getDay(); // 0 = domingo
-    let horas = [];
-
-    switch (tipo) {
-      case "Consulta general":
-        horas = ["09:00", "10:00", "11:00", "14:00", "15:00"];
-        break;
-      case "Limpieza dental":
-        horas = ["09:30", "11:30", "15:00"];
-        break;
-      case "Revisión":
-        horas = ["10:00", "12:00", "16:00"];
-        break;
-      case "Ortodoncia":
-        horas = ["10:30", "13:00", "15:30"];
-        break;
-      case "Extracción":
-        horas = ["09:00", "11:00", "14:00"];
-        break;
-      case "Blanqueamiento":
-        horas = ["12:00", "14:30", "16:00"];
-        break;
-      default:
-        horas = [];
-    }
-
-    if (dia === 0) return []; // Domingo sin citas
-    if (dia === 3) return horas.filter((_, i) => i % 2 === 0); // Miércoles mitad
-
-    return horas;
-  };
-
-  // Actualizar horarios cuando cambia tipo o fecha
+  // --- Cargar servicios activos ---
   useEffect(() => {
-    const horas = generarHorasDisponibles(formData.tipoAtencion, formData.fecha);
-    setHorasDisponibles(horas);
-    if (!horas.includes(formData.hora)) {
-      setFormData({ ...formData, hora: "" });
-    }
+    const fetchServicios = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/servicios");
+        const data = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data.data)
+          ? res.data.data
+          : [];
+        setServicios(data.filter(s => s.activo === true || s.activo === "activo"));
+      } catch (err) {
+        console.error("Error al cargar servicios:", err);
+      }
+    };
+    fetchServicios();
+  }, []);
+
+  // --- Cargar doctores disponibles cuando se seleccione tipo de atención y fecha ---
+  useEffect(() => {
+    const fetchDoctores = async () => {
+      if (!formData.servicioId || !formData.fecha) {
+        setDoctoresDisponibles([]);
+        return;
+      }
+      try {
+        const res = await axios.get(`http://localhost:3000/citas/doctores-disponibles?fecha=${formData.fecha}`);
+
+        const data = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data.message)
+          ? res.data.message
+          : [];
+
+        setDoctoresDisponibles(data);
+
+        // Reset doctorId si el seleccionado no está en la lista
+        if (!data.some(d => d.id === parseInt(formData.doctorId))) {
+          setFormData(prev => ({ ...prev, doctorId: "" }));
+        }
+      } catch (err) {
+        console.error("Error al obtener doctores disponibles:", err);
+        setDoctoresDisponibles([]);
+      }
+    };
+
+    fetchDoctores();
   }, [formData.tipoAtencion, formData.fecha]);
 
+  // --- Cargar horas disponibles cuando se seleccione doctor y fecha ---
+  useEffect(() => {
+    const fetchHoras = async () => {
+      if (!formData.fecha || !formData.doctorId) {
+        setHorasDisponibles([]);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`http://localhost:3000/citas/horas-disponibles?doctorId=${formData.doctorId}&fecha=${formData.fecha}`);
+
+        const data = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data.message)
+          ? res.data.message
+          : [];
+
+        setHorasDisponibles(data);
+
+        if (!data.includes(formData.hora)) {
+          setFormData(prev => ({ ...prev, hora: "" }));
+        }
+      } catch (err) {
+        console.error("Error al obtener horas disponibles:", err);
+        setHorasDisponibles([]);
+      }
+    };
+
+    fetchHoras();
+  }, [formData.fecha, formData.doctorId]);
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   const handleNext = () => {
-    if (!formData.tipoAtencion || !formData.fecha || !formData.hora) {
-      alert("Por favor completa los campos obligatorios.");
+    if (!formData.servicioId || !formData.fecha || !formData.hora || !formData.doctorId) {
+      alert("Por favor completa todos los campos obligatorios.");
       return;
     }
     setStep(2);
   };
 
   const handleBack = () => setStep(1);
-
-  const handleConfirm = () => {
-    alert("✅ Cita creada exitosamente");
-    onClose();
+  
+  console.log(parseInt(formData.servicioId));
+  console.log(formData.fecha);
+  console.log(formData.hora);
+  console.log(parseInt(formData.doctorId));
+  console.log(formData.comentarios)
+  console.log(JSON.parse(localStorage.getItem('user')).persona.id)
+  
+  const handleConfirm = async () => {
+    try {
+      const payload = {
+        servicioId: parseInt(formData.servicioId),
+        fecha: formData.fecha,
+        hora: formData.hora,
+        doctorId: parseInt(formData.doctorId),
+        pacienteId: JSON.parse(localStorage.getItem('user')).persona.id,
+      };
+      const res = await axios.post("http://localhost:3000/citas", payload);
+      
+      if (res.data.code === 0) {
+        alert("✅ Cita creada exitosamente");
+        onClose();
+      } else {
+        alert("Error: " + res.data.message);
+      }
+    } catch (err) {
+      
+      console.error("Error al crear cita:", err);
+      alert("Error al crear cita");
+    }
   };
 
   return (
-    <div className="">
-      <div className="fixed inset-0 overlay-dark flex items-center justify-center z-50">
-        <motion.div
-          layout
-          className="bg-light rounded-2xl shadow-lg w-full max-w-lg p-6 relative"
-        >
-          <h2 className="text-2xl font-semibold text-primary mb-4 text-center">
-            {step === 1 ? "Agendar Cita" : "Confirmar Cita"}
-          </h2>
+    <div className="fixed inset-0 overlay-dark flex items-center justify-center z-50">
+      <motion.div
+        layout
+        className="bg-light rounded-2xl shadow-lg w-full max-w-lg p-6 relative"
+      >
+        <h2 className="text-2xl font-semibold text-primary mb-4 text-center">
+          {step === 1 ? "Agendar Cita" : "Confirmar Cita"}
+        </h2>
 
-          <AnimatePresence mode="wait">
-            {step === 1 ? (
-              <motion.div
-                key="step1"
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -30, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-4"
-              >
-                {/* Tipo de atención */}
-                <div>
-                  <label className="block text-md font-medium text-primary/70">
-                    Tipo de atención *
-                  </label>
-                  <select
-                    name="tipoAtencion"
-                    className="w-full border rounded-lg p-2 mt-1"
-                    value={formData.tipoAtencion}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccione...</option>
-                    <option value="Consulta general">Consulta general</option>
-                    <option value="Limpieza dental">Limpieza dental</option>
-                    <option value="Revisión">Revisión</option>
-                    <option value="Ortodoncia">Ortodoncia</option>
-                    <option value="Extracción">Extracción</option>
-                    <option value="Blanqueamiento">Blanqueamiento</option>
-                  </select>
-                </div>
+        <AnimatePresence mode="wait">
+          {step === 1 ? (
+            <motion.div
+              key="step1"
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -30, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              {/* Tipo de atención */}
+              <div>
+                <label className="block text-md font-medium text-primary/70">Tipo de atención *</label>
+                <select
+                  name="servicioId"
+                  className="w-full border rounded-lg p-2 mt-1"
+                  value={formData.servicioId}
+                  onChange={handleChange}
+                >
+                  <option value="">Seleccione...</option>
+                  {servicios.map(serv => (
+                    <option key={serv.id} value={serv.id}>{serv.nombre}</option>
+                  ))}
+                </select>
+              </div>
 
-                {/* Fecha */}
-                <div>
-                  <label className="block text-md font-medium text-primary/70">
-                    Fecha *
-                  </label>
-                  <input
-                    type="date"
-                    name="fecha"
-                    className="w-full border rounded-lg p-2 mt-1"
-                    value={formData.fecha}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split("T")[0]}
-                  />
-                </div>
+              {/* Fecha */}
+              <div>
+                <label className="block text-md font-medium text-primary/70">Fecha *</label>
+                <input
+                  type="date"
+                  name="fecha"
+                  className="w-full border rounded-lg p-2 mt-1"
+                  value={formData.fecha}
+                  onChange={handleChange}
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </div>
 
-                {/* Horarios disponibles */}
-                <div>
-                  <label className="block text-md font-medium text-primary/70">
-                    Horas disponibles *
-                  </label>
+              {/* Doctor */}
+              <div>
+                <label className="block text-md font-medium text-primary/70">Doctor *</label>
+                <select
+                  name="doctorId"
+                  className="w-full border rounded-lg p-2 mt-1"
+                  value={formData.doctorId}
+                  onChange={handleChange}
+                >
+                  <option value="">Seleccione...</option>
+                  {Array.isArray(doctoresDisponibles) && doctoresDisponibles.map(doc => (
+                    <option key={doc.id} value={doc.id}>{doc.nombre}</option>
+                  ))}
+                </select>
+              </div>
 
-                  {formData.tipoAtencion && formData.fecha ? (
-                    horasDisponibles.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-2 mt-2">
-                        {horasDisponibles.map((hora) => (
-                          <button
-                            key={hora}
-                            type="button"
-                            className={`p-2 rounded-lg border transition 
-                              ${
-                                formData.hora === hora
-                                  ? "bg-blue-500 text-white border-blue-600"
-                                  : "bg-white text-primary border-primary/30 hover:bg-blue-50"
-                              }`}
-                            onClick={() =>
-                              setFormData({ ...formData, hora })
-                            }
-                          >
-                            {hora}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 mt-2">
-                        No hay horarios disponibles para esta fecha.
-                      </p>
-                    )
-                  ) : (
-                    <p className="text-sm text-gray-500 mt-2">
-                      Seleccione tipo y fecha para ver disponibilidad.
-                    </p>
-                  )}
-                </div>
+              {/* Horas disponibles */}
+              <div>
+                <label className="block text-md font-medium text-primary/70">Horas disponibles *</label>
+                {Array.isArray(horasDisponibles) && horasDisponibles.length > 0 ? (
+                  <div className="grid grid-cols-4 gap-2 mt-2">
+                    {horasDisponibles.map(hora => (
+                      <button
+                        key={hora}
+                        type="button"
+                        className={`p-2 rounded-lg border transition cursor-pointer ${
+                          formData.hora === hora
+                            ? "bg-info text-light"
+                            : "bg-white text-primary border-primary/30 hover:bg-info"
+                        }`}
+                        onClick={() => setFormData(prev => ({ ...prev, hora }))}
+                      >
+                        {hora.slice(1).replace('_', ':')}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 mt-2">Seleccione fecha y doctor para ver horarios disponibles.</p>
+                )}
+              </div>
 
-                {/* Doctor */}
-                <div>
-                  <label className="block text-md font-medium text-primary/70">
-                    Doctor (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    name="doctor"
-                    className="w-full border rounded-lg p-2 mt-1"
-                    placeholder="Ej. Dra. López"
-                    value={formData.doctor}
-                    onChange={handleChange}
-                  />
-                </div>
+              {/* Comentarios */}
+              
+              
+              
 
-                {/* Comentarios */}
-                <div>
-                  <label className="block text-md font-medium text-primary/70">
-                    Comentarios (opcional)
-                  </label>
-                  <textarea
-                    name="comentarios"
-                    rows="2"
-                    className="w-full border rounded-lg p-2 mt-1"
-                    placeholder="Ej. dolor en muela izquierda..."
-                    value={formData.comentarios}
-                    onChange={handleChange}
-                  />
-                </div>
+              {/* Botones */}
+              <div className="flex justify-between mt-4">
+                <button onClick={onClose} className="btn-primary bg-primary/10 text-primary hover:bg-primary/10">Cancelar</button>
+                <button onClick={handleNext} className="btn-primary bg-success text-light hover:bg-success/90">Siguiente ➜</button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="step2"
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 50, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="space-y-2 mb-4">
+                <p><strong>Tipo de atención:</strong> {servicios.find(s=>s.id === parseInt(formData.servicioId))?.nombre}</p>
+                <p><strong>Fecha:</strong> {formData.fecha}</p>
+                <p><strong>Hora:</strong> {formData.hora.slice(1).replace('_', ':')}</p>
+                <p><strong>Doctor:</strong> {doctoresDisponibles.find(d => d.id === parseInt(formData.doctorId))?.nombre}</p>
+                {formData.comentarios && <p><strong>Comentarios:</strong> {formData.comentarios}</p>}
+              </div>
 
-                {/* Botones */}
-                <div className="flex justify-between mt-4">
-                  <button
-                    onClick={onClose}
-                    className="btn-primary bg-primary/10 text-primary hover:bg-primary/20"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    className="btn-primary bg-success text-light hover:bg-success/90"
-                  >
-                    Siguiente ➜
-                  </button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="step2"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 50, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="space-y-2 mb-4">
-                  <p>
-                    <strong>Tipo de atención:</strong> {formData.tipoAtencion}
-                  </p>
-                  <p>
-                    <strong>Fecha:</strong> {formData.fecha}
-                  </p>
-                  <p>
-                    <strong>Hora:</strong> {formData.hora}
-                  </p>
-                  {formData.doctor && (
-                    <p>
-                      <strong>Doctor:</strong> {formData.doctor}
-                    </p>
-                  )}
-                  {formData.comentarios && (
-                    <p>
-                      <strong>Comentarios:</strong> {formData.comentarios}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex justify-between mt-6">
-                  <button
-                    onClick={handleBack}
-                    className="btn-primary bg-primary/10 text-primary hover:bg-primary/20"
-                  >
-                    ← Volver
-                  </button>
-                  <button
-                    onClick={handleConfirm}
-                    className="btn-primary bg-success text-light hover:bg-success/90"
-                  >
-                    Confirmar cita
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+              <div className="flex justify-between mt-6">
+                <button onClick={handleBack} className="btn-primary bg-primary/10 text-primary hover:bg-primary/20">← Volver</button>
+                <button onClick={handleConfirm} className="btn-primary bg-success text-light hover:bg-success/90">Confirmar cita</button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
