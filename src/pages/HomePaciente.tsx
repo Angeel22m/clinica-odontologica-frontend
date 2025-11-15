@@ -1,12 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModalAgendarCita from "../components/ModalAgendarCita";
 import { FiMenu } from "react-icons/fi";
 import { FiBell } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
 export default function HomePaciente() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [citasPendientes, setCitasPendientes] = useState([]);
+  
+  useEffect(() => {
+    const fetchCitasPendientes = async () => {
+    const pacienteId = JSON.parse(localStorage.getItem('user')).id
+      try {
+        const res = await axios.get(`http://localhost:3000/citas/paciente/${pacienteId}`);
+        
+        setCitasPendientes(Array.isArray(res.data) ? res.data : []);
+        
+      } catch (err) {
+        console.error('error al cargar las citas pendientes', err);
+      }
+    };
+    fetchCitasPendientes(); 
+  }, [])
 
   return (
     <div className="min-h-screen bg-light text-primary">
@@ -58,17 +75,53 @@ export default function HomePaciente() {
       <div className="text-success text-3xl font-bold mb-2" >{`Hola, ${JSON.parse(localStorage.getItem('user')).persona.nombre}`}</div>
         <div className="grid md:grid-cols-2 gap-6">
           {/* Citas pendientes */}
-          <section className="bg-white shadow-lg rounded-xl p-6">
+          <section className="bg-white shadow-xl rounded-xl p-6 max-h-[500px] overflow-y-auto">
             <h2 className="text-xl font-medium mb-3">
               Citas pendientes de asistir
             </h2>
-            <div className="bg-primary/5 rounded-lg p-6 text-center">
-              (Aquí van las citas pendientes...)
+            { citasPendientes.length > 0 ? (
+            <div className="flex flex-col gap-4">
+              { citasPendientes.map(cita => (
+                <div
+                  key = {cita.id}
+                  className="p-4 border border-primary/20 rounded-lg shadow-sm hover:shadow-lg transition"
+                >
+                  <div className="text-lg font-semibold text-primary">
+                    {cita.servicio?.nombre}
+                  </div>
+                  
+                  <div className="mt-1 text-sm text-gray-600">
+                    Con: {" "}
+                    <span className="font-medium text-dark">
+                      {cita.doctor?.persona?.nombre} {cita.doctor?.persona?.apellido}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 text-sm text-gray-600">
+                    Fecha:{" "}
+                    <span className="font-medium text-dark">
+                      {new Date(cita.fecha).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="mt-1 text-sm text-gray-600">
+                    Hora:{" "}
+                    <span className="font-medium text-dark">
+                      {cita.hora}
+                    </span>
+                  </div>
+                  
+                </div>
+              ))}
+              
             </div>
+            ) : (
+            <div>No tiene citas pendientes</div>
+            )}
           </section>
 
           {/* Citas por confirmar */}
-          <section className="bg-white shadow-lg rounded-xl p-6">
+          <section className="bg-white shadow-xl rounded-xl p-6">
             <h2 className="text-xl font-medium mb-3">Citas por confirmar</h2>
             <div className="bg-primary/5 rounded-lg p-6 text-center">
               (Aquí van las citas por confirmar...)
