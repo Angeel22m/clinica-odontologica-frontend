@@ -57,7 +57,7 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
 
   return (
     <div className="min-h-screen bg-light p-6 relative">
-      <LogoutButton onLogout={handleLogout} />
+      <LogoutButton />
 
       <div className="max-w-6xl mx-auto bg-light rounded-xl shadow-2xl p-6">
         {!expedienteSeleccionado ? (

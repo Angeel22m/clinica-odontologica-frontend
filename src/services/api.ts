@@ -2,14 +2,16 @@ import type { Expediente, ClinicalRecord,UpdateExpedienteDto,NewClinicalRecord }
 import { api } from './axios';
 import { AxiosError } from 'axios';
 
+
+const headers = {headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}}
 /**
  * Obtiene todos los expedientes
  */
 export const fetchExpedientes = async (): Promise<Expediente[]> => {
   try {
-    const { data } = await api.get<Expediente[]>('/expediente');
+    const { data } = await api.get<Expediente[]>('/expediente',{headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}});
     return data;
-  } catch (error: unknown) {
+  } catch (error: unknown)  {
     if (error instanceof AxiosError) {
       console.error('Error al cargar expedientes:', error.response?.data || error.message);
     } else {
@@ -22,7 +24,7 @@ export const fetchExpedientes = async (): Promise<Expediente[]> => {
 
 export const getExpedienteById = async (id: number): Promise<Expediente> => {
   if (!id) throw new Error("No se proporcionó un ID de expediente");
-  const response = await api.get<Expediente>(`/expediente/${id}`);
+  const response = await api.get<Expediente>(`/expediente/${id}`,{headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}});
   return response.data;
 };
 
@@ -37,7 +39,7 @@ export const addDetalleConsulta = async (data: NewClinicalRecord): Promise<Clini
  */
 export const fetchPatientHistory = async (pacienteId: number): Promise<ClinicalRecord[]> => {
   try {
-    const { data } = await api.get<ClinicalRecord[]>(`/expediente/historial/${pacienteId}`);
+    const { data } = await api.get<ClinicalRecord[]>(`/expediente/historial/${pacienteId}`,headers);
     return data;
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
@@ -52,7 +54,7 @@ export const fetchPatientHistory = async (pacienteId: number): Promise<ClinicalR
 
 export const fetchExpedienteById = async (id: number): Promise<Expediente> => {
   try {
-    const { data } = await api.get<Expediente>(`/expediente/${id}`);
+    const { data } = await api.get<Expediente>(`/expediente/${id}`,{headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}});
     return data;
   } catch (error: unknown) {
     if (error instanceof AxiosError) {
@@ -91,7 +93,7 @@ export const uploadFileToExpediente = async (
 
     // 3. Realizar la petición POST con Axios
     const { data } = await api.post(url, formData, {
-      // 💡 IMPLEMENTACIÓN DE onUploadProgress
+      // IMPLEMENTACIÓN DE onUploadProgress
       onUploadProgress: (progressEvent: any) => {
         if (progressEvent.lengthComputable) {
           // Calcula el porcentaje de subida
@@ -120,7 +122,7 @@ export const uploadFileToExpediente = async (
 
 export const fetchExpedientesByDoctor = async (doctorId: number): Promise<Expediente[]> => {
   try {
-    const { data } = await api.get<Expediente[]>(`/expediente/doctor/${doctorId}`);
+    const { data } = await api.get<Expediente[]>(`/expediente/doctor/${doctorId}`,{headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}});
     return data;
   } catch (error: unknown) {
     if (error instanceof AxiosError) {

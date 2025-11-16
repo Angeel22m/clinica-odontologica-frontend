@@ -4,7 +4,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import ExpedientesPage from "../pages/ExpedientePage";
 import DashboardPage from "../pages/DashboardPage";
-import NotFoundPage from "../pages/NotFoundPage";
 import HistorialdelPaciente from "../pages/HistorialdelPaciente";
 import RegisterPage from "../pages/RegisterPage";
 import AdminServicesPage from "../pages/AdminServicesPage";
@@ -16,6 +15,7 @@ import ExpedientesPagePorDoctor from "../pages/ExpedientePorDoctorPage";
 import EmpleadosPage from "../pages/administracionEmpleados/empleadosPage";
 
 import ProtectedRoute from "../components/ProtectedRoute";
+import  DoctorPage from "../pages/DoctorPage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -27,6 +27,8 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
+      <Route path="/expedientes" element={<ExpedientesPage/>} />
+      <Route path="/citas/doctor" element={<DoctorPage/>}/>
 
       {/* Rutas protegidas por rol */}
       <Route
@@ -39,22 +41,14 @@ const AppRoutes: React.FC = () => {
         }
       />
 
-      <Route
-        path="/expedientes"
-        element={
-          <ProtectedRoute
-            element={<ExpedientesPage />}
-            allowedRoles={["ADMIN", "RECEPCIONISTA"]}
-          />
-        }
-      />
+     
 
       <Route
         path="/expedientes/doctor"
         element={
           <ProtectedRoute
             element={<ExpedientesPagePorDoctor doctorId={1} />}
-            allowedRoles={["DOCTOR"]}
+            allowedRoles={["DOCTOR","ADMIN","CLIENTE"]}
           />
         }
       />
