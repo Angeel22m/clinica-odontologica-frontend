@@ -10,10 +10,17 @@ export default function HomePaciente() {
   const [showModal, setShowModal] = useState(false);
   const [citasPendientes, setCitasPendientes] = useState([]);
   
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id) {
+    window.location.href = 'http://localhost:5173/login';
+    return null;
+  }
+  
   useEffect(() => {
     const fetchCitasPendientes = async () => {
-    const pacienteId = JSON.parse(localStorage.getItem('user')).id
       try {
+        const pacienteId = user.id;
+        
         const res = await axios.get(`http://localhost:3000/citas/paciente/${pacienteId}`);
         
         setCitasPendientes(Array.isArray(res.data) ? res.data : []);
@@ -103,6 +110,7 @@ export default function HomePaciente() {
                       {new Date(cita.fecha).toLocaleDateString()} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
                     </span>
                   </div>
+
                   
                 </div>
               ))}
