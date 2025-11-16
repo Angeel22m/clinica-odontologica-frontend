@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import Notification from "../components/Notification";
 
 export default function ModalAgendarCita({ onClose, pacienteId }) {
   const [step, setStep] = useState(1);
@@ -11,9 +12,8 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
     doctorId: "",
     comentarios: "",
   });
-  
-  
 
+  const [notification, setNotification] = useState("");
   const [servicios, setServicios] = useState([]);
   const [doctoresDisponibles, setDoctoresDisponibles] = useState([]);
   const [horasDisponibles, setHorasDisponibles] = useState([]);
@@ -104,20 +104,13 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
 
   const handleNext = () => {
     if (!formData.servicioId || !formData.fecha || !formData.hora || !formData.doctorId) {
-      alert("Por favor completa todos los campos obligatorios.");
+      setNotification("Por favor completa todos los campos obligatorios.");
       return;
     }
     setStep(2);
   };
 
   const handleBack = () => setStep(1);
-  
-  console.log(parseInt(formData.servicioId));
-  console.log(formData.fecha);
-  console.log(formData.hora);
-  console.log(parseInt(formData.doctorId));
-  console.log(formData.comentarios)
-  console.log(JSON.parse(localStorage.getItem('user')).persona.id)
   
   const handleConfirm = async () => {
     try {
@@ -131,17 +124,24 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
       const res = await axios.post("http://localhost:3000/citas", payload);
       
       if (res.data.code === 0) {
-        alert("✅ Cita creada exitosamente");
+        setNotification("Cita creada exitosamente");
         onClose();
       } else {
-        alert("Error: " + res.data.message);
+        setNotification("Error: " + res.data.message);
       }
     } catch (err) {
       
       console.error("Error al crear cita:", err);
-      alert("Error al crear cita");
+      setNotification("Error al crear cita");
     }
   };
+  
+    useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   return (
     <div className="fixed inset-0 overlay-dark flex items-center justify-center z-50">
@@ -264,10 +264,15 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
                 <button onClick={handleBack} className="btn-primary bg-primary/10 text-primary hover:bg-primary/20">← Volver</button>
                 <button onClick={handleConfirm} className="btn-primary bg-success text-light hover:bg-success/90">Confirmar cita</button>
               </div>
+              
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
+              {notification && (
+        	<Notification message={notification} 
+        	onClose={() => setNotification("")} />
+      		)}      
     </div>
   );
 }
