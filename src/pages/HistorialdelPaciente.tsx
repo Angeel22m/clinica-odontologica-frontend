@@ -54,6 +54,7 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
         
           <h2 className="text-3xl font-bold text-primary mb-2">{expediente.nombrePaciente}</h2>
           <p className="text-md text-info">Atendido por {expediente.doctorNombre}</p>
+
         </div>
         
       </div>

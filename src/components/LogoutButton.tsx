@@ -1,17 +1,24 @@
-// components/LogoutButton.tsx
-import React from 'react';
-import { LogOut } from 'lucide-react';
+// src/components/LogoutButton.tsx
+import React from "react";
+import { LogOut } from "lucide-react";
 
-interface LogoutButtonProps {
-  onLogout: () => void;
-}
+const LogoutButton: React.FC = () => {
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("¿Estás seguro de que deseas cerrar sesión?");
+    if (!confirmLogout) return;
 
-const LogoutButton: React.FC<LogoutButtonProps> = ({ onLogout }) => {
+    // Elimina los datos de sesión
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Redirige al login
+    window.location.href = "/login";
+  };
+
   return (
     <button
       onClick={onLogout}
       className="w-full flex items-center gap-4 btn-alert rounded-md p-2 cursor-pointer shadow"
-    >
       <LogOut className="w-5 h-5" />
       Logout
     </button>
