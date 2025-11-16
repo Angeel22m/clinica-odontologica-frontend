@@ -71,7 +71,7 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
       </div>
 
      {/* Información básica con iconos */}
-<div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-primary">
+<div className="mt-4 mb-2 grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-primary">
   <div className="flex items-center gap-2">
     <Heart className="w-4 h-4 text-accent" />
     <span className="font-semibold">Alergias:</span>
@@ -101,8 +101,6 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
     </div>
   </div>
 </div>
-
-
 
       {/* Consultas */}
       <div className="mb-6">
@@ -159,7 +157,7 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
 
       {/* Modal Imagen */}
       {imagenAbierta && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setImagenAbierta(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center overlay-dark" onClick={() => setImagenAbierta(null)}>
           <img src={imagenAbierta} alt="Preview" className="max-h-[90%] max-w-[90%] rounded-lg shadow-lg" />
         </div>
       )}

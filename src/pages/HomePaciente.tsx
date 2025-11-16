@@ -132,20 +132,6 @@ export default function HomePaciente() {
                     </span>
                   </div>
                   
-                  <div className="mt-2 flex justify-center gap-3">
-                    <button
-                      onClick={() => handleEditar(cita)}
-                      className="px-3 py-1 rounded-lg bg-accent text-white hover:bg-info"
-                    >Editar
-                    </button>
-                  
-                    <button
-                      onClick={() => handleEliminar(cita.id)}
-                      className="px-3 py-1 rounded-lg bg-red-500 text-white hover:bg-red-600"
-                    >Cancelar
-                    </button>
-                  </div>
-                  
                 </div>
               ))}
               
