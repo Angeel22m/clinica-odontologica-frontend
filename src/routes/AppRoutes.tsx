@@ -14,6 +14,8 @@ import LandingPage from '../pages/LandingPage';
 import PublicServicesPage from '../pages/ServicesPage'
 import ExpedientesPagePorDoctor from '../pages/ExpedientePorDoctorPage'
 import EmpleadosPage from '../pages/administracionEmpleados/empleadosPage'
+
+import HomePaciente from '../pages/HomePaciente'
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -30,6 +32,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/services" element={<PublicServicesPage />} />
       <Route path="/empleados" element={<EmpleadosPage />} />
       <Route path="/expedientes/doctor" element={<ExpedientesPagePorDoctor doctorId={1} />} />
+      <Route path="/home/paciente" element={<HomePaciente />} />
 
     </Routes>
   );

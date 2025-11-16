@@ -11,6 +11,7 @@
   --color-accent: #7ED1F2;
   --color-info: #04B2D9;
   --color-success: #74BF04;
+  --color-alert: #F01E1E;
 }
 
 /* Botones principales */
@@ -21,6 +22,11 @@
   padding: 0.5rem 1rem;
   transition: background-color 0.3s;
   cursor: pointer;
+}
+
+.btn-alert {
+  background-color: var(--color-alert);
+  color: var(--color-light)
 }
 
 .btn-primary:hover {
