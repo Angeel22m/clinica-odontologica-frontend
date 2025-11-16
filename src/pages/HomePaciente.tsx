@@ -110,7 +110,20 @@ export default function HomePaciente() {
                       {new Date(cita.fecha).toLocaleDateString()} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
                     </span>
                   </div>
-
+                  
+                  <div className="mt-2 flex justify-center gap-3">
+                    <button
+                      onClick={() => handleEditar(cita)}
+                      className="px-3 py-1 rounded-lg bg-accent text-white hover:bg-info"
+                    >Editar
+                    </button>
+                  
+                    <button
+                      onClick={() => handleEliminar(cita.id)}
+                      className="px-3 py-1 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                    >Cancelar
+                    </button>
+                  </div>
                   
                 </div>
               ))}
@@ -123,7 +136,7 @@ export default function HomePaciente() {
 
           {/* Citas por confirmar */}
           <section className="bg-white shadow-xl rounded-xl p-6">
-            <h2 className="text-xl font-medium mb-3">Citas por confirmar</h2>
+            <h2 className="text-xl font-medium mb-3">Asistencia confirmada</h2>
             <div className="bg-primary/5 rounded-lg p-6 text-center">
               (Aquí van las citas por confirmar...)
             </div>
