@@ -17,10 +17,7 @@ export default function EmpleadosPage() {
     const data = await obtenerEmpleados();
     setEmpleados(data);
   };
-  const handleLogout = () => {
-    console.log("Logout"); // Reemplazar por lógica real
-  };
-
+ 
   useEffect(() => {
     cargar();
   }, []);
@@ -38,7 +35,7 @@ export default function EmpleadosPage() {
       </p>
     </div>
 
-    <LogoutButton onLogout={handleLogout} />
+    <LogoutButton />
   </div>
 
   {/* Contenedor principal */}

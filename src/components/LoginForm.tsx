@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
 interface LoginResult {
   success: boolean;
@@ -9,6 +10,38 @@ interface LoginFormProps {
   onLogin?: (usernameOrEmail: string, password: string) => Promise<LoginResult>;
   errorMessage?: string;
 }
+
+
+  // Login con Google
+  const handleGoogleLogin = async () => {
+    try {
+      // Abrimos la ruta OAuth de Google en una nueva ventana
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+
+      const googleWindow = window.open(
+        "http://localhost:3000/auth/google/login",
+        "Google Login",
+        `width=${width},height=${height},top=${top},left=${left}`
+      );
+
+      // Escuchamos mensaje del popup
+      window.addEventListener("message", (event) => {
+        if (event.origin !== "http://localhost:3000") return;
+        const data = event.data;
+        if (data.token && data.user) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          window.location.href = "/home";
+        }
+      });
+    } catch (error) {
+      console.error("Error login con Google:", error);
+    }
+  };
+
 
 export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps) {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -86,11 +119,18 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
 
         <button
           type="submit"
-          className="w-full btn-primary p-2 rounded-lg hover:bg-accent transition mt-4 mb-3"
+          className="flex items-center btn-primary justify-center gap-3 w-full bg-primary text-light rounded-lg py-2.5 px-4 font-medium shadow-md hover:bg-info transition-all duration-300 mt-4 mb-3"
           disabled={loading}
         >
           {loading ? "Ingresando..." : "Iniciar Sesión"}
         </button>
+        <button
+  onClick={handleGoogleLogin}
+  className="flex items-center btn-primary justify-center gap-3 w-full bg-primary text-light rounded-lg py-2.5 px-4 font-medium shadow-md hover:bg-info transition-all duration-300"
+>
+  <FcGoogle className="text-xl bg-light rounded-full p-0.5" />
+  <span>Iniciar sesión con Google</span>
+</button>
 
         <div className="flex justify-center gap-12 mt-4 text-center">
           <a

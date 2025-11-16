@@ -60,6 +60,7 @@ const HistorialdelPaciente: React.FC = () => {
     <h3 className="text-3xl font-extrabold text-primary tracking-tight">
       Historial de Consultas del Paciente
     </h3>
+    <LogoutButton/>
   </header>
 
   {/* Contenedor centrado */}

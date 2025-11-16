@@ -100,6 +100,8 @@ export default function EmpleadoModal({
   } else {
     alert(mensaje || "Error al guardar empleado");
     console.log(error.reponse.data)
+    console.log(error.response.data)
+    alert(mensaje);
     console.error("Error al guardar empleado:", error);
   }
 }

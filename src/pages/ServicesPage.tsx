@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { Link } from "react-router-dom";
 const PublicServiciosPage = () => {
   const [servicios, setServicios] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,12 +40,18 @@ const PublicServiciosPage = () => {
   || s.activo === "activo");
 
   return (
+    
     <section className="py-16 bg-light">
       <div className="max-w-7xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-12 text-primary">
           Nuestros Servicios
         </h2>
-
+        <Link
+      to="/"
+      className="btn-primary absolute top-4 left-4 px-4 py-2 rounded-lg font-semibold shadow hover:opacity-90 transition"
+    >
+      Volver
+    </Link>
         {serviciosActivos.length === 0 ? (
           <p className="text-primary py-16">
             No hay servicios disponibles
