@@ -14,8 +14,13 @@ import EmpleadosPage from '../pages/administracionEmpleados/empleadosPage'
 import HomePaciente from '../pages/HomePaciente'
 import ProtectedRoute from "../components/ProtectedRoute";
 import  DoctorPage from "../pages/DoctorPage";
+import { useAuth } from "../hooks/UseAuth";
+
+// solo es para pruebas luego se dejan los roles correspondientes
+const allUser  =['ADMIN',"CLIENTE","ADMINISTRADOR","DOCTOR"] 
 
 const AppRoutes: React.FC = () => {
+  const { idUser, idEmpleado} = useAuth();
   return (
     <Routes>
       {/* Rutas públicas */}
@@ -25,32 +30,43 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
-      <Route path="/expedientes" element={<ExpedientesPage/>} />
-      <Route path="/citas/doctor" element={<DoctorPage/>}/>
-      <Route path="/empleados" element={<EmpleadosPage />} />
-      <Route path="/expedientes/doctor" element={<ExpedientesPagePorDoctor doctorId={1} />} />
-      <Route path="/home/paciente" element={<HomePaciente />} />
 
-
+      
+          
       {/* Rutas protegidas por rol */}
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute
             element={<DashboardPage />}
-            allowedRoles={["ADMIN", "DOCTOR", "RECEPCIONISTA"]}
+            allowedRoles={allUser}
           />
         }
+
       />
 
-     
+        <Route path="/home/paciente" 
+        element={ <ProtectedRoute 
+          element={<HomePaciente />}
+          allowedRoles={allUser}
+      
+      />
+      } />
 
+       <Route path="/citas/doctor" 
+       element={<ProtectedRoute 
+        element={<DoctorPage/>} 
+        allowedRoles={allUser}
+        />
+      }
+      />
+        
       <Route
         path="/expedientes/doctor"
         element={
           <ProtectedRoute
-            element={<ExpedientesPagePorDoctor doctorId={1} />}
-            allowedRoles={["DOCTOR","ADMIN","CLIENTE"]}
+            element={<ExpedientesPagePorDoctor doctorId={idEmpleado} />}
+            allowedRoles={allUser}
           />
         }
       />
@@ -60,7 +76,7 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<EmpleadosPage />}
-            allowedRoles={["ADMIN"]}
+            allowedRoles={allUser}
           />
         }
       />
@@ -69,8 +85,8 @@ const AppRoutes: React.FC = () => {
         path="/Historial"
         element={
           <ProtectedRoute
-            element={<HistorialdelPaciente />}
-            allowedRoles={["CLIENTE"]}
+            element={<HistorialdelPaciente pacienteId={idUser} />}
+            allowedRoles={allUser}
           />
         }
       />
@@ -80,10 +96,16 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminServicesPage />}
-            allowedRoles={["ADMIN"]}
+            allowedRoles={allUser}
           />
         }
       />
+
+      <Route path="/expedientes" 
+      element={<ProtectedRoute element={<ExpedientesPage/>}
+      allowedRoles={allUser}
+      
+      />} />
 
       {/* Fallback */}
       <Route path="*" element={<LandingPage/>} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import type { Expediente, ClinicalRecord } from '../types/expediente';
-import { fetchExpedientes, fetchPatientHistory } from '../services/api';
+import { fetchExpedientes, fetchPatientHistory } from '../services/expedientesService';
 import PatientCard from '../components/PatientCard';
 import PatientDetails from '../components/PatientDetails';
 import LogoutButton from '../components/LogoutButton';

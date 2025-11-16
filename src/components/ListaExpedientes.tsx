@@ -1,7 +1,7 @@
 // components/ListaExpedientes.tsx
 import React, { useEffect, useState } from "react";
 import { ExpedienteCard } from "./ExpedienteCards";
-import { fetchExpedientesByDoctor } from "../services/api";
+import { fetchExpedientesByDoctor } from "../services/expedientesService";
 import type { Expediente } from "../types/expediente";
 
 interface ExpedientesListProps {

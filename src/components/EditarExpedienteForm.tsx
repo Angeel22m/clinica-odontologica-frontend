@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { updateExpediente } from "../services/api";
+import { updateExpediente } from "../services/expedientesService";
 import type { UpdateExpedienteDto } from "../types/expediente";
 import Modal from "./modal";
 

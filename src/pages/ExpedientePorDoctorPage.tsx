@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { ExpedientesList } from "../components/ExpedienteList";
 import { ExpedienteDetalle } from "../components/ExpedienteDetails";
 import { ArrowLeftCircle } from "lucide-react";
-import { fetchExpedientesByDoctor } from "../services/api";
+import { fetchExpedientesByDoctor } from "../services/expedientesService";
 import type { Expediente } from "../types/expediente";
-import LogoutButton from "../components/LogoutButton";
+import { Link } from "react-router-dom";
+import { FiChevronLeft } from "react-icons/fi";
+
 
 interface Props {
   doctorId: number;
@@ -36,7 +38,7 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
         setExpedientes(mapped);
       } catch (err: unknown) {
         console.error(err);
-        setError("No se pudieron cargar los expedientes.");
+        setError("No se pudieron cargar los expedientes.");        
       } finally {
         setLoading(false);
       }
@@ -47,17 +49,17 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
 
   const expedienteSeleccionado = expedientes.find((e) => e.id === selectedId);
 
-  const handleLogout = () => {
-    console.log("Logout"); // Reemplazar por lógica real
-  };
-
   if (loading) return <div className="p-6 text-center">Cargando expedientes...</div>;
   if (error) return <div className="p-6 text-center text-red-500">{error}</div>;
   if (expedientes.length === 0) return <div className="p-6 text-center">No hay expedientes disponibles.</div>;
 
   return (
+    
     <div className="min-h-screen bg-light p-6 relative">
-      <LogoutButton />
+      <button className="btn-primary flex items-center gap-1">
+        <FiChevronLeft />
+        <Link to={"/citas/doctor"}>Regresar</Link>
+        </button>      
 
       <div className="max-w-6xl mx-auto bg-light rounded-xl shadow-2xl p-6">
         {!expedienteSeleccionado ? (

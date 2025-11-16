@@ -11,36 +11,69 @@ interface LoginFormProps {
   errorMessage?: string;
 }
 
+const handleGoogleLogin = async () => {
+  try {
+    const width = 600;
+    const height = 700;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
 
-  // Login con Google
-  const handleGoogleLogin = async () => {
-    try {
-      // Abrimos la ruta OAuth de Google en una nueva ventana
-      const width = 600;
-      const height = 700;
-      const left = window.screen.width / 2 - width / 2;
-      const top = window.screen.height / 2 - height / 2;
+    const googleWindow = window.open(
+      "http://localhost:3000/auth/google/login",
+      "Google Login",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
 
-      const googleWindow = window.open(
-        "http://localhost:3000/auth/google/login",
-        "Google Login",
-        `width=${width},height=${height},top=${top},left=${left}`
-      );
+    // Escuchar mensaje del servidor
+    const listener = (event: MessageEvent) => {
+      if (event.origin !== "http://localhost:3000") return;
 
-      // Escuchamos mensaje del popup
-      window.addEventListener("message", (event) => {
-        if (event.origin !== "http://localhost:3000") return;
-        const data = event.data;
-        if (data.token && data.user) {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-          window.location.href = "/home";
-        }
-      });
-    } catch (error) {
-      console.error("Error login con Google:", error);
-    }
-  };
+      const { token, user } = event.data;
+
+      if (token && user) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // Redirigir correctamente
+        redirectByRole(user.rol);
+
+        // Cerrar popup
+        googleWindow?.close();
+
+        // Eliminar listener para no duplicar eventos
+        window.removeEventListener("message", listener);
+      }
+    };
+
+    window.addEventListener("message", listener);
+  } catch (error) {
+    console.error("Error login con Google:", error);
+  }
+};
+
+  const redirectByRole = (rol: string) => {
+  switch (rol) {
+    case "ADMIN":
+      window.location.href = "/dashboard";
+      break;
+
+    case "DOCTOR":
+      window.location.href = "/citas/doctor";
+      break;
+
+    case "RECEPCIONISTA":
+      window.location.href = "/home";
+      break;
+
+    case "CLIENTE":
+      window.location.href = "/home/paciente";
+      break;
+
+    default:
+      console.warn("Rol no reconocido:", rol);
+      window.location.href = "/home";
+  }
+};
 
 
 export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps) {
@@ -125,12 +158,14 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
           {loading ? "Ingresando..." : "Iniciar Sesión"}
         </button>
         <button
+  type="button"
   onClick={handleGoogleLogin}
   className="flex items-center btn-primary justify-center gap-3 w-full bg-primary text-light rounded-lg py-2.5 px-4 font-medium shadow-md hover:bg-info transition-all duration-300"
 >
   <FcGoogle className="text-xl bg-light rounded-full p-0.5" />
   <span>Iniciar sesión con Google</span>
 </button>
+
 
         <div className="flex justify-center gap-12 mt-4 text-center">
           <a

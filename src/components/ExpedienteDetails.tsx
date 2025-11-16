@@ -3,7 +3,7 @@ import { Calendar, Stethoscope, Upload, Pencil, FileText,Heart } from "lucide-re
 import { BriefcaseMedical, Pill } from 'lucide-react';
 import FileUploader from "./FileUploader";
 import EditExpedienteForm from "../components/EditarExpedienteForm";
-import { getExpedienteById } from "../services/api"; // tu función para fetch backend
+import { getExpedienteById } from "../services/expedientesService"; // tu función para fetch backend
 import type { Archivo } from "../types/expediente";
 import NuevoDetalleForm from "./NuevoDetalleForm";
 

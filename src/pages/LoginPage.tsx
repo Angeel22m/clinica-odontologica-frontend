@@ -5,36 +5,72 @@ import { useState } from "react";
 export default function LoginPage() {
   const [serverError, setServerError] = useState("");
   
-  const handleLogin = async (user: string, pass: string): Promise<{ success: boolean; error?: string}> => {
-    try {
-      const response = await axios.post("http://localhost:3000/auth/login", {
-        correo: user,
-        password: pass,
-      });
+  const handleLogin = async (
+  user: string,
+  pass: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const response = await axios.post("http://localhost:3000/auth/login", {
+      correo: user,
+      password: pass,
+    });
 
-      const data = response.data;
-      console.log(response.data);
-      if (data.code === 0) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-	window.location.href = "/home";
-        console.log("Inicio de sesión exitoso");
+    const data = response.data;
+    console.log("Login response:", data);
 
-        return { success: true };
-      } else {
-        const msg = data.message || "Error al iniciar sesión";
-      	setServerError(msg);
-        console.error("Error:", data.message);
-        return { success: false, error: msg };
-      }
-    } catch (error: any) {
-      console.error("Error al iniciar sesión:", error);
-      const message = 
-        error.response?.data?.message || "No se pudo conectar con el servidor. Intente más tarde";
-      setServerError(message);
-      return { success: false, error: message };
+    if (data.code === 0) {
+
+      // Guardar datos en localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Sacar el rol del user
+      const rol = data.user.rol;
+
+      console.log(rol);
+
+      // Redirigir dependiendo del rol
+      redirectByRole(rol);
+
+      return { success: true };
+    } else {
+      const msg = data.message || "Error al iniciar sesión";
+      setServerError(msg);
+      return { success: false, error: msg };
     }
-  };
+  } catch (error: any) {
+    const message =
+      error.response?.data?.message ||
+      "No se pudo conectar con el servidor. Intente más tarde";
+
+    setServerError(message);
+    return { success: false, error: message };
+  }
+};
+
+const redirectByRole = (rol: string) => {
+  switch (rol) {
+    case "ADMIN":
+      window.location.href = "/dashboard";
+      break;
+
+    case "DOCTOR":
+      window.location.href = "/citas/doctor";
+      break;
+
+    case "RECEPCIONISTA":
+      window.location.href = "/home";
+      break;
+
+    case "PACIENTE":
+      window.location.href = "/home/paciente";
+      break;
+
+    default:
+      console.warn("Rol no reconocido:", rol);
+      window.location.href = "/home";
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-light pt-8 px-4 overflow-auto">

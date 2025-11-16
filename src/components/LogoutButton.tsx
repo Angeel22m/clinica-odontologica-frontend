@@ -17,8 +17,8 @@ const LogoutButton: React.FC = () => {
 
   return (
     <button
-      onClick={onLogout}
-      className="w-full flex items-center gap-4 btn-alert rounded-md p-2 cursor-pointer shadow"
+      onClick={handleLogout}
+      className="w-full flex items-center gap-4 btn-alert rounded-md p-2 cursor-pointer shadow">
       <LogOut className="w-5 h-5" />
       Logout
     </button>

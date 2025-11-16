@@ -1,12 +1,22 @@
 import { FiPhone,FiClipboard, FiClock } from "react-icons/fi";
 import type {Cita} from "../../types/TypesCitas/CitasPorDoctor"
-const formatHora = (code: string) => {
-  const parts = code.substring(1).split("_");
-  const h = parseInt(parts[0], 10);
-  const m = parts[1];
-  const h12 = h % 12 || 12;
-  return `${h12}:${m} ${h >= 12 ? "PM" : "AM"}`;
+const formatHora = (code: string): string => {
+  if (!code.startsWith("H")) return code;
+
+  const info = code.replace("H", ""); // "09_30"
+  const [horaStr, minStr] = info.split("_");
+
+  const hora = parseInt(horaStr, 10);
+  const minutos = parseInt(minStr, 10);
+
+  if (isNaN(hora) || isNaN(minutos)) return code;
+
+  const hora12 = hora % 12 || 12;
+  const ampm = hora >= 12 ? "PM" : "AM";
+
+  return `${hora12}:${minutos.toString().padStart(2, "0")} ${ampm}`;
 };
+
 
 const CitaCard: React.FC<{ cita: Cita }> = ({ cita }) => {
   const nombrePaciente = `${cita.paciente.nombre} ${cita.paciente.apellido}`;

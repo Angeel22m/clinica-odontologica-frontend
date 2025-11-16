@@ -24,7 +24,7 @@ export interface Paciente {
 export interface Cita {
   id: number;
   fecha: string;
-  estado: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
+  estado: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA' | 'COMPLETADA';
   hora: string;
   pacienteId: number;
   doctorId: number;

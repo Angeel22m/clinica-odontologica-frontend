@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   element, 
-  redirectTo = "/landing",
+  redirectTo = "/login",
   allowedRoles
 }) => {
   const token = localStorage.getItem('token');
@@ -41,7 +41,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             // El rol del usuario NO está en la lista de roles permitidos.
             // Lo enviamos a una ruta segura (como el home o dashboard)
             console.warn(`Acceso denegado: El rol '${userRole}' no puede acceder a esta ruta.`);
-            return <Navigate to="/" replace />; 
+            return <Navigate to="/landing" replace />; 
         }
     } catch (e) {
         // Error al parsear el JSON de usuario. Redirigir al login.

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Calendar, Stethoscope, FileText,Heart } from "lucide-react";
 import { BriefcaseMedical, Pill } from 'lucide-react';
-import { getExpedienteById } from "../services/api"; // tu función para fetch backend
+import { getExpedienteByIdPaciente } from "../services/expedientesService"; // tu función para fetch backend
 import type { Archivo } from "../types/expediente";
 import { Link } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
 
-const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void }> = ({ expedienteId, onBack }) => {
+const HistorialdelPaciente: React.FC<{ pacienteId: number}> = ({ pacienteId}) => {
   const [expediente, setExpediente] = useState<any>(null);
   const [ascending, setAscending] = useState(false);
   const [imagenAbierta, setImagenAbierta] = useState<string | null>(null);
@@ -14,7 +14,7 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
   // Cargar expediente
   const fetchExpediente = async () => {
     try {
-      const data = await getExpedienteById(JSON.parse(localStorage.getItem('user')).persona.id);
+      const data = await getExpedienteByIdPaciente(pacienteId);
       setExpediente(data);
     } catch (err) {
       console.error("Error al obtener expediente:", err);
@@ -23,7 +23,7 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
 
   useEffect(() => {
     fetchExpediente();
-  }, [expedienteId]);
+  }, [pacienteId]);
 
   // Ordenar consultas
   const sorted = useMemo(() => {
@@ -152,8 +152,6 @@ const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void 
     </div>
   </div>
 )}    
-
-
       {/* Modal Imagen */}
       {imagenAbierta && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overlay-dark" onClick={() => setImagenAbierta(null)}>

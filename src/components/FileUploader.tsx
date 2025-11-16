@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type {DragEvent} from 'react'
 import Modal from './modal';
-import { uploadFileToExpediente } from '../services/api';
+import { uploadFileToExpediente } from '../services/expedientesService';
 
 interface FileUploaderProps {
   expedienteId: number;

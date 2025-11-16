@@ -21,10 +21,17 @@ export const fetchExpedientes = async (): Promise<Expediente[]> => {
   }
 };
 
-
+//obtener expedientes por id 
 export const getExpedienteById = async (id: number): Promise<Expediente> => {
   if (!id) throw new Error("No se proporcionó un ID de expediente");
   const response = await api.get<Expediente>(`/expediente/${id}`,{headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}});
+  return response.data;
+};
+
+//obtener expedientes por id del paciente
+export const getExpedienteByIdPaciente = async (id: number): Promise<Expediente> => {
+  if (!id) throw new Error("No se proporcionó un ID de expediente");
+  const response = await api.get<Expediente>(`/expediente/paciente/${id}`,{headers:{'Authorization':`Bearer ${localStorage.getItem('token')}`}});
   return response.data;
 };
 

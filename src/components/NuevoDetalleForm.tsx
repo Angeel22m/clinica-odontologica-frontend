@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "./modal";
-import { addDetalleConsulta } from "../services/api"; // función para POST al backend
+import { addDetalleConsulta } from "../services/expedientesService"; // función para POST al backend
 
 
 interface NuevoDetalleFormProps {
