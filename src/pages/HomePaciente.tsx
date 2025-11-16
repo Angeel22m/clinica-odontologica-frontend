@@ -128,7 +128,7 @@ export default function HomePaciente() {
                   <div className="mt-1 text-sm text-gray-600">
                     Fecha y Hora:{" "}
                     <span className="font-medium text-dark">
-                      {new Date(cita.fecha).toLocaleDateString()} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
+                      {cita.fecha.split("T")[0]} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
                     </span>
                   </div>
                   
