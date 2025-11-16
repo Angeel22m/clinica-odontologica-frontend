@@ -1,86 +1,168 @@
-import React, {useState, useEffect,useMemo, useCallback } from 'react'; 
-import { Search } from 'lucide-react';
-import type { Expediente, ClinicalRecord } from '../types/expediente';
-import { fetchExpedientes, fetchPatientHistory } from '../services/api';
-import PatientDetails from '../components/PatientDetails';
-import LogoutButton from '../components/LogoutButton';
-import PatientCard from '../components/PatientCard';
-import ExpedienteGeneralPanel from '../components/Expedientegeneral';
+import React, { useState, useEffect, useMemo } from "react";
+import { Calendar, Stethoscope, FileText,Heart } from "lucide-react";
+import { BriefcaseMedical, Pill } from 'lucide-react';
+import { getExpedienteById } from "../services/api"; // tu función para fetch backend
+import type { Archivo } from "../types/expediente";
+import { Link } from "react-router-dom";
+import { FiChevronLeft } from "react-icons/fi";
 
-const HistorialdelPaciente: React.FC = () => {
-    const [expedientes, setExpedientes] = useState<Expediente[]>([]);
-    const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
-    const [history, setHistory] = useState<ClinicalRecord[] | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isLoadingList, setIsLoadingList] = useState(true);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+const HistorialdelPaciente: React.FC<{ expedienteId: number; onBack: () => void }> = ({ expedienteId, onBack }) => {
+  const [expediente, setExpediente] = useState<any>(null);
+  const [ascending, setAscending] = useState(false);
+  const [imagenAbierta, setImagenAbierta] = useState<string | null>(null);
 
-    useEffect(() => {
-        setIsLoadingList(true);
-        fetchExpedientes().then(data => {
-            setExpedientes(data);
-            setIsLoadingList(false);
-            if (data.length > 0) setSelectedPatientId(data[0].pacienteId);
-        }).catch(() => setIsLoadingList(false));
-    }, []);
+  // Cargar expediente
+  const fetchExpediente = async () => {
+    try {
+      const data = await getExpedienteById(JSON.parse(localStorage.getItem('user')).persona.id);
+      setExpediente(data);
+    } catch (err) {
+      console.error("Error al obtener expediente:", err);
+    }
+  };
 
-    useEffect(() => {
-        if (selectedPatientId !== null) {
-            setIsLoadingHistory(true);
-            fetchPatientHistory(selectedPatientId)
-                .then(data => {
-                    setHistory(data);
-                    setIsLoadingHistory(false);
-                }).catch(() => {
-                    setHistory(null);
-                    setIsLoadingHistory(false);
-                });
-        }else setHistory(null);
-    }, [selectedPatientId]);
+  useEffect(() => {
+    fetchExpediente();
+  }, [expedienteId]);
 
-    const handlePatientSelect = useCallback((id: number) => setSelectedPatientId(id), []);
-    const filteredExpedientes = useMemo(() => {
-        if (!searchTerm) return expedientes;
-        const lower = searchTerm.toLowerCase();
-        return expedientes.filter(e =>
-            e.paciente.nombre.toLowerCase().includes(lower) ||
-            e.paciente.apellido.toLowerCase().includes(lower) ||
-            e.id.toString().includes(lower) ||
-            e.pacienteId.toString().includes(lower)
-        );
-    }, [expedientes, searchTerm]);
+  // Ordenar consultas
+  const sorted = useMemo(() => {
+    if (!expediente?.detalles) return [];
+    return [...expediente.detalles].sort((a, b) =>
+      ascending
+        ? new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+        : new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
+  }, [expediente?.detalles, ascending]);
 
-    const selectedExpediente = expedientes.find(e => e.pacienteId === selectedPatientId);
+  if (!expediente) return <p>Cargando expediente...</p>;
 
+  return (
+    <div className="relative p-6 bg-light rounded-xl shadow-xl m-8">
+        
+        <button className="btn-primary flex items-center gap-1">
+        <FiChevronLeft />
+        <Link to={"/home/paciente"}>Regresar</Link>
+        </button>
+	
 
-    return (
-   <div className="h-screen w-screen flex flex-col bg-light">
-  {/* Header fijo */}
-  <header className="py-4 text-center bg-light shadow-md z-20">
-    <h3 className="text-3xl font-extrabold text-primary tracking-tight">
-      Historial de Consultas del Paciente
-    </h3>
-    <LogoutButton/>
-  </header>
+      {/* Encabezado */}
+      <div className="flex justify-between items-start mt-4 mb-4">
+        <div>
+        
+          <h2 className="text-3xl font-bold text-primary mb-2">{expediente.nombrePaciente}</h2>
+          <p className="text-md text-info">Atendido por {expediente.doctorNombre}</p>
 
-  {/* Contenedor centrado */}
-  <main className="flex-1 flex items-center justify-center p-6">
-    <section className="w-full max-w-5xl h-[85vh] flex flex-col overflow-y-auto bg-white rounded-xl shadow-2xl border border-secondary/20">
-      {selectedExpediente && history !== null ? (
-        <PatientDetails history={history} expediente={selectedExpediente} />
-      ) : (
-        <div className="flex flex-1 items-center justify-center p-8">
-          <p className="text-secondary text-lg text-center">
-            Selecciona una ficha de expediente para ver el historial clínico.
-          </p>
         </div>
-      )}
-    </section>
-  </main>
+        
+      </div>
+
+      {/* Botones */}
+      <div className="mb-4 flex items-center gap-2">
+        
+
+        {expediente.detalles?.length > 0 && (
+          <button onClick={() => setAscending(!ascending)} className="btn-nueva-consulta">
+            {ascending ? "▲ Ascendente" : "▼ Descendente"}
+          </button>
+
+        )}
+      </div>
+
+     {/* Información básica con iconos */}
+<div className="mt-4 mb-2 grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-primary">
+  <div className="flex items-center gap-2">
+    <Heart className="w-4 h-4 text-accent" />
+    <span className="font-semibold">Alergias:</span>
+    <div className="w-24 break-words">
+    {expediente.alergias || 'N/A'}
+    </div>
+  </div>
+  <div className="flex items-center gap-2">
+    <BriefcaseMedical className="w-4 h-4 text-info" />
+    <span className="font-semibold">Enfermedades:</span> 
+    <div className="w-40 break-words">
+    {expediente.enfermedades || 'N/A'}
+    </div>
+  </div>
+  <div className="flex items-center gap-2">
+    <Pill className="w-4 h-4 text-success" />
+    <span className="font-semibold">Medicamentos:</span>
+    <div className="w-28 break-words">
+    {expediente.medicamentos || 'N/A'}
+    </div>
+  </div>
+  <div className="flex items-center gap-2">
+    <Stethoscope className="w-4 h-4 text-primary" />
+    <span className="font-semibold">Doctor:</span>
+    <div className="w-28 break-words">
+    {expediente.doctorNombre || 'N/A'}
+    </div>
+  </div>
 </div>
 
+      {/* Consultas */}
+      <div className="mb-6">
+        <h3 className="text-2xl font-semibold text-primary mb-2">Consultas</h3>
+        {sorted.length === 0 ? <p className="text-secondary text-sm">No hay consultas registradas.</p> :
+          <div className="space-y-4">
+            {sorted.map(d => (
+              <div key={d.id} className="p-4 bg-light border-l-4 border-accent rounded-lg shadow-md">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-accent font-semibold flex items-center">
+                    <Stethoscope className="w-4 h-4 mr-1" /> Consulta
+                  </h4>
+                  <p className="text-sm text-info flex items-center">
+                    <Calendar className="w-4 h-4 mr-1" /> {new Date(d.fecha).toLocaleDateString("es-ES")}
+                  </p>
+                </div>
+                <p><strong>Motivo:</strong> {d.motivo}</p>
+                <p><strong>Diagnóstico:</strong> {d.diagnostico}</p>
+                <p><strong>Tratamiento:</strong> {d.tratamiento}</p>
+                <p><strong>Plan:</strong> <span className="text-success">{d.planTratamiento}</span></p>
+              </div>
+            ))}
+          </div>}
+      </div>
 
-    )
+      {/* Archivos */}
+      {expediente.archivos?.length > 0 && (
+  <div>
+    <h3 className="text-2xl font-semibold text-primary mb-3">Archivos</h3>
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {(expediente.archivos as Archivo[]).map((a: Archivo) => (
+        <div key={a.id} className="relative group">
+          {a.type?.startsWith("image") ? (
+            <img
+              src={a.url}
+              alt={a.nombre}
+              className="rounded-lg shadow-md object-cover w-full h-40 cursor-pointer"
+              onClick={() => setImagenAbierta(a.url)}
+            />
+          ) : (
+            <div
+              className="rounded-lg shadow-md w-full h-40 flex items-center justify-center bg-gray-100 text-gray-700 font-bold text-center cursor-pointer"
+              onClick={() => window.open(a.url, "_blank")}
+            >
+              <FileText className="w-6 h-6 mb-1" /> {a.nombre}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}    
 
+
+      {/* Modal Imagen */}
+      {imagenAbierta && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overlay-dark" onClick={() => setImagenAbierta(null)}>
+          <img src={imagenAbierta} alt="Preview" className="max-h-[90%] max-w-[90%] rounded-lg shadow-lg" />
+        </div>
+      )}
+
+    </div>
+  );
 };
+
 export default HistorialdelPaciente;

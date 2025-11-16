@@ -1,19 +1,17 @@
-// src/routes/AppRoutes.tsx
-import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-
-import ExpedientesPage from "../pages/ExpedientePage";
-import DashboardPage from "../pages/DashboardPage";
-import HistorialdelPaciente from "../pages/HistorialdelPaciente";
-import RegisterPage from "../pages/RegisterPage";
-import AdminServicesPage from "../pages/AdminServicesPage";
-import LoginPage from "../pages/LoginPage";
-import HomePage from "../pages/HomePage";
-import LandingPage from "../pages/LandingPage";
-import PublicServicesPage from "../pages/ServicesPage";
-import ExpedientesPagePorDoctor from "../pages/ExpedientePorDoctorPage";
-import EmpleadosPage from "../pages/administracionEmpleados/empleadosPage";
-
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import ExpedientesPage from '../pages/ExpedientePage';
+import DashboardPage from '../pages/DashboardPage';
+import HistorialdelPaciente from '../pages/HistorialdelPaciente';
+import RegisterPage from '../pages/RegisterPage'
+import AdminServicesPage from '../pages/AdminServicesPage';
+import LoginPage from '../pages/LoginPage';
+import HomePage from '../pages/HomePage';
+import LandingPage from '../pages/LandingPage';
+import PublicServicesPage from '../pages/ServicesPage'
+import ExpedientesPagePorDoctor from '../pages/ExpedientePorDoctorPage'
+import EmpleadosPage from '../pages/administracionEmpleados/empleadosPage'
+import HomePaciente from '../pages/HomePaciente'
 import ProtectedRoute from "../components/ProtectedRoute";
 import  DoctorPage from "../pages/DoctorPage";
 
@@ -29,6 +27,10 @@ const AppRoutes: React.FC = () => {
       <Route path="/services" element={<PublicServicesPage />} />
       <Route path="/expedientes" element={<ExpedientesPage/>} />
       <Route path="/citas/doctor" element={<DoctorPage/>}/>
+      <Route path="/empleados" element={<EmpleadosPage />} />
+      <Route path="/expedientes/doctor" element={<ExpedientesPagePorDoctor doctorId={1} />} />
+      <Route path="/home/paciente" element={<HomePaciente />} />
+
 
       {/* Rutas protegidas por rol */}
       <Route
