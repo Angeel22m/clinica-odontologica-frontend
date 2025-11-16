@@ -3,7 +3,11 @@ import ModalAgendarCita from "../components/ModalAgendarCita";
 import { FiMenu } from "react-icons/fi";
 import { FiBell } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from 'react-router-dom';
 import axios from "axios";
+import LogoutButton from "../components/LogoutButton";
+import { FiSettings } from "react-icons/fi";
+import { FiUser } from "react-icons/fi";
 
 export default function HomePaciente() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -37,7 +41,9 @@ export default function HomePaciente() {
       {/* HEADER */}
       <header className="w-full bg-white shadow-sm py-3 px-6 flex justify-end items-center">
         <nav className="flex items-center gap-8">
-          <button className="hover:text-info transition cursor-pointer">Historial clínico</button>
+          <Link to={"/Historial"} className="hover:text-info transition cursor-pointer">Historial clínico
+          </Link>
+          
           <button
             onClick={() => setShowModal(true)}
             className="hover:text-info transition cursor-pointer"
@@ -62,15 +68,26 @@ export default function HomePaciente() {
 
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50">
-                <button className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer">
+              
+                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+                <FiUser />
+                <Link>
                   Perfil
-                </button>
-                <button className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer">
+                </Link>
+                </div>
+                
+                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+                <FiSettings />
+                <Link>
                   Configuración
-                </button>
-                <button className="w-full text-left px-4 py-2 hover:bg-primary/10 text-red-500 cursor-pointer">
+                </Link>
+                </div>
+                
+                <div className="w-full text-left px-4 py-2 cursor-pointer">
+                <LogoutButton className="">
                   Cerrar sesión
-                </button>
+                </LogoutButton>
+                </div>
               </div>
             )}
           </div>
