@@ -13,13 +13,8 @@ import LandingPage from "../pages/LandingPage";
 import PublicServicesPage from "../pages/ServicesPage";
 import ExpedientesPagePorDoctor from "../pages/ExpedientePorDoctorPage";
 import EmpleadosPage from "../pages/administracionEmpleados/empleadosPage";
-import ExpedientesPage from '../pages/ExpedientePage';
-import DashboardPage from '../pages/DashboardPage';
-import NotFoundPage from '../pages/NotFoundPage';
-import HistorialdelPaciente from '../pages/HistorialdelPaciente';
 import HomePaciente from '../pages/HomePaciente'
 import ProtectedRoute from "../components/ProtectedRoute";
-
 import RecepcionistaPage from "../pages/RecepcionistaPage";
 
 
