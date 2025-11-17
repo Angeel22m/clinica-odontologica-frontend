@@ -15,7 +15,7 @@ const DoctorPage: React.FC = () => {
     const {nombre,apellido} = useAuth();
 
     return (
-        <div className="max-w-7xl w-full mx-auto p-6 bg-light border border-primary/20 rounded-2xl shadow-xl font-inter">
+        <div className="w-full mx-auto p-6 bg-light border border-primary/20 rounded-2xl shadow-xl font-inter">
             
            {/* --- CABECERA (Doctor Info y Botones) --- */}
 <header className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-3 sm:gap-4">

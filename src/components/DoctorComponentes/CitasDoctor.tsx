@@ -15,10 +15,12 @@ const CitasDoctor: React.FC = () => {
   const [error, setError] = useState("");
 
   // FILTROS
-  const [filtroTiempo, setFiltroTiempo] = useState("todos");
   const [filtroEstado, setFiltroEstado] = useState("todos");
-  const [fechaEspecifica, setFechaEspecifica] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
+  const [filtroTiempo, setFiltroTiempo] = useState<"todos" | "dia" | "semana" | "mes">("todos");
+  const [fechaEspecifica, setFechaEspecifica] = useState(""); // YYYY-MM-DD
+
 
   const filterButton = (id: string, active: string) =>
     `px-3 py-1 text-xs rounded-full border shadow-sm ${
@@ -47,22 +49,23 @@ const CitasDoctor: React.FC = () => {
     if (idEmpleado > 0) loadCitas();
   }, [idEmpleado]);
 
-  // ==========================================================
-  // FILTROS
-  // ==========================================================
-  const citasFiltradas = useMemo(() => {
-    let data = [...citas];
+  //filtros
+const citasFiltradas = useMemo(() => {
+  let data = [...citas];
 
-    if (filtroEstado !== "todos") {
-      data = data.filter((c) => c.estado === filtroEstado);
-    }
+  // Filtrar por estado
+  if (filtroEstado !== "todos") {
+    data = data.filter((c) => c.estado === filtroEstado);
+  }
 
-    if (filtroTiempo === "dia" && fechaEspecifica) {
-      data = data.filter((c) => c.fecha.startsWith(fechaEspecifica));
-    }
+  // Filtrar por día
+  if (filtroTiempo === "dia" && fechaEspecifica) {
+    data = data.filter((c) => c.fecha?.substring(0, 10) === fechaEspecifica);
+  }
 
-    return data;
-  }, [citas, filtroTiempo, filtroEstado, fechaEspecifica]);
+  return data;
+}, [citas, filtroEstado, filtroTiempo, fechaEspecifica]);
+
 
   const totalPages = Math.ceil(citasFiltradas.length / ITEMS_PER_PAGE);
 

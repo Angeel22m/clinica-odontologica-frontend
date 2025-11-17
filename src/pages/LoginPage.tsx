@@ -62,7 +62,7 @@ const redirectByRole = (rol: string) => {
       window.location.href = "/home";
       break;
 
-    case "PACIENTE":
+    case "CLIENTE":
       window.location.href = "/home/paciente";
       break;
 
