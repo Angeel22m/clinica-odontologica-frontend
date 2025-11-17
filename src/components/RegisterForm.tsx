@@ -100,10 +100,6 @@ export default function RegisterForm() {
           {[
             { name: "nombre", label: "Nombre", type: "text", placeholder: "Nombre" },
             { name: "apellido", label: "Apellido", type: "text", placeholder: "Apellido" },
-            { name: "dni", label: "DNI", type: "text", placeholder: "XXXX-XXXX-XXXXX" },
-            { name: "telefono", label: "Teléfono", type: "tel", placeholder: "+504 XXXX-XXXX" },
-            { name: "direccion", label: "Dirección", type: "text", placeholder: "Direccion completa" },
-            { name: "fechaNac", label: "Fecha de nacimiento", type: "date" },
           ].map((field) => (
             <div key={field.name} className="flex flex-col">
               <label

@@ -130,7 +130,7 @@ export default function HomePaciente() {
               { citasPendientes.map(cita => (
                 <div
                   key = {cita.id}
-                  className="p-4 border border-primary/20 rounded-lg shadow-sm hover:shadow-lg transition"
+                  className="p-4 border-l-4 border-accent rounded-lg shadow-sm hover:shadow-lg transition"
                 >
                   <div className="text-lg font-semibold text-primary">
                     {cita.servicio?.nombre}

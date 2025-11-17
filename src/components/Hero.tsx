@@ -2,7 +2,7 @@ import Button from './Button'
 
 export default function Hero() {
   return (
-    <section className="pt-32 text-center px-6">
+    <section className="pt-32 flex flex-col gap-2 text-center items-center justify-center px-6">
       <h1 className="text-5xl font-bold text-primary">
         Sonríe con confianza
       </h1>
