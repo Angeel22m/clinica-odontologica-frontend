@@ -78,5 +78,12 @@
   {
     "persona": { "id": 20, "nombre": "Yessenia", "apellido": "Baca", "dni": "080119930025", "telefono": "9991025", "direccion": "Zona Universitaria", "fechaNac": "1993-01-25", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
     "user":    { "id": 20, "correo": "c20@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 20, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
+  },
+
+  {
+    "persona": { "id": 21, "nombre": "Paciente", "apellido": "Incompleto", "dni": "", "telefono": "", "direccion": "", "fechaNac": "", "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" },
+    "user":    { "id": 21, "correo": "incompleto@mail.com", "rol": "CLIENTE", "activo": true, "personaId": 21, "createdAt": "2025-01-01T00:00:00.000Z", "updatedAt": "2025-01-01T00:00:00.000Z" }
   }
 ]
+
+
