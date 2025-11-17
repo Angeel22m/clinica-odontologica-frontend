@@ -5,10 +5,10 @@ import AboutUsSection from '../components/AboutUsSection'
 
 export default function HomePage() {
   return (
-    <div className="bg-light min-h-screen relative">
+    <div className="bg-light min-h-screen relative ">
       <Header />
-      <main>
-        <Hero />
+      <main className="flex flex-col justify-center gap-12">
+        <Hero/>
         <div className="border border-1 mt-12"></div>
         <AboutUsSection />
         <div className="border border-1 mt-12"></div>
@@ -17,3 +17,4 @@ export default function HomePage() {
     </div>
   )
 }
+
