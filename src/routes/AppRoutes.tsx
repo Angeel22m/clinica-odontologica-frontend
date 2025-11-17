@@ -1,6 +1,18 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import ExpedientesPage from "../pages/ExpedientePage";
+import DashboardPage from "../pages/DashboardPage";
+import NotFoundPage from "../pages/NotFoundPage";
+import HistorialdelPaciente from "../pages/HistorialdelPaciente";
+import RegisterPage from "../pages/RegisterPage";
+import AdminServicesPage from "../pages/AdminServicesPage";
+import LoginPage from "../pages/LoginPage";
+import HomePage from "../pages/HomePage";
+import LandingPage from "../pages/LandingPage";
+import PublicServicesPage from "../pages/ServicesPage";
+import ExpedientesPagePorDoctor from "../pages/ExpedientePorDoctorPage";
+import EmpleadosPage from "../pages/administracionEmpleados/empleadosPage";
 import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
@@ -16,6 +28,9 @@ import ExpedientesPagePorDoctor from '../pages/ExpedientePorDoctorPage'
 import EmpleadosPage from '../pages/administracionEmpleados/empleadosPage'
 import HomePaciente from '../pages/HomePaciente'
 import ProtectedRoute from "../components/ProtectedRoute";
+
+import RecepcionistaPage from "../pages/RecepcionistaPage";
+
 
 const AppRoutes: React.FC = () => {
   return (
@@ -42,7 +57,7 @@ const AppRoutes: React.FC = () => {
           />
         }
       />
-
+      
       <Route
         path="/expedientes"
         element={
@@ -92,6 +107,21 @@ const AppRoutes: React.FC = () => {
           />
         }
       />
+
+
+    <Route path="/recepcionista" element={<RecepcionistaPage />} />
+
+
+    {/* <Route
+        path="/recepcionista"
+        element={
+          <ProtectedRoute
+            element={<RecepcionistaPage />}
+            allowedRoles={["RECEPCIONISTA, ADMIN"]}
+          />
+        }
+      /> */}
+
 
       {/* Fallback */}
       <Route path="*" element={<LandingPage/>} />

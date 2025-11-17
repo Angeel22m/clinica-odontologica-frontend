@@ -42,8 +42,8 @@ export async function login(correo: string, password: string): Promise<LoginResp
 /**
  * SIGNUP
  * Puede devolver:
- *  ✅ { code: 10, message: "Usuario creado" }
- *  ❌ { statusCode: 400, message: [ "error1", "error2" ] }
+ *   { code: 10, message: "Usuario creado" }
+ *   { statusCode: 400, message: [ "error1", "error2" ] }
  * Por eso NO se tipa como LoginResponse
  */
 export async function signup(data: SignupPayload): Promise<any> {
