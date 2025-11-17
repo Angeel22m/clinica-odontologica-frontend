@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ModalAgendarCita from "../components/ModalAgendarCita";
+import ModalEditarCita from "../components/ModalEditarCita";
 import { FiMenu } from "react-icons/fi";
 import { FiBell } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,13 +9,26 @@ import axios from "axios";
 export default function HomePaciente() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showModalEditar, setShowModalEditar] = useState(false);
   const [citasPendientes, setCitasPendientes] = useState([]);
+  const [citaEditando, setCitaEditando] = useState(null);
   
   const user = JSON.parse(localStorage.getItem('user'));
   if (!user || !user.id) {
     window.location.href = 'http://localhost:5173/login';
     return null;
   }
+  
+  const fetchCitasPendientes = async () => {
+  try {
+    const pacienteId = user.personaId;
+    const res = await axios.get(`http://localhost:3000/citas/paciente/${pacienteId}`);
+    setCitasPendientes(Array.isArray(res.data) ? res.data : []);
+  } catch (err) {
+    console.error('error al cargar las citas pendientes', err);
+  }
+};
+
   
   useEffect(() => {
     const fetchCitasPendientes = async () => {
@@ -30,7 +44,32 @@ export default function HomePaciente() {
       }
     };
     fetchCitasPendientes(); 
-  }, [])
+  }, []);
+  
+  const handleEditar = (cita) => {
+    setCitaEditando(cita);
+    setShowModalEditar(true);
+  };
+  
+  const handleEliminar = async (cita) => {
+  
+    if (!confirm("Estas seguro de cancelar esta cita?")) return;
+    
+    try {
+      const res = await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`);
+      
+      if (res.data.code === 0) {
+        alert("Cita cancelada correctamente");
+        fetchCitasPendientes()
+      } else {
+        alert(res.data.message);
+      }
+    }  catch (err) {
+        console.error("Error al cancelar cita:", err);
+        alert("Ocurrio un error al cancelar la cita");
+    }
+  };
+  
 
   return (
     <div className="min-h-screen bg-light text-primary">
@@ -107,7 +146,7 @@ export default function HomePaciente() {
                   <div className="mt-1 text-sm text-gray-600">
                     Fecha y Hora:{" "}
                     <span className="font-medium text-dark">
-                      {new Date(cita.fecha).toLocaleDateString()} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
+                      {cita.fecha.split("T")[0]} - {cita.hora.length===6 ? cita.hora.slice(1).replace('_', ':') : cita.hora}
                     </span>
                   </div>
                   
@@ -119,7 +158,7 @@ export default function HomePaciente() {
                     </button>
                   
                     <button
-                      onClick={() => handleEliminar(cita.id)}
+                      onClick={() => handleEliminar(cita)}
                       className="px-3 py-1 rounded-lg btn-alert cursor-pointer"
                     >Cancelar
                     </button>
@@ -145,7 +184,21 @@ export default function HomePaciente() {
       </main>
 
       {/* MODAL */}
-      {showModal && <ModalAgendarCita onClose={() => setShowModal(false)} />}
+      {showModal && 
+      <ModalAgendarCita onClose={() => {
+      setShowModal(false);
+      fetchCitasPendientes();
+      }} />}
+      {showModalEditar && citaEditando && (
+        <ModalEditarCita 
+          cita={citaEditando}
+          onClose={() => setShowModalEditar(false)}
+          onUpdated={() => {
+            setShowModalEditar(false);
+            fetchCitasPendientes();
+          }}
+        />
+      )}
     </div>
   );
 }
