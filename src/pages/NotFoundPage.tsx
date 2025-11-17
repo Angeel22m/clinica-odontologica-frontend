@@ -37,7 +37,7 @@ const NotFoundPage: React.FC = () => {
       hover:shadow-xl
     "
   >
-    Volver al Dashboard
+    Volver a Landing
   </Link>
 
   {/* Pequeña Referencia Opcional */}
