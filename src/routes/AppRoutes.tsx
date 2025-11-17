@@ -15,6 +15,7 @@ import HomePaciente from '../pages/HomePaciente'
 import ProtectedRoute from "../components/ProtectedRoute";
 import  DoctorPage from "../pages/DoctorPage";
 import { useAuth } from "../hooks/UseAuth";
+import RecepcionistaPage from '../pages/RecepcionistaPage';
 
 // solo es para pruebas luego se dejan los roles correspondientes
 const allUser  =['ADMIN',"CLIENTE","ADMINISTRADOR","DOCTOR"] 
@@ -30,6 +31,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
+      <Route path="/recepcionista" element={<RecepcionistaPage />} />
 
       
           
@@ -90,6 +92,7 @@ const AppRoutes: React.FC = () => {
           />
         }
       />
+      
 
       <Route
         path="/admin/services"

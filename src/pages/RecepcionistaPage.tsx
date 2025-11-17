@@ -1,16 +1,14 @@
 // src/pages/RecepcionistaPage.tsx
-import React, { useState, useRef, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, Navigate } from "react-router-dom";
 import {
-  Menu,
   Search,
-  User,
   Calendar,
   ClipboardList,
   AlertTriangle,
-  FileText,
-  LogOut,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiMenu, FiSettings, FiUser } from "react-icons/fi";
 
 import EditarPacienteModal from "../components/EditarPacienteModal";
 import modificarInfoService, {
@@ -19,6 +17,8 @@ import modificarInfoService, {
 } from "../services/modificarInfoService";
 import { getCitasByPaciente } from "../services/citasService";
 import type { Cita } from "../types/cita";
+import LogoutButton from "../components/LogoutButton";
+import RegisterForm from "../components/RecepcionistaComponentes/RegisterForm";
 
 export default function RecepcionistaPage() {
   const userString = localStorage.getItem("user");
@@ -36,6 +36,7 @@ export default function RecepcionistaPage() {
   const correoRecepcionista: string = user.correo || "Sin correo";
 
   const [searchEmail, setSearchEmail] = useState("");
+  const [open, setOpen] = useState(false);
   const [paciente, setPaciente] = useState<PacienteRecepcionista | any | null>(
     null
   );
@@ -45,6 +46,14 @@ export default function RecepcionistaPage() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenModal = () => {
+        setOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpen(false);
+    };
 
   const datosIncompletos = (p: any) => {
     if (!p) return false;
@@ -136,16 +145,6 @@ export default function RecepcionistaPage() {
     }
   };
 
-  const handleLogout = () => {
-    const confirmLogout = window.confirm(
-      "¿Estás seguro de que deseas cerrar sesión?"
-    );
-    if (!confirmLogout) return;
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  };
 
   // Cerrar el menú de hamburguesa si se hace click fuera
   useEffect(() => {
@@ -183,40 +182,57 @@ export default function RecepcionistaPage() {
             {correoRecepcionista}
           </span>
 
-          <button
-            className="p-2 rounded bg-gray-200 hover:bg-gray-300 shadow-sm"
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            <Menu size={22} />
-          </button>
+          {/* MENÚ DESPLEGABLE */}
+          <div className="relative">
+            <AnimatePresence mode="wait">
+            <motion.button
+            onClick={() => setMenuOpen(!menuOpen)}
+            animate={{rotate: menuOpen ? -90 : 0}}
+            transition = {{ duration: 0.2}}
+            className="p-2">
+            <FiMenu
+              className="hover:text-info transition h-7 w-7 cursor-pointer"
+            />
+            </motion.button>
+            </AnimatePresence>
 
-          {menuOpen && (
-            <div
-              ref={menuRef}
-              className="absolute right-0 top-10 bg-white text-gray-900 shadow-xl rounded border border-gray-200 p-3 z-10 w-48"
-            >
-              <button className="flex items-center gap-2 py-1 w-full text-left hover:bg-gray-100 rounded px-2">
-                <User size={18} /> Perfil
-              </button>
-              <button className="flex items-center gap-2 py-1 w-full text-left hover:bg-gray-100 rounded px-2">
-                <FileText size={18} /> Configuración
-              </button>
-              <button
-                className="flex items-center gap-2 py-1 w-full text-left text-red-600 hover:bg-gray-100 rounded px-2"
-                onClick={handleLogout}
-              >
-                <LogOut size={18} /> Cerrar sesión
-              </button>
-            </div>
-          )}
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50">
+              
+                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+                <FiUser />
+                <Link>
+                  Perfil
+                </Link>
+                </div>
+                
+                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+                <FiSettings />
+                <Link>
+                  Configuración
+                </Link>
+                </div>
+                
+                <div className="w-full text-left px-4 py-2 cursor-pointer">
+                <LogoutButton className="">
+                  Cerrar sesión
+                </LogoutButton>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Botones principales */}
       <div className="flex gap-4 mb-6">
-        <button className="btn-accent shadow-sm">
+        <button className="btn-accent shadow-sm"
+        onClick={handleOpenModal}
+        >
           Registrar Cliente
         </button>
+        <RegisterForm open={open} onClose={handleCloseModal}/>
+      
 
         <button className="btn-accent shadow-sm">
           Generar Factura

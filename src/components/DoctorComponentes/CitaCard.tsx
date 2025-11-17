@@ -52,10 +52,6 @@ const CitaCard: React.FC<{ cita: Cita }> = ({ cita }) => {
       ? "border-success"
       : "border-info";
 
-  const handleAction = (accion: string) => {
-    console.log("Acción:", accion, cita.id);
-  };
-
   return (
     <div
       className={`cursor-pointer bg-light border-l-4 rounded-xl p-6 shadow-md hover:shadow-lg transition-all ${estadoBorderClass}`}

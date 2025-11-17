@@ -62,7 +62,7 @@ const handleGoogleLogin = async () => {
       break;
 
     case "RECEPCIONISTA":
-      window.location.href = "/home";
+      window.location.href = "/recepcionista";
       break;
 
     case "CLIENTE":
