@@ -17,15 +17,6 @@ import ExpedientesPage from '../pages/ExpedientePage';
 import DashboardPage from '../pages/DashboardPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import HistorialdelPaciente from '../pages/HistorialdelPaciente';
-
-import RegisterPage from '../pages/RegisterPage'
-import AdminServicesPage from '../pages/AdminServicesPage';
-import LoginPage from '../pages/LoginPage';
-import HomePage from '../pages/HomePage';
-import LandingPage from '../pages/LandingPage';
-import PublicServicesPage from '../pages/ServicesPage'
-import ExpedientesPagePorDoctor from '../pages/ExpedientePorDoctorPage'
-import EmpleadosPage from '../pages/administracionEmpleados/empleadosPage'
 import HomePaciente from '../pages/HomePaciente'
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -45,7 +36,8 @@ const AppRoutes: React.FC = () => {
       <Route path="/empleados" element={<EmpleadosPage />} />
       <Route path="/expedientes/doctor" element={<ExpedientesPagePorDoctor doctorId={1} />} />
       <Route path="/home/paciente" element={<HomePaciente />} />
-
+      
+      <Route path="/recepcionista" element={<RecepcionistaPage />} />
 
       {/* Rutas protegidas por rol */}
       <Route
@@ -109,18 +101,10 @@ const AppRoutes: React.FC = () => {
       />
 
 
-    <Route path="/recepcionista" element={<RecepcionistaPage />} />
+    
 
 
-    {/* <Route
-        path="/recepcionista"
-        element={
-          <ProtectedRoute
-            element={<RecepcionistaPage />}
-            allowedRoles={["RECEPCIONISTA, ADMIN"]}
-          />
-        }
-      /> */}
+   
 
 
       {/* Fallback */}
