@@ -9,7 +9,7 @@ import axios from "axios";
 import LogoutButton from "../components/LogoutButton";
 import { FiSettings } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
-
+import { useAuth } from "../hooks/UseAuth";
 export default function HomePaciente() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -40,9 +40,6 @@ export default function HomePaciente() {
         const pacienteId = user.personaId;
         
         const res = await axios.get(`http://localhost:3000/citas/paciente/${pacienteId}`);
-        
-        console.log(res.data);
-        console.log(pacienteId);
         
         setCitasPendientes(Array.isArray(res.data) ? res.data : []);
         
@@ -82,8 +79,10 @@ export default function HomePaciente() {
   return (
     <div className="min-h-screen bg-light text-primary">
       {/* HEADER */}
-      <header className="w-full bg-white shadow-sm py-3 px-6 flex justify-end items-center">
+      <header className="w-full bg-white shadow-sm py-3 px-6 flex items-center justify-between">
+         <div className="text-success text-3xl font-bold mb-3" >{`Hola, ${JSON.parse(localStorage.getItem('user')).persona.nombre}`}</div>
         <nav className="flex items-center gap-8">
+             
           <Link to={"/Historial"} className="hover:text-info transition cursor-pointer">Historial clínico
           </Link>
           
@@ -139,10 +138,10 @@ export default function HomePaciente() {
 
       {/* CONTENIDO PRINCIPAL */}
       <main className="p-5 max-w-7xl mx-auto">
-      <div className="text-success text-3xl font-bold mb-3" >{`Hola, ${JSON.parse(localStorage.getItem('user')).persona.nombre}`}</div>
+  
         <div className="grid md:grid-cols-2 gap-6">
           {/* Citas pendientes */}
-          <section className="bg-white shadow-xl rounded-xl p-6 max-h-[500px] overflow-y-auto">
+          <section className="bg-white shadow-xl rounded-xl p-6 md:max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-medium mb-3">
               Citas pendientes de asistir
             </h2>

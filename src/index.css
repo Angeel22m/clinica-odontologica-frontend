@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 @theme {
@@ -14,62 +13,9 @@
   --color-alert: #F01E1E;
 }
 
-/* Botones principales */
-.btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-light);
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  transition: background-color 0.3s;
-  cursor: pointer;
-}
-
-.btn-alert {
-  background-color: var(--color-alert);
-  color: var(--color-light)
-}
-
-.btn-primary:hover {
-  background-color: var(--color-light);
-  color: var(--color-primary);
-}
-/* Botón de acento (Adjuntar Archivo y similar) */
-.btn-accent {
-  background-color: var(--color-primary); /* azul claro */
-  color: var(--color-light);
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.3s, color 0.3s;
-  cursor: pointer;
-}
-
-.btn-accent:hover {
-  background-color: var(--color-info); /* azul más oscuro al pasar el mouse */
-  color: var(--color-light);
-}
-
-/* Botón “Nueva Consulta” */
-.btn-nueva-consulta {
-  background-color: var(--color-accent);
-  color: var(--color-light);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.3s, color 0.3s;
-  cursor: pointer;
-}
-
-.btn-nueva-consulta:hover {
-  background-color: var(--color-info); /* azul más oscuro al hover */
-  color: var(--color-light);
-}
-
-/* Botón primario */
+/* ------------------------------- */
+/*       BOTONES PRINCIPALES       */
+/* ------------------------------- */
 .btn-primary {
   background-color: var(--color-primary);
   color: var(--color-light);
@@ -84,49 +30,82 @@
   color: var(--color-light);
 }
 
-/* Texto y fondos generales */
-.text-primary {
-  color: var(--color-primary);
-}
-
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.text-light {
+.btn-alert {
+  background-color: var(--color-alert);
   color: var(--color-light);
 }
 
-.bg-light {
-  background-color: var(--color-light);
+.btn-accent {
+  background-color: var(--color-primary);
+  color: var(--color-light);
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
 }
 
-.text-accent {
-  color: var(--color-accent);
-}
-
-.bg-accent {
-  background-color: var(--color-accent);
-}
-
-.text-info {
-  color: var(--color-info);
-}
-
-.bg-info {
+.btn-accent:hover {
   background-color: var(--color-info);
+  color: var(--color-light);
 }
 
-.text-success {
-  color: var(--color-success);
+.btn-nueva-consulta {
+  background-color: var(--color-accent);
+  color: var(--color-light);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
 }
 
-.bg-success {
-  background-color: var(--color-success);
+.btn-nueva-consulta:hover {
+  background-color: var(--color-info);
+  color: var(--color-light);
 }
+
+.btn-ligth {
+  background-color: var(--color-light);
+  color: var(--color-accent);
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.3s color 0.3s;
+  cursor: pointer;
+}
+
+/* ------------------------------- */
+/*       TEXTO Y FONDOS            */
+/* ------------------------------- */
+.text-primary { color: var(--color-primary); }
+.bg-primary { background-color: var(--color-primary); }
+
+.text-light { color: var(--color-light); }
+.bg-light { background-color: var(--color-light); }
+
+.text-accent { color: var(--color-accent); }
+.bg-accent { background-color: var(--color-accent); }
+
+.text-info { color: var(--color-info); }
+.bg-info { background-color: var(--color-info); }
+
+.text-success { color: var(--color-success); }
+.bg-success { background-color: var(--color-success); }
+
+/* ------------------------------- */
+/*       OVERLAY                   */
+/* ------------------------------- */
 .overlay-dark {
   background-color: rgba(0,0,0,0.6);
+}
 
+/* ------------------------------- */
+/*       ANIMACIONES               */
+/* ------------------------------- */
 @keyframes slide-in {
   from {
     opacity: 0;
@@ -152,28 +131,15 @@
     transform: translateX(100%);
   }
 }
-.bg-primary\/10 {
-  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
-}
 
-.bg-accent\/10 {
-  background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
-}
+/* ------------------------------- */
+/*       COLORES CON OPACIDAD      */
+/* ------------------------------- */
+.bg-primary\/10 { background-color: color-mix(in srgb, var(--color-primary) 10%, transparent); }
+.bg-accent\/10 { background-color: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.bg-success\/20 { background-color: color-mix(in srgb, var(--color-success) 20%, transparent); }
 
-.bg-success\/20 {
-  background-color: color-mix(in srgb, var(--color-success) 20%, transparent);
-}
+.text-primary\/70 { color: color-mix(in srgb, var(--color-primary) 70%, transparent); }
+.text-primary\/60 { color: color-mix(in srgb, var(--color-primary) 60%, transparent); }
 
-.text-primary\/70 {
-  color: color-mix(in srgb, var(--color-primary) 70%, transparent);
-}
-
-.text-primary\/60 {
-  color: color-mix(in srgb, var(--color-primary) 60%, transparent);
-}
-
-.border-primary\/10 {
-  border-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
-}
-
-}
+.border-primary\/10 { border-color: color-mix(in srgb, var(--color-primary) 10%, transparent); }

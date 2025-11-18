@@ -33,4 +33,5 @@ export interface Cita {
   updatedAt: string;
   servicio: Servicio;
   paciente: Paciente;
+  expedienteId: number;
 }

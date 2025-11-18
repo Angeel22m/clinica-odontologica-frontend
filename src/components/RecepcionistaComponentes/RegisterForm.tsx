@@ -92,7 +92,7 @@ const  RegisterForm : React.FC<crearClienteFormProps> = ({
 
   return (
     <Modal open={open} onClose={onClose} title="Registrar Nuevo Cliente">
-    <div className="flex justify-center items-center bg-white py-6">
+    <div className="flex justify-center items-center bg-white max-w-lg">
       <form
         onSubmit={handleSubmit}
         className="bg-light p-8 pt-6 pb-7 rounded-2xl shadow-xl w-full max-w-3xl"

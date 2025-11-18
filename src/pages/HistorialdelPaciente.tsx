@@ -40,10 +40,14 @@ const HistorialdelPaciente: React.FC<{ pacienteId: number}> = ({ pacienteId}) =>
   return (
     <div className="relative p-6 bg-light rounded-xl shadow-xl m-8">
         
-        <button className="btn-primary flex items-center gap-1">
-        <FiChevronLeft />
-        <Link to={"/home/paciente"}>Regresar</Link>
+        
+        <button>
+      <Link className="btn-primary flex items-center gap-1" to={"/home/paciente"}>
+      <FiChevronLeft />
+      Regresar</Link>
         </button>
+        
+        
 	
 
       {/* Encabezado */}

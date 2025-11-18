@@ -1,10 +1,11 @@
 import { FiPhone, FiClipboard, FiClock } from "react-icons/fi";
 import type { Cita } from "../../types/TypesCitas/CitasPorDoctor";
+import ModalDetalleCita from "../DoctorComponentes/modalDetalleCita"
+import { useState } from "react";
 
 const formatHora = (code: string): string => {
 
   const [horaStr, minStr] = code.split(":");
-
   const hora = parseInt(horaStr, 10);
   const minutos = parseInt(minStr, 10);
 
@@ -13,7 +14,6 @@ const formatHora = (code: string): string => {
   }
 
   const ampm = hora >= 12 ? "PM" : "AM";
-
   let hora12 = hora % 12;
   if (hora12 === 0) {
     hora12 = 12; 
@@ -26,6 +26,7 @@ const formatHora = (code: string): string => {
 
 
 const CitaCard: React.FC<{ cita: Cita }> = ({ cita }) => {
+  const [openModal, setOpenModal] = useState(false);
   const nombrePaciente = `${cita.paciente.nombre} ${cita.paciente.apellido}`;
   const nombreServicio = cita.servicio.nombre;
 
@@ -40,20 +41,28 @@ const CitaCard: React.FC<{ cita: Cita }> = ({ cita }) => {
   // Colores por estado
   const estadoPillClass =
     cita.estado === "PENDIENTE"
-      ? "bg-primary text-light"
-      : cita.estado === "CONFIRMADA"
-      ? "bg-success text-light"
-      : "bg-info text-light";
+              ? "bg-primary text-light"
+              : cita.estado === "CONFIRMADA"
+              ? "bg-success text-light"
+              : cita.estado === "CANCELADA"
+              ? "bg-alert text-light"
+              : "bg-info text-light"
+      
 
   const estadoBorderClass =
     cita.estado === "PENDIENTE"
       ? "border-primary"
       : cita.estado === "CONFIRMADA"
       ? "border-success"
-      : "border-info";
+      : cita.estado === "CANCELADA"
+      ? "border-alert"
+      : "border-info"      
+      ;
 
   return (
+    <>
     <div
+     onClick={() => setOpenModal(true)}
       className={`cursor-pointer bg-light border-l-4 rounded-xl p-6 shadow-md hover:shadow-lg transition-all ${estadoBorderClass}`}
     >
       {/* HEADER */}
@@ -90,6 +99,13 @@ const CitaCard: React.FC<{ cita: Cita }> = ({ cita }) => {
         </p>
       </div>
     </div>
+      {/* MODAL DETALLE CITA */}
+      <ModalDetalleCita
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        cita={cita}
+      />
+      </>
   );
 };
 

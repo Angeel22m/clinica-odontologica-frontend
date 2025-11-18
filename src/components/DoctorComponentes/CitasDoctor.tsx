@@ -104,7 +104,7 @@ const citasFiltradas = useMemo(() => {
             <span>Filtrar por tiempo:</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 [&>*]:cursor-pointer">
             <button
               className={filterButton("todos", filtroTiempo)}
               onClick={() => setFiltroTiempo("todos")}
@@ -125,7 +125,7 @@ const citasFiltradas = useMemo(() => {
                 setFechaEspecifica(e.target.value);
                 setFiltroTiempo("dia");
               }}
-              className="text-xs p-1 border rounded-md"
+              className="text-xs p-1 border rounded-md cursor-pointer"
             />
           </div>
         </div>
@@ -137,7 +137,7 @@ const citasFiltradas = useMemo(() => {
             <span>Filtrar por estado:</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 [&>*]:cursor-pointer">
             <button
               className={filterButton("todos", filtroEstado)}
               onClick={() => setFiltroEstado("todos")}
@@ -167,7 +167,7 @@ const citasFiltradas = useMemo(() => {
       </div>
 
       {/* PAGINACIÓN */}
-      <div className="flex flex-wrap justify-center gap-2 overflow-x-auto py-2">
+      <div className="flex flex-wrap justify-center gap-2 overflow-x-auto py-2 [&>*]:cursor-pointer">
         {[...Array(totalPages)].map((_, i) => (
           <button
             key={i}

@@ -224,7 +224,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
                         }`}
                         onClick={() => setFormData(prev => ({ ...prev, hora }))}
                       >
-                        {hora.slice(1).replace('_', ':')}
+                        {hora}
                       </button>
                     ))}
                   </div>

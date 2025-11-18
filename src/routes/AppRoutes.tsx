@@ -64,7 +64,7 @@ const AppRoutes: React.FC = () => {
       />
         
       <Route
-        path="/expedientes/doctor"
+        path="/expedientes/doctor/:expedienteId?"
         element={
           <ProtectedRoute
             element={<ExpedientesPagePorDoctor doctorId={idEmpleado} />}

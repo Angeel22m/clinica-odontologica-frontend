@@ -4,6 +4,7 @@ import type {
   PacienteRecepcionista,
   PacienteModificarPayload,
 } from "../services/modificarInfoService";
+import Modal from "./modal"; // Asegúrate que la ruta sea correcta
 
 interface EditarPacienteModalProps {
   open: boolean;
@@ -19,23 +20,24 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
   onSave,
 }) => {
   const [form, setForm] = useState<PacienteModificarPayload>({
-    // nombre: "",
-    // apellido: "",
+    // Estos campos se inicializarán en useEffect
     dni: "",
     telefono: "",
     direccion: "",
     fechaNac: "",
+    // Se incluye 'password' porque es modificable
+    password: "", 
   });
 
   useEffect(() => {
     if (open && paciente) {
+      // Inicializar el formulario con los datos del paciente.
       setForm({
-        // nombre: paciente.nombre ?? "",
-        // apellido: paciente.apellido ?? "",
         dni: paciente.dni ?? "",
         telefono: paciente.telefono ?? "",
         direccion: paciente.direccion ?? "",
         fechaNac: paciente.fechaNac ? paciente.fechaNac.slice(0, 10) : "",
+        password: "", // La contraseña siempre debe inicializarse vacía por seguridad.
       });
     }
   }, [open, paciente]);
@@ -52,146 +54,156 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await onSave(form);
+    
+    // Si la contraseña está vacía, no la enviamos al servicio.
+    const payload: PacienteModificarPayload = form.password
+      ? form
+      : { ...form, password: undefined }; 
+      
+    await onSave(payload);
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6">
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Editar información del paciente
-        </h2>
+    // Se elimina el Fragment innecesario y se usa directamente Modal.
+    // El div anidado 'flex justify-center items-center bg-white max-w-lg' es redundante 
+    // porque el componente Modal ya lo maneja.
+    <Modal open={open} onClose={onClose} title="Editar Paciente">
+      {/* Aplicamos estilos de scroll al form si es necesario. 
+        Si el componente Modal ya maneja el scroll en el children, solo necesitamos el 'space-y-3'.
+        Si quieres que el formulario ocupe un ancho específico, usa w-full max-w-xl.
+      */}
+      <form onSubmit={handleSubmit} className="space-y-4 pt-3"> 
+        {/* CORREO Y CONTRASEÑA */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Correo
+          </label>
+          <input
+            type="email"
+            value={paciente.correo}
+            disabled
+            className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+          />
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Contraseña (Dejar vacío para no cambiar)
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={form.password || ""}
+            onChange={handleChange}
+            placeholder="********"
+            className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* NOMBRE Y APELLIDO (DESHABILITADOS) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Correo
-            </label>
-            <input
-              type="email"
-              value={paciente.correo}
-              disabled
-              className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-            />
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Contraseña
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={form.password || ""}
-                onChange={handleChange}
-                className="mt-1 w-full p-2 border rounded-lg"
-              />
-            </div>
-
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Nombre
-              </label>
-              <input
-                type="text"
-                name="nombre"
-                // value={form.nombre || ""}
-                disabled
-                value={paciente.nombre || ""}
-                onChange={handleChange}
-                className="mt-1 w-full p-2 border rounded-lg"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Apellido
-              </label>
-              <input
-                type="text"
-                name="apellido"
-                value={paciente.apellido || ""}
-                disabled
-                onChange={handleChange}
-                className="mt-1 w-full p-2 border rounded-lg"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                DNI
-              </label>
-              <input
-                type="text"
-                name="dni"
-                value={form.dni || ""}
-                onChange={handleChange}
-                className="mt-1 w-full p-2 border rounded-lg"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Teléfono
-              </label>
-              <input
-                type="text"
-                name="telefono"
-                value={form.telefono || ""}
-                onChange={handleChange}
-                className="mt-1 w-full p-2 border rounded-lg"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Dirección
+              Nombre
             </label>
             <input
               type="text"
-              name="direccion"
-              value={form.direccion || ""}
-              onChange={handleChange}
-              className="mt-1 w-full p-2 border rounded-lg"
+              name="nombre"
+              value={paciente.nombre || ""}
+              disabled
+              className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Fecha de nacimiento
+              Apellido
             </label>
             <input
-              type="date"
-              name="fechaNac"
-              value={form.fechaNac || ""}
+              type="text"
+              name="apellido"
+              value={paciente.apellido || ""}
+              disabled
+              className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+            />
+          </div>
+        </div>
+
+        {/* DNI Y TELÉFONO (EDITABLES) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              DNI
+            </label>
+            <input
+              type="text"
+              name="dni"
+              value={form.dni || ""}
               onChange={handleChange}
-              className="mt-1 w-full p-2 border rounded-lg"
+              className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-accent text-white hover:bg-info"
-            >
-              Guardar cambios
-            </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Teléfono
+            </label>
+            <input
+              type="text"
+              name="telefono"
+              value={form.telefono || ""}
+              onChange={handleChange}
+              className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            />
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+
+        {/* DIRECCIÓN (EDITABLE) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Dirección
+          </label>
+          <input
+            type="text"
+            name="direccion"
+            value={form.direccion || ""}
+            onChange={handleChange}
+            className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* FECHA DE NACIMIENTO (EDITABLE) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Fecha de nacimiento
+          </label>
+          <input
+            type="date"
+            name="fechaNac"
+            value={form.fechaNac || ""}
+            onChange={handleChange}
+            className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* BOTONES */}
+        <div className="flex justify-end gap-3 pt-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg btn-primary border border-gray-300 text-gray-700 hover:bg-gray-100 transition duration-150"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 btn-accent rounded-lg bg-accent text-white hover:bg-info transition duration-150"
+          >
+            Guardar cambios
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 

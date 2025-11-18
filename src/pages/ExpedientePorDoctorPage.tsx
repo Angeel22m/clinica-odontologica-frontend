@@ -4,7 +4,7 @@ import { ExpedienteDetalle } from "../components/ExpedienteDetails";
 import { ArrowLeftCircle } from "lucide-react";
 import { fetchExpedientesByDoctor } from "../services/expedientesService";
 import type { Expediente } from "../types/expediente";
-import { Link } from "react-router-dom";
+import { Link,useParams, useNavigate } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
 
 
@@ -22,6 +22,35 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { expedienteId } = useParams<{ expedienteId: string }>();
+  const navigate = useNavigate();
+  const urlExpedienteId = expedienteId ? parseInt(expedienteId) : null;
+
+  const initialSelectedId = expedienteId ? parseInt(expedienteId) : null;
+  useEffect(() => {
+        // Si el ID de la URL es diferente al ID actual seleccionado, actualízalo.
+        if (urlExpedienteId !== selectedId) {
+            setSelectedId(urlExpedienteId);
+        }
+    }, [urlExpedienteId, selectedId]);
+
+    const currentExpedienteId = selectedId || urlExpedienteId;
+
+  const handleSelectExpediente = (id: number | null) => {
+    setSelectedId(id);
+    
+    // Construye la nueva URL
+    const baseUrl = `/expedientes/doctor`;
+    
+    if (id) {
+        // Navega a /expedientes/doctor/123
+        navigate(`${baseUrl}/${id}`);
+    } else {
+        // Navega de vuelta a /expedientes/doctor
+        navigate(baseUrl);
+    }
+  };
+  
 
   useEffect(() => {
     const loadExpedientes = async () => {
@@ -47,36 +76,41 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
     loadExpedientes();
   }, [doctorId]);
 
-  const expedienteSeleccionado = expedientes.find((e) => e.id === selectedId);
+  const expedienteSeleccionado = expedientes.find((e) => e.id === currentExpedienteId);
 
   if (loading) return <div className="p-6 text-center">Cargando expedientes...</div>;
   if (error) return <div className="p-6 text-center text-red-500">{error}</div>;
   if (expedientes.length === 0) return <div className="p-6 text-center">No hay expedientes disponibles.</div>;
 
   return (
-    
-    <div className="min-h-screen bg-light p-6 relative">
+  <div className="min-h-screen bg-light p-6 relative">
       <button className="btn-primary flex items-center gap-1">
         <FiChevronLeft />
         <Link to={"/citas/doctor"}>Regresar</Link>
-        </button>      
+      </button>
 
       <div className="max-w-6xl mx-auto bg-light rounded-xl shadow-2xl p-6">
         {!expedienteSeleccionado ? (
           <>
             <h1 className="text-4xl font-bold text-primary mb-6">Gestión de Expedientes</h1>
-            <ExpedientesList expedientes={expedientes} onSelect={setSelectedId} />
+            {/* 4. Usar el nuevo handler para seleccionar */}
+            <ExpedientesList expedientes={expedientes} onSelect={handleSelectExpediente} /> 
           </>
         ) : (
           <div>
             <button
-              onClick={() => setSelectedId(null)}
+              // 5. Usar el nuevo handler para volver a la lista
+              onClick={() => handleSelectExpediente(null)} 
               className="flex items-center gap-2 mb-6 text-accent hover:text-info transition cursor-pointer hover:scale-[1.03] transition duration-200 ease-in-out">
               <ArrowLeftCircle className="w-6 h-6" />
               <span className="font-medium">Volver a lista</span>
             </button>
 
-            <ExpedienteDetalle expedienteId={expedienteSeleccionado.id} onBack={() => setSelectedId(null)} />
+            <ExpedienteDetalle 
+                expedienteId={expedienteSeleccionado.id} 
+                // 6. Usar el nuevo handler para el botón de regreso
+                onBack={() => handleSelectExpediente(null)} 
+            />
           </div>
         )}
       </div>

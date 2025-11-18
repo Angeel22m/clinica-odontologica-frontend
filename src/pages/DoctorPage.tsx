@@ -67,11 +67,11 @@ const DoctorPage: React.FC = () => {
                 </Link>
                 </div>
                 
-                <div className="w-full text-left px-4 py-2 cursor-pointer">
+                <button className="w-full px-2 cursor-pointer">
                 <LogoutButton className="">
                   Cerrar sesión
                 </LogoutButton>
-                </div>
+                </button>
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 // src/pages/RecepcionistaPage.tsx
 import { useState, useRef, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Search,
   Calendar,
@@ -15,32 +15,20 @@ import modificarInfoService, {
   type PacienteModificarPayload,
   type PacienteRecepcionista,
 } from "../services/modificarInfoService";
-import { getCitasByPaciente } from "../services/citasService";
-import type { Cita } from "../types/cita";
 import LogoutButton from "../components/LogoutButton";
 import RegisterForm from "../components/RecepcionistaComponentes/RegisterForm";
+import { useAuth } from "../hooks/UseAuth";
+import ModalAgendarCita from "../components/ModalAgendarCita";
 
 export default function RecepcionistaPage() {
-  const userString = localStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-
-  // Control de acceso: solo RECEPCIONISTA o ADMIN y activo
-  if (
-    !user ||
-    !user.activo ||
-    !(user.rol === "RECEPCIONISTA" || user.rol === "ADMIN")
-  ) {
-    return <Navigate to="/login" replace />;
-  }
-
-  const correoRecepcionista: string = user.correo || "Sin correo";
 
   const [searchEmail, setSearchEmail] = useState("");
+  const { nombre,apellido} = useAuth();
   const [open, setOpen] = useState(false);
   const [paciente, setPaciente] = useState<PacienteRecepcionista | any | null>(
     null
   );
-  const [citas, setCitas] = useState<Cita[]>([]);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -70,8 +58,7 @@ export default function RecepcionistaPage() {
 
   const cargarPacienteYCitas = async (correo: string) => {
     setLoading(true);
-    setPaciente(null);
-    setCitas([]);
+    setPaciente(null);    
 
     try {
       // Buscar en backend por correo
@@ -80,10 +67,7 @@ export default function RecepcionistaPage() {
       );
 
       setPaciente(pacienteFormateado);
-
-      // Cargar citas del mock (todas, no solo del día)
-      const citasPaciente = await getCitasByPaciente(pacienteFormateado.id);
-      setCitas(citasPaciente);
+    
     } catch (error: any) {
       console.error(error);
       if (error?.status === 404) {
@@ -104,8 +88,7 @@ export default function RecepcionistaPage() {
   // Buscar automáticamente mientras escribe (debounce)
   useEffect(() => {
     if (!searchEmail.trim()) {
-      setPaciente(null);
-      setCitas([]);
+      setPaciente(null);      
       return;
     }
 
@@ -167,137 +150,140 @@ export default function RecepcionistaPage() {
   }, [menuOpen]);
 
   return (
-    <div className="p-8 min-h-screen text-primary relative">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-6 border-b pb-4">
-        <div className="flex flex-col mb-2">
-          <h1 className="text-4xl font-bold mb-2 text-primary">
-            Recepción
-          </h1>
-          <p className="text-primary/70">Bienvenido</p>
-        </div>
+   <div className="p-8 min-h-screen text-primary relative bg-light">
+  {/* Header */}
+  <header className="flex justify-between items-center mb-6 border-b border-primary/10 pb-4">
+    <div className="flex flex-col mb-2">
+      <h1 className="text-4xl font-bold mb-2 text-primary">
+        Recepción
+      </h1>
+      <p className="text-primary/70">{nombre} {apellido}</p>
+    </div>
 
-        <div className="flex items-center gap-4 relative">
-          <span className="text-sm text-gray-600">
-            {correoRecepcionista}
-          </span>
+    <div className="flex items-center gap-4 relative">    
 
-          {/* MENÚ DESPLEGABLE */}
-          <div className="relative">
-            <AnimatePresence mode="wait">
-            <motion.button
-            onClick={() => setMenuOpen(!menuOpen)}
-            animate={{rotate: menuOpen ? -90 : 0}}
-            transition = {{ duration: 0.2}}
-            className="p-2">
-            <FiMenu
-              className="hover:text-info transition h-7 w-7 cursor-pointer"
-            />
-            </motion.button>
-            </AnimatePresence>
-
-            {menuOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50">
-              
-                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-                <FiUser />
-                <Link>
-                  Perfil
-                </Link>
-                </div>
-                
-                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-                <FiSettings />
-                <Link>
-                  Configuración
-                </Link>
-                </div>
-                
-                <div className="w-full text-left px-4 py-2 cursor-pointer">
-                <LogoutButton className="">
-                  Cerrar sesión
-                </LogoutButton>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Botones principales */}
-      <div className="flex gap-4 mb-6">
-        <button className="btn-accent shadow-sm"
-        onClick={handleOpenModal}
+      {/* MENÚ DESPLEGABLE */}
+      <div className="relative" ref={menuRef}>
+        <AnimatePresence mode="wait">
+        <motion.button
+          onClick={() => setMenuOpen(!menuOpen)}
+          animate={{rotate: menuOpen ? -90 : 0}}
+          transition = {{ duration: 0.2}}
+          className="p-2"
         >
-          Registrar Cliente
-        </button>
-        <RegisterForm open={open} onClose={handleCloseModal}/>
-      
+          <FiMenu
+            className="text-primary hover:text-info transition h-7 w-7 cursor-pointer"
+          />
+        </motion.button>
+        </AnimatePresence>
 
-        <button className="btn-accent shadow-sm">
-          Generar Factura
-        </button>
-      </div>
+        {menuOpen && (
+          <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50 border border-primary/10">
+          
+            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+            <FiUser />
+            <Link>
+              Perfil
+            </Link>
+            </div>
+            
+            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+            <FiSettings />
+            <Link>
+              Configuración
+            </Link>
+            </div>
+            
+            {/* Se agrega un separador visual */}
+            <hr className="my-1 border-primary/10" />
 
-      {/* Buscador de pacientes */}
-      <div className="mb-6 p-4 bg-gray-100 rounded shadow-sm">
-        <h2 className="text-lg font-semibold mb-3">
-          Buscar Paciente
-        </h2>
-
-        <div className="flex gap-2 items-center">
-          <div className="relative flex-1">
-            <input
-              type="email"
-              placeholder="Correo del paciente"
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              className="w-full p-3 pl-10 border border-primary rounded-xl shadow-lg focus:ring-2 focus:ring-accent focus:border-accent transition-all"
-            />
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-            />
+            <div className="w-full px-2 cursor-pointer">
+            <LogoutButton className="text-primary hover:text-alert">
+              Cerrar sesión
+            </LogoutButton>
+            </div>
           </div>
-
-          <button
-            onClick={handleSearch}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Search size={18} /> Buscar
-          </button>
-        </div>
-
-        {loading && (
-          <p className="mt-2 text-gray-600 text-sm">
-            Buscando...
-          </p>
         )}
       </div>
+    </div>
+  </header>
 
-      {/* Resultados */}
-      <div>
-        {paciente?.notFound && (
-          <p className="text-red-600">
-            Paciente no encontrado.
-          </p>
-        )}
+  {/* Botones principales */}
+  <div className="flex gap-4 mb-6">
+    <button className="btn-accent shadow-md"
+    onClick={handleOpenModal}
+    >
+      Registrar Cliente
+    </button>
+    <RegisterForm open={open} onClose={handleCloseModal}/>
+  
 
-        {paciente?.error && (
-          <p className="text-red-600">
-            {paciente.message || "Error al buscar paciente."}
-          </p>
-        )}
+    <button className="btn-accent shadow-md">
+      Generar Factura
+    </button>
+  </div>
 
-        {paciente &&
-          !paciente.notFound &&
-          !paciente.error && (
-            <div className="p-4 bg-white rounded shadow-sm border">
-              {/* Información del paciente */}
-              <h3 className="text-xl font-semibold mb-2">
-                Información del Paciente
-              </h3>
+  {/* Buscador de pacientes */}
+  <div className="mb-6 p-4 bg-primary/10 rounded-xl shadow-inner">
+    <h2 className="text-lg font-semibold mb-3 text-primary">
+      Buscar Paciente
+    </h2>
 
+    <div className="flex gap-2 items-center">
+      <div className="relative flex-1">
+        <input
+          type="email"
+          placeholder="Correo del paciente"
+          value={searchEmail}
+          onChange={(e) => setSearchEmail(e.target.value)}
+          // Clases ajustadas para usar la paleta
+          className="w-full p-3 pl-10 border border-primary/20 rounded-xl shadow-sm focus:ring-2 focus:ring-info focus:border-info transition-all text-primary bg-light"
+        />
+        <Search
+          size={18}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/60"
+        />
+      </div>
+
+      <button
+        onClick={handleSearch}
+        className="btn-accent px-4 py-3" // Usamos btn-accent y ajustamos el padding
+      >
+        <Search size={18} /> Buscar
+      </button>
+    </div>
+
+    {loading && (
+      <p className="mt-2 text-primary/70 text-sm">
+        Buscando...
+      </p>
+    )}
+  </div>
+
+  {/* Resultados */}
+  <div>
+    {paciente?.notFound && (
+      <p className="text-alert font-medium">
+        Paciente no encontrado.
+      </p>
+    )}
+
+    {paciente?.error && (
+      <p className="text-alert font-medium">
+        {paciente.message || "Error al buscar paciente."}
+      </p>
+    )}
+
+    {paciente &&
+      !paciente.notFound &&
+      !paciente.error && (
+        <div className="p-4 bg-light rounded-xl shadow-lg border border-primary/10">
+          {/* Información del paciente */}
+          <h3 className="text-xl font-bold mb-3 border-b border-primary/10 pb-2 text-primary">
+            Información del Paciente
+          </h3>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-2 gap-x-4 text-primary">
               <p>
                 <strong>Correo:</strong> {paciente.correo}
               </p>
@@ -326,82 +312,68 @@ export default function RecepcionistaPage() {
                   ? new Date(paciente.fechaNac).toLocaleDateString()
                   : "N/A"}
               </p>
+          </div>
+          
 
-              {/* Datos incompletos */}
-              {datosIncompletos(paciente) && (
-                <div className="mt-4 p-3 border border-red-600 bg-red-50 rounded flex items-center gap-2">
-                  <AlertTriangle
-                    size={22}
-                    className="text-red-600"
-                  />
-                  <span className="text-red-800">
-                    El paciente tiene datos incompletos.
-                  </span>
+          {/* Datos incompletos */}
+          {datosIncompletos(paciente) && (
+            <div className="mt-6 p-4 border border-alert bg-alert/10 rounded-xl flex items-center gap-3">
+              <AlertTriangle
+                size={22}
+                className="text-alert flex-shrink-0"
+              />
+              <span className="text-alert font-medium">
+                El paciente tiene datos incompletos.
+              </span>
 
-                  <button
-                    className="ml-auto bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                    onClick={() => setModalOpen(true)}
-                  >
-                    Completar datos
-                  </button>
-                </div>
-              )}
-
-              {/* Acciones cuando todo está completo */}
-              {!datosIncompletos(paciente) && (
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
-                    <Calendar size={18} /> Crear Cita
-                  </button>
-
-                  <button className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700">
-                    <ClipboardList size={18} /> Cita de seguimiento
-                  </button>
-
-                  <button
-                    className="flex items-center gap-2 bg-yellow-600 text-white px-3 py-2 rounded hover:bg-yellow-700"
-                    onClick={() => setModalOpen(true)}
-                  >
-                    Editar información
-                  </button>
-                </div>
-              )}
-
-              {/* Citas */}
-              {citas.length > 0 && (
-                <div className="mt-6">
-                  <h4 className="text-lg font-semibold mb-2">
-                    Citas del paciente
-                  </h4>
-
-                  <ul className="space-y-2">
-                    {citas.map((cita) => (
-                      <li
-                        key={cita.id}
-                        className="border p-3 rounded shadow-sm flex justify-between"
-                      >
-                        <span>
-                          {new Date(cita.fecha).toLocaleString()}
-                        </span>
-                        <span className="font-semibold">
-                          {cita.estado}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <button
+                className="ml-auto bg-alert text-light px-4 py-2 rounded-lg hover:bg-info transition-colors shadow-md"
+                onClick={() => setModalOpen(true)}
+              >
+                Completar datos
+              </button>
             </div>
           )}
-      </div>
 
-      {/* Modal para editar/completar datos */}
-      <EditarPacienteModal
-        paciente={!paciente || paciente.notFound || paciente.error ? null : paciente}
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={guardarCambios}
-      />
-    </div>
+          {/* Acciones cuando todo está completo */}
+          {!datosIncompletos(paciente) && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+              onClick={() => setShowModal(true)}
+              
+              className="flex items-center gap-2 bg-success text-light px-4 py-2 rounded-lg hover:opacity-80 transition-opacity shadow-md">
+                <Calendar size={18} /> Crear Cita
+              </button>
+
+              <button className="flex items-center gap-2 bg-info text-light px-4 py-2 rounded-lg hover:opacity-80 transition-opacity shadow-md">
+                <ClipboardList size={18} /> Cita de seguimiento
+              </button>
+
+              <button
+                className="flex items-center gap-2 bg-primary text-light px-4 py-2 rounded-lg hover:opacity-80 transition-opacity shadow-md"
+                onClick={() => setModalOpen(true)}
+              >
+                Editar información
+              </button>
+            </div>
+          )}          
+        </div>
+      )}
+  </div>
+     {showModal && 
+           <ModalAgendarCita onClose={() => {
+           setShowModal(false);           
+           }} />}
+
+
+  {/* Modal para editar/completar datos */}
+  <EditarPacienteModal
+    paciente={!paciente || paciente.notFound || paciente.error ? null : paciente}
+    open={modalOpen}
+    onClose={() => setModalOpen(false)}
+    onSave={guardarCambios}
+  />
+  
+</div>
   );
 }
