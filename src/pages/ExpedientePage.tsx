@@ -4,7 +4,7 @@ import type { Expediente, ClinicalRecord } from '../types/expediente';
 import { fetchExpedientes, fetchPatientHistory } from '../services/expedientesService';
 import PatientCard from '../components/PatientCard';
 import PatientDetails from '../components/PatientDetails';
-import LogoutButton from '../components/LogoutButton';
+import HeaderMenu from '../components/HeaderMenu';
 
 const ExpedientesPage: React.FC = () => {
   const [expedientes, setExpediente] = useState<Expediente[]>([]);
@@ -55,11 +55,15 @@ const ExpedientesPage: React.FC = () => {
     <div className="h-screen bg-light font-sans p-4 md:p-8 flex flex-col">
   {/* Header fijo */}
   <header className="mb-4 text-center sticky top-0 bg-light z-20">
-    <LogoutButton  />
+    
     <h1 className="text-4xl font-extrabold text-primary tracking-tight">
       Sistema de Expedientes Clínicos
     </h1>
     <p className="text-secondary mt-1">Clínica Odontológica</p>
+
+    <div className="absolute top-4 right-4">
+      <HeaderMenu />
+    </div>
   </header>
 
   {/* Buscador fijo */}
