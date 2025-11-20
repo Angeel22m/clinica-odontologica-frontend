@@ -62,13 +62,15 @@ export default function ModalEditarCita({ cita, onClose, onUpdated }) {
     }
 
     // Convertir HH:MM → HHH_MM
-    const horaBackend = "H" + hora.replace(":", "_");
+    //const horaBackend = "H" + hora.replace(":", "_");
 
     try {
       const body = {
         fecha,
-        hora: horaBackend,
+        hora,
       };
+      
+      console.log(body);
 
       const res = await axios.put(
         `http://localhost:3000/citas/${cita.id}`,
@@ -105,6 +107,7 @@ export default function ModalEditarCita({ cita, onClose, onUpdated }) {
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
             className="border rounded-md px-3 py-2"
+            min={new Date().toISOString().split("T")[0]}
           />
 
           <label>Hora</label>

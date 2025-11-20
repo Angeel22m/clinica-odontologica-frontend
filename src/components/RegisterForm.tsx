@@ -4,10 +4,6 @@ export default function RegisterForm() {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
-    dni: "",
-    telefono: "",
-    direccion: "",
-    fechaNac: "",
     correo: "",
     password: "",
     confirmPassword: "",
@@ -40,10 +36,6 @@ export default function RegisterForm() {
         body: JSON.stringify({
           nombre: formData.nombre,
           apellido: formData.apellido,
-          dni: formData.dni,
-          telefono: formData.telefono,
-          direccion: formData.direccion,
-          fechaNac: formData.fechaNac,
           correo: formData.correo,
           password: formData.password,
         }),
@@ -58,10 +50,6 @@ export default function RegisterForm() {
         setFormData({
           nombre: "",
           apellido: "",
-          dni: "",
-          telefono: "",
-          direccion: "",
-          fechaNac: "",
           correo: "",
           password: "",
           confirmPassword: "",

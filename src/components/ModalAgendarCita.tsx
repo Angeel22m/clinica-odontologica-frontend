@@ -124,8 +124,10 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
       const res = await axios.post("http://localhost:3000/citas", payload);
       
       if (res.data.code === 0) {
+      
+	onClose();
         setNotification("Cita creada exitosamente");
-        onClose();
+        
       } else {
         setNotification("Error: " + res.data.message);
       }
@@ -231,11 +233,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
                 ) : (
                   <p className="text-sm text-gray-500 mt-2">Seleccione fecha y doctor para ver horarios disponibles.</p>
                 )}
-              </div>
-
-              {/* Comentarios */}
-              
-              
+              </div> 
               
 
               {/* Botones */}
@@ -255,7 +253,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
               <div className="space-y-2 mb-4">
                 <p><strong>Tipo de atención:</strong> {servicios.find(s=>s.id === parseInt(formData.servicioId))?.nombre}</p>
                 <p><strong>Fecha:</strong> {formData.fecha}</p>
-                <p><strong>Hora:</strong> {formData.hora.slice(1).replace('_', ':')}</p>
+                <p><strong>Hora:</strong> {formData.hora.replace('_', ':')}</p>
                 <p><strong>Doctor:</strong> {doctoresDisponibles.find(d => d.id === parseInt(formData.doctorId))?.nombre}</p>
                 {formData.comentarios && <p><strong>Comentarios:</strong> {formData.comentarios}</p>}
               </div>
