@@ -12,7 +12,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
   if (!open) return null;
 
   return (<div className="fixed inset-0 z-50 flex items-center justify-center overlay-dark backdrop-blur-sm p-4">  
-  <div className="bg-light rounded-2xl shadow-2xl max-w-lg p-6 relative animate-slide-in border border-primary/10 max-h-full md:max-h-[90vh] flex flex-col">
+  <div className="bg-light rounded-2xl shadow-2xl max-w-lg p-6 relative  border border-primary/10 max-h-full md:max-h-[90vh] flex flex-col">
 
     {/* Botón de cierre */}
     <button

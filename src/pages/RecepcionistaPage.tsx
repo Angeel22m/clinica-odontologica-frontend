@@ -303,7 +303,7 @@ export default function RecepcionistaPage() {
      {showModal && 
            <ModalAgendarCita onClose={() => {
            setShowModal(false);           
-           }} />}
+           }}pacienteId={paciente.id} /> }
 
 
   {/* Modal para editar/completar datos */}
