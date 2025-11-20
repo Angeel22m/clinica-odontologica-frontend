@@ -1,4 +1,17 @@
-// Define las interfaces compartidas para toda la aplicación
+
+
+// Interfaz para los datos del Empleado (Doctor) anidado en la asociación
+export interface DoctorPersonData {
+  persona: PatientData; // Reutiliza PatientData para nombre/apellido
+}
+
+// Interfaz que representa un registro en la tabla ExpedienteDoctor
+export interface ExpedienteDoctorAssociation {
+  expedienteId: number;
+  doctorId: number;
+  fechaAsociacion: string;
+  doctor: DoctorPersonData; // El objeto del Doctor anidado
+}
 
 // Interfaz para los datos de nombre/apellido de paciente o doctor
 export interface PatientData {
@@ -16,9 +29,8 @@ export interface Archivo {
 
 // Interfaz que representa un Expediente Maestro (respuesta de GET /expediente)
 export interface Expediente {
-  id: number; // ID del Expediente
-  pacienteId: number; // ID real del Paciente (usado para el historial)
-  doctorId: number;
+  id: number; 
+  pacienteId: number; 
   alergias: string;
   enfermedades: string;
   medicamentos: string;
@@ -27,11 +39,10 @@ export interface Expediente {
   createdAt: string;
   updatedAt: string;
   paciente: PatientData; // Datos del paciente anidados
-  doctor: {
-    persona: PatientData; // Datos del doctor
-  };
-  detalles?: ClinicalRecord[]; // Historial de consultas (opcional)
-  archivos?: Archivo[]; // Archivos adjuntos (opcional)
+  detalles?: ClinicalRecord[]; 
+  archivos?: Archivo[]; 
+
+  doctoresAsociados: ExpedienteDoctorAssociation[]; 
 }
 
 // Interfaz que representa un Registro Clínico (respuesta de GET /expediente/historial/:pacienteId)

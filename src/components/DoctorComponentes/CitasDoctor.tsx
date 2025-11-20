@@ -1,15 +1,16 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { FiCalendar, FiClock, FiCheckCircle } from "react-icons/fi";
 import { fetchExpedientes } from "../../services/CitasDoctor/CitasServices";
 import type { Cita } from "../../types/TypesCitas/CitasPorDoctor";
 import CitaCard from "./CitaCard";
-import { useAuth } from "../../hooks/UseAuth"; // si ya usas el hook del usuario
+import { useAuth } from "../../hooks/UseAuth"; // Hook de autenticación
+import socket from "../../config/socket"; // Importa la instancia del socket
 
 const ITEMS_PER_PAGE = 8;
 
 const CitasDoctor: React.FC = () => {
   const { idEmpleado } = useAuth(); 
-  
+  const [ascending, setAscending] = useState(false);
   const [citas, setCitas] = useState<Cita[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,29 +26,61 @@ const CitasDoctor: React.FC = () => {
   const filterButton = (id: string, active: string) =>
     `px-3 py-1 text-xs rounded-full border shadow-sm ${
       active === id
-        ? "bg-accent text-primary border-primary"
+        ? "bg-success text-primary border-primary"
         : "bg-light text-primary/70"
     }`;
+
 
   // ==========================================================
   // CARGAR CITAS DEL DOCTOR DESDE LA API
   // ==========================================================
-  useEffect(() => {
-    const loadCitas = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchExpedientes(idEmpleado); // <--- doctorId
-        setCitas(Array.isArray(data) ? data : [data]);
-      } catch (err) {
-        console.error(err);
-        setError("No se pudieron cargar las citas del doctor");
-      } finally {
-        setLoading(false);
-      }
-    };
+const loadCitas = useCallback(async () => {
+    if (!idEmpleado || idEmpleado <= 0) return;
 
-    if (idEmpleado > 0) loadCitas();
-  }, [idEmpleado]);
+    try {
+      setLoading(true);
+      const data = await fetchExpedientes(idEmpleado);
+      setCitas(Array.isArray(data) ? data : [data]);
+      setError("");
+    } catch (err) {
+      console.error("Error al cargar citas:", err);
+      setError("No se pudieron cargar las citas del doctor");
+    } finally {
+      setLoading(false);
+    }
+  }, [idEmpleado]);
+
+useEffect(() => {
+    // Se ejecuta al montar o cuando loadCitas cambie (sólo si cambia idEmpleado)
+    loadCitas(); 
+  }, [loadCitas]);
+
+useEffect(() => {
+    
+    const handleCitaCancelada = (data:number) => {
+        
+        // 1. FILTRAR: Comprueba si esta cancelación es para el doctor actual
+        // El idEmpleado está disponible aquí gracias al cierre de useEffect.
+        if (data === idEmpleado) { 
+            
+            // 2. ACCIÓN: Recargar la lista de citas del doctor
+            loadCitas(); // 👈 Llama a la función estable de carga
+            
+            // 3. UI/UX: Mostrar una notificación
+
+        }
+    };
+
+    // Suscribirse al evento
+    socket.on('updateCitasDoctor', handleCitaCancelada);
+
+    // FUNCIÓN DE LIMPIEZA: Desuscribirse al desmontar para evitar duplicados
+    return () => {
+      socket.off('updateCitasDoctor', handleCitaCancelada);
+    };
+    // Dependencias: idEmpleado y loadCitas para que el handler siempre tenga la última versión
+  }, [idEmpleado, loadCitas]);
+
 
   //filtros
 const citasFiltradas = useMemo(() => {
@@ -63,8 +96,22 @@ const citasFiltradas = useMemo(() => {
     data = data.filter((c) => c.fecha?.substring(0, 10) === fechaEspecifica);
   }
 
+  data.sort((a, b) => {
+      // Convertimos la fecha (cadena) a un objeto Date para compararla
+      const fechaA = new Date(a.fecha).getTime();
+      const fechaB = new Date(b.fecha).getTime();
+
+      if (ascending) {
+        // Orden Ascendente (fecha más antigua primero)
+        return fechaA - fechaB;
+      } else {
+        // Orden Descendente (fecha más reciente primero)
+        return fechaB - fechaA;
+      }
+    });
+
   return data;
-}, [citas, filtroEstado, filtroTiempo, fechaEspecifica]);
+}, [citas, filtroEstado, filtroTiempo, fechaEspecifica,ascending]);
 
 
   const totalPages = Math.ceil(citasFiltradas.length / ITEMS_PER_PAGE);
@@ -94,6 +141,12 @@ const citasFiltradas = useMemo(() => {
         <FiCalendar /> Próximas Citas
         <span className="text-accent">({citasFiltradas.length})</span>
       </h1>
+       {citas.length > 0 && (
+          <button onClick={() => setAscending(!ascending)} className="btn-primary">
+            {ascending ? "▲ Ascendente" : "▼ Descendente"}
+          </button>
+
+        )}
 
       {/* FILTROS */}
       <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
@@ -161,6 +214,12 @@ const citasFiltradas = useMemo(() => {
               onClick={() => setFiltroEstado("CANCELADA")}
             >
               Canceladas
+            </button>
+            <button
+              className={filterButton("COMPLETADA", filtroEstado)}
+              onClick={() => setFiltroEstado("COMPLETADA")}
+            >
+              Completadas
             </button>
           </div>
         </div>
