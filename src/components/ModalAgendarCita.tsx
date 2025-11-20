@@ -119,7 +119,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
         fecha: formData.fecha,
         hora: formData.hora,
         doctorId: parseInt(formData.doctorId),
-        pacienteId: JSON.parse(localStorage.getItem('user')).persona.id,
+        pacienteId: parseInt(pacienteId) || parseInt(JSON.parse(localStorage.getItem('user')).persona.id),
       };
       const res = await axios.post("http://localhost:3000/citas", payload);
       

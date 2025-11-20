@@ -1,24 +1,24 @@
 // src/pages/RecepcionistaPage.tsx
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+
 import {
   Search,
   Calendar,
   ClipboardList,
   AlertTriangle,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FiMenu, FiSettings, FiUser } from "react-icons/fi";
+
 
 import EditarPacienteModal from "../components/EditarPacienteModal";
 import modificarInfoService, {
   type PacienteModificarPayload,
   type PacienteRecepcionista,
 } from "../services/modificarInfoService";
-import LogoutButton from "../components/LogoutButton";
+
 import RegisterForm from "../components/RecepcionistaComponentes/RegisterForm";
 import { useAuth } from "../hooks/UseAuth";
 import ModalAgendarCita from "../components/ModalAgendarCita";
+import HeaderMenu from "../components/HeaderMenu";
 
 export default function RecepcionistaPage() {
 
@@ -129,26 +129,6 @@ export default function RecepcionistaPage() {
   };
 
 
-  // Cerrar el menú de hamburguesa si se hace click fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
-        setMenuOpen(false);
-      }
-    };
-
-    if (menuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [menuOpen]);
-
   return (
    <div className="p-8 min-h-screen text-primary relative bg-light">
   {/* Header */}
@@ -163,48 +143,8 @@ export default function RecepcionistaPage() {
     <div className="flex items-center gap-4 relative">    
 
       {/* MENÚ DESPLEGABLE */}
-      <div className="relative" ref={menuRef}>
-        <AnimatePresence mode="wait">
-        <motion.button
-          onClick={() => setMenuOpen(!menuOpen)}
-          animate={{rotate: menuOpen ? -90 : 0}}
-          transition = {{ duration: 0.2}}
-          className="p-2"
-        >
-          <FiMenu
-            className="text-primary hover:text-info transition h-7 w-7 cursor-pointer"
-          />
-        </motion.button>
-        </AnimatePresence>
+      <HeaderMenu/>
 
-        {menuOpen && (
-          <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50 border border-primary/10">
-          
-            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-            <FiUser />
-            <Link>
-              Perfil
-            </Link>
-            </div>
-            
-            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-            <FiSettings />
-            <Link>
-              Configuración
-            </Link>
-            </div>
-            
-            {/* Se agrega un separador visual */}
-            <hr className="my-1 border-primary/10" />
-
-            <div className="w-full px-2 cursor-pointer">
-            <LogoutButton className="text-primary hover:text-alert">
-              Cerrar sesión
-            </LogoutButton>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   </header>
 
@@ -363,7 +303,7 @@ export default function RecepcionistaPage() {
      {showModal && 
            <ModalAgendarCita onClose={() => {
            setShowModal(false);           
-           }} />}
+           }}pacienteId={paciente.id} /> }
 
 
   {/* Modal para editar/completar datos */}

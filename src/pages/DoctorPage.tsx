@@ -12,7 +12,7 @@ import { useAuth } from '../hooks/UseAuth';
 const DoctorPage: React.FC = () => {
     
     const [menuOpen, setMenuOpen] = useState(false);
-    const {nombre,apellido} = useAuth();
+    const {nombre,apellido} = useAuth();  
 
     return (
         <div className="w-full mx-auto p-6 bg-light border border-primary/20 rounded-2xl shadow-xl font-inter">
@@ -22,7 +22,7 @@ const DoctorPage: React.FC = () => {
 
     {/* Información del Doctor */}
     <div className="w-full sm:flex-1 p-3 bg-primary/10 border border-primary/20 rounded-xl text-primary font-semibold text-lg sm:text-xl shadow-sm">
-        Doctor {`${nombre } ${apellido}`}
+        Dr. {`${nombre } ${apellido}`}
     </div>
     
     <div className="flex w-full sm:w-auto items-center gap-2 sm:gap-3">
@@ -55,20 +55,20 @@ const DoctorPage: React.FC = () => {
               
                 <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
                 <FiUser />
-                <Link>
+                <button>
                   Perfil
-                </Link>
+                </button>
                 </div>
                 
                 <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
                 <FiSettings />
-                <Link>
+                <button>
                   Configuración
-                </Link>
+                </button>
                 </div>
                 
                 <button className="w-full px-2 cursor-pointer">
-                <LogoutButton className="">
+                <LogoutButton>
                   Cerrar sesión
                 </LogoutButton>
                 </button>
@@ -79,7 +79,7 @@ const DoctorPage: React.FC = () => {
 </header>
 
             {/* --- TÍTULO DE LA SECCIÓN AGENDA --- */}
-            <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-4 border-b-2 border-accent pb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-4 border-b-2 border-primary pb-2">
                 Agenda de Citas
             </h2>
             

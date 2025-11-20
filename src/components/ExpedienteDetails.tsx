@@ -61,8 +61,7 @@ export const ExpedienteDetalle: React.FC<{ expedienteId: number; onBack: () => v
       {/* Encabezado */}
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h2 className="text-3xl font-bold text-primary mb-2">{expediente.nombrePaciente}</h2>
-          <p className="text-md text-info">Atendido por {expediente.doctorNombre}</p>
+          <h2 className="text-3xl font-bold text-primary mb-2">{expediente.nombrePaciente}</h2>          
         </div>
         <button onClick={() => setShowEditModal(true)} className="btn-accent">
           <Pencil className="w-4 h-4" /> Editar Expediente
@@ -120,9 +119,9 @@ export const ExpedienteDetalle: React.FC<{ expedienteId: number; onBack: () => v
   </div>
   <div className="flex items-center gap-2">
     <Stethoscope className="w-4 h-4 text-primary" />
-    <span className="font-semibold">Doctor:</span>
+    <span className="font-semibold">observaciones:</span>
     <div className="w-28 break-words">
-    {expediente.doctorNombre || 'N/A'}
+    {expediente.observaciones || 'N/A'}
     </div>
   </div>
 </div>

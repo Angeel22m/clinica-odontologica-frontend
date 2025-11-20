@@ -14,16 +14,11 @@ export const ExpedienteCard: React.FC<ExpedienteCardProps> = ({ expediente, onSe
       <div className="flex items-center mb-3">
         <User className="w-8 h-8 text-accent mr-3 bg-light rounded-full p-1" />
         <div>
-          <h3 className="text-xl font-bold text-primary">{expediente.nombrePaciente}</h3>
-          <p className="text-sm text-info">{expediente.doctorNombre}</p>          
+          <h3 className="text-xl font-bold text-primary">{expediente.nombrePaciente}</h3>                 
         </div>
       </div>
 
-      <div className="text-sm text-primary space-y-1">
-        <p><strong>Alergias:</strong> {expediente.alergias || "N/A"}</p>
-        <p><strong>Enfermedades:</strong> {expediente.enfermedades || "N/A"}</p>
-        <p><strong>Medicamentos:</strong> {expediente.medicamentos || "N/A"}</p>
-      </div>
+      
 
       <div className="mt-3 flex items-center justify-between">
         <span

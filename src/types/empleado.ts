@@ -22,7 +22,7 @@ export type EmpleadoResponse = {
   persona: EmpleadoPersona;
 };
 
-// ✅ Crear empleado (POST)
+//Crear empleado (POST)
 export type CrearEmpleadoDTO = {
   nombre: string;
   apellido: string;
@@ -39,5 +39,5 @@ export type CrearEmpleadoDTO = {
   fechaIngreso: string;
 };
 
-// ✅ Editar empleado (PUT)
+//Editar empleado (PUT)
 export type ActualizarEmpleadoDTO = Partial<CrearEmpleadoDTO>;

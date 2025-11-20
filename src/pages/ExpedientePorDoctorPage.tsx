@@ -14,7 +14,6 @@ interface Props {
 
 type ExpedienteConNombres = Expediente & {
   nombrePaciente: string;
-  doctorNombre: string;
 };
 
 const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
@@ -59,10 +58,10 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
         const data = await fetchExpedientesByDoctor(doctorId);
 
         const mapped: ExpedienteConNombres[] = data.map((exp) => ({
-          ...exp,
-          nombrePaciente: `${exp.paciente.nombre} ${exp.paciente.apellido}`,
-          doctorNombre: `${exp.doctor.persona.nombre} ${exp.doctor.persona.apellido}`,
-        }));
+    ...exp,
+    nombrePaciente: `${exp.paciente.nombre} ${exp.paciente.apellido}`,  
+    
+      }));
 
         setExpedientes(mapped);
       } catch (err: unknown) {
