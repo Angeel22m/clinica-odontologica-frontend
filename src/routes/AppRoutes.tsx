@@ -31,6 +31,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
+      <Route path="/empleados" element={<EmpleadosPage />} />
       <Route path="/recepcionista" element={<RecepcionistaPage />} />
 
       
