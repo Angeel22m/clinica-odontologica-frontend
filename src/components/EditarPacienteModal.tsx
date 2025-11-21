@@ -1,10 +1,29 @@
 // src/components/EditarPacienteModal.tsx
+
 import React, { useEffect, useState } from "react";
 import type {
   PacienteRecepcionista,
   PacienteModificarPayload,
 } from "../services/modificarInfoService";
-import Modal from "./modal"; // Asegúrate que la ruta sea correcta
+import Modal from "./modal"; 
+
+
+// Tipo para el estado de errores (Parcial del payload, solo los campos editables)
+type FormErrors = Partial<Record<keyof PacienteModificarPayload, string>>;
+
+const regex = {
+  // Contraseña: Mínimo 8 caracteres, al menos una mayúscula, un número, un carácter especial.
+  password: /^(?=.*\d)(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+
+  // DNI: Exactamente 13 dígitos.
+  dni: /^\d{13}$/,
+
+  // Teléfono: Exactamente 8 dígitos.
+  telefono: /^\d{8}$/,
+
+  // Dirección: Al menos 5 caracteres, permitiendo letras, números, espacios y signos comunes.
+  direccion: /^[a-zA-Z0-9\s.,#'\-]{5,}$/,
+};
 
 interface EditarPacienteModalProps {
   open: boolean;
@@ -20,42 +39,104 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
   onSave,
 }) => {
   const [form, setForm] = useState<PacienteModificarPayload>({
-    // Estos campos se inicializarán en useEffect
     dni: "",
     telefono: "",
     direccion: "",
     fechaNac: "",
-    // Se incluye 'password' porque es modificable
-    password: "", 
+    password: "",
   });
+
+  // Nuevo estado para los errores
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (open && paciente) {
-      // Inicializar el formulario con los datos del paciente.
+      // Inicializar el formulario
       setForm({
         dni: paciente.dni ?? "",
         telefono: paciente.telefono ?? "",
         direccion: paciente.direccion ?? "",
         fechaNac: paciente.fechaNac ? paciente.fechaNac.slice(0, 10) : "",
-        password: "", // La contraseña siempre debe inicializarse vacía por seguridad.
+        password: "",
       });
+     
+      setErrors({}); 
     }
   }, [open, paciente]);
 
   if (!open || !paciente) return null;
 
+  // 3. Función de Validación en tiempo real (handleChange)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const key = name as keyof PacienteModificarPayload;
+
     setForm((prev) => ({
       ...prev,
-      [name]: value,
+      [key]: value,
     }));
+
+    // Resetear el error si el campo se vacía o la validación es correcta
+    if (regex[key]) {
+      const pattern = regex[key as keyof typeof regex];
+      let error = "";
+
+      if (value.length > 0 && !pattern.test(value)) {
+        if (key === 'password') {
+          error = "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
+        } else if (key === 'dni') {
+          error = "El DNI debe tener exactamente 13 dígitos.";
+        } else if (key === 'telefono') {
+          error = "El Teléfono debe tener exactamente 8 dígitos.";
+        } else if (key === 'direccion') {
+          error = "La Dirección debe tener un formato válido (mín. 5 caracteres).";
+        }
+      }
+      
+      setErrors((prev) => ({
+        ...prev,
+        [key]: error,
+      }));
+    }
   };
 
+  // 4. Función de Validación Final (handleSubmit)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    // Si la contraseña está vacía, no la enviamos al servicio.
+
+    let newErrors: FormErrors = {};
+    const fieldsToValidate: (keyof PacienteModificarPayload)[] = ['dni', 'telefono', 'direccion', 'password'];
+
+    fieldsToValidate.forEach((field) => {
+      const value = form[field];
+      const pattern = regex[field as keyof typeof regex];
+
+      // La contraseña solo se valida si NO está vacía
+      if (field === 'password') {
+        if (value && !pattern.test(value)) {
+          newErrors.password = "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
+        }
+      } 
+      // DNI, Teléfono y Dirección son obligatorios y deben cumplir el formato
+      else {
+        if (!value) {
+          newErrors[field] = `El campo es obligatorio.`;
+        } else if (!pattern.test(value)) {
+          // Reutiliza los mensajes de error más detallados de handleChange
+          newErrors[field] = errors[field] || `El formato de ${field} es incorrecto.`;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+
+    // Si hay errores, detenemos el envío
+    if (Object.keys(newErrors).length > 0) {
+      console.error("Errores de validación:", newErrors);
+      return; 
+    }
+
+    // 5. Preparar el payload para el servicio (excluir password si está vacía)
     const payload: PacienteModificarPayload = form.password
       ? form
       : { ...form, password: undefined }; 
@@ -63,17 +144,21 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
     await onSave(payload);
   };
 
+  // 6. Actualizar el renderizado para mostrar errores
+  const getClassName = (fieldName: keyof PacienteModificarPayload) => {
+    const baseClasses = "mt-1 w-full p-2 border rounded-lg";
+    const focusClasses = "focus:border-blue-500 focus:ring-blue-500";
+    const errorClass = "border-red-500";
+    
+    return `${baseClasses} ${errors[fieldName] ? errorClass : focusClasses}`;
+  };
+
+
   return (
-    // Se elimina el Fragment innecesario y se usa directamente Modal.
-    // El div anidado 'flex justify-center items-center bg-white max-w-lg' es redundante 
-    // porque el componente Modal ya lo maneja.
     <Modal open={open} onClose={onClose} title="Editar Paciente">
-      {/* Aplicamos estilos de scroll al form si es necesario. 
-        Si el componente Modal ya maneja el scroll en el children, solo necesitamos el 'space-y-3'.
-        Si quieres que el formulario ocupe un ancho específico, usa w-full max-w-xl.
-      */}
       <form onSubmit={handleSubmit} className="space-y-4 pt-3"> 
-        {/* CORREO Y CONTRASEÑA */}
+        {/* CORREO (Deshabilitado) */}
+        {/* ... (código del correo sin cambios) ... */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Correo
@@ -86,6 +171,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
           />
         </div>
 
+        {/* CONTRASEÑA */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Contraseña (Dejar vacío para no cambiar)
@@ -96,11 +182,15 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             value={form.password || ""}
             onChange={handleChange}
             placeholder="********"
-            className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            className={getClassName('password')}
           />
+          {errors.password && (
+            <p className=" text-xs text-alert mt-1">{errors.password}</p>
+          )}
         </div>
 
-        {/* NOMBRE Y APELLIDO (DESHABILITADOS) */}
+        {/* NOMBRE Y APELLIDO (Deshabilitados) */}
+        {/* ... (código de Nombre y Apellido sin cambios) ... */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -114,7 +204,6 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
               className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Apellido
@@ -140,8 +229,11 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
               name="dni"
               value={form.dni || ""}
               onChange={handleChange}
-              className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+              className={getClassName('dni')}
             />
+            {errors.dni && (
+              <p className=" text-alert text-xs mt-1">{errors.dni}</p>
+            )}
           </div>
 
           <div>
@@ -153,8 +245,11 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
               name="telefono"
               value={form.telefono || ""}
               onChange={handleChange}
-              className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+              className={getClassName('telefono')}
             />
+            {errors.telefono && (
+              <p className=" text-alert text-xs mt-1">{errors.telefono}</p>
+            )}
           </div>
         </div>
 
@@ -168,8 +263,11 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             name="direccion"
             value={form.direccion || ""}
             onChange={handleChange}
-            className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            className={getClassName('direccion')}
           />
+          {errors.direccion && (
+            <p className=" text-xs text-alert mt-1">{errors.direccion}</p>
+          )}
         </div>
 
         {/* FECHA DE NACIMIENTO (EDITABLE) */}
@@ -181,9 +279,12 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             type="date"
             name="fechaNac"
             value={form.fechaNac || ""}
-            onChange={handleChange}
-            className="mt-1 w-full p-2 border rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            onChange={handleChange}           
+            className={getClassName('fechaNac')} 
           />
+          {errors.fechaNac && (
+            <p className=" text-xs text-alert text-alert/300 mt-1">{errors.fechaNac}</p>
+          )}
         </div>
 
         {/* BOTONES */}
@@ -198,6 +299,8 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
           <button
             type="submit"
             className="px-4 py-2 btn-accent rounded-lg bg-accent text-white hover:bg-info transition duration-150"
+            // Puedes deshabilitar el botón si hay errores en tiempo real
+            disabled={Object.values(errors).some(error => error !== "")}
           >
             Guardar cambios
           </button>
