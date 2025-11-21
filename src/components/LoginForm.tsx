@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import { useLoginBlock } from "./useLoginBlock";
 interface LoginResult {
   success: boolean;
   error?: string;
@@ -81,6 +82,8 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const { isBlocked, secondsLeft, blockFor } = useLoginBlock();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,12 +95,25 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
 
     setError("");
     setLoading(true);
+    
+    if (isBlocked) return;
 
     try {
       if (onLogin) {
         const result = await onLogin(usernameOrEmail, password);
+        
+        if (result.code === 99) {
+          
+          blockFor(result.retryAfter);
+          setError(result.error)
+          return;
+        }
+        
         if (!result.success) {
+          console.log(result.retryAfter);
           setError(result.error || "Credenciales inválidas o usuario no existente");
+          
+          
         
       } else {
           setError("");
@@ -131,6 +147,7 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
         <div className="mb-4">
           <label className="block text-primary mb-2 text-left">Correo o Usuario</label>
           <input
+            disabled={isBlocked}
             type="text"
             value={usernameOrEmail}
             placeholder="email@ejemplo.com"
@@ -142,6 +159,7 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
         <div className="mb-4">
           <label className="block text-primary mb-2 text-left">Contraseña</label>
           <input
+            disabled={isBlocked}
             type="password"
             value={password}
             placeholder="********"
@@ -153,7 +171,7 @@ export default function LoginForm({ onLogin, errorMessage = "" }: LoginFormProps
         <button
           type="submit"
           className="flex items-center btn-primary justify-center gap-3 w-full bg-primary text-light rounded-lg py-2.5 px-4 font-medium shadow-md hover:bg-info transition-all duration-300 mt-4 mb-3"
-          disabled={loading}
+          disabled={isBlocked ? !loading : loading}
         >
           {loading ? "Ingresando..." : "Iniciar Sesión"}
         </button>
