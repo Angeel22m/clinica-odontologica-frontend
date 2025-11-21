@@ -1,9 +1,15 @@
 // src/components/LogoutButton.tsx
 import React from "react";
 import { LogOut } from "lucide-react";
+import { logoutService } from "../services/logoutService";
+import { useAuth } from "../hooks/UseAuth";
 
 const LogoutButton: React.FC = () => {
+  const { rol, idEmpleado } = useAuth();
   const handleLogout = () => {
+    if ( rol == "DOCTOR" ||  rol == "RECEPCIONISTA") {
+      logoutService(idEmpleado);
+    }
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/login";
