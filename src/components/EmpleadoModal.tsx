@@ -1,25 +1,7 @@
-// src/components/EmpleadoModal.tsx
-
 import { useState, useEffect } from "react";
-import type {
-  CrearEmpleadoDTO,
-  ActualizarEmpleadoDTO,
-  EmpleadoResponse,
-} from "../types/empleado";
+import type { CrearEmpleadoDTO, ActualizarEmpleadoDTO, EmpleadoResponse } from "../types/empleado";
+import { crearEmpleado, actualizarEmpleado } from "../services/empleadosService";
 
-import {
-  crearEmpleado,
-  actualizarEmpleado,
-} from "../services/empleadosService";
-
-import {
-  limpiarDNI,
-  limpiarTelefono,
-  validarEmpleadoCampos,
-} from "../utils/validacionesEmpleado";
-
-import Notification from "./Notification";
-import ConfirmDialog from "./ConfirmDialog";
 
 type Props = {
   visible: boolean;
@@ -36,8 +18,6 @@ export default function EmpleadoModal({
   empleadoSeleccionado,
   onSaved,
 }: Props) {
-  const hoy = new Date().toISOString().split("T")[0];
-
   const [formData, setFormData] = useState<CrearEmpleadoDTO>({
     nombre: "",
     apellido: "",
@@ -49,24 +29,11 @@ export default function EmpleadoModal({
     password: "",
     puesto: "DOCTOR",
     salario: 0,
-    fechaIngreso: hoy,
+    fechaIngreso: "",
     activo: true,
     usuarioActivo: true,
   });
 
-  const [errores, setErrores] = useState<Record<string, string>>({});
-  const [intentadoGuardar, setIntentadoGuardar] = useState(false);
-
-  // Notificaciones
-  const [notification, setNotification] = useState("");
-
-  // Confirmaciones
-  const [confirmAction, setConfirmAction] = useState<null | (() => void)>(
-    null
-  );
-  const [confirmMessage, setConfirmMessage] = useState("");
-
-  // Cargar datos si es edición
   useEffect(() => {
     if (empleadoSeleccionado) {
       setFormData({
@@ -84,376 +51,253 @@ export default function EmpleadoModal({
         activo: empleadoSeleccionado.activo,
         usuarioActivo: empleadoSeleccionado.activo,
       });
+    } else {
+      setFormData({
+        nombre: "",
+        apellido: "",
+        dni: "",
+        telefono: "",
+        direccion: "",
+        fechaNac: "",
+        correo: "",
+        password: "",
+        puesto: "DOCTOR",
+        salario: 0,
+        fechaIngreso: "",
+        activo: true,
+        usuarioActivo: true,
+      },);
     }
   }, [empleadoSeleccionado]);
 
-  // Manejar cambios
   const handleChange = (field: string, value: any) => {
-    let nuevoValor = value;
-
-    if (field === "dni") nuevoValor = limpiarDNI(value);
-    if (field === "telefono") nuevoValor = limpiarTelefono(value);
-
-    const actualizado = { ...formData, [field]: nuevoValor };
-    setFormData(actualizado);
-
-    if (intentadoGuardar) {
-      setErrores(
-        validarEmpleadoCampos(actualizado, !!empleadoSeleccionado)
-      );
-    }
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Guardar
-  const trySave = async () => {
-    setIntentadoGuardar(true);
+  const handleSubmit = async () => {
+    try {
+      const payload: any = { ...formData };
+      payload.salario = Number(payload.salario);
+      payload.puesto = payload.puesto || "DOCTOR";
 
-    const val = validarEmpleadoCampos(
-      formData,
-      !!empleadoSeleccionado
-    );
+      if (empleadoSeleccionado) {
+        // eliminar campos no usados en edición
+        delete payload.correo;
+        delete payload.password;
+       await actualizarEmpleado(empleadoSeleccionado.personaId, payload as ActualizarEmpleadoDTO);
 
-    setErrores(val);
-    if (Object.keys(val).length > 0) return;
-
-    const accionGuardar = async () => {
-      try {
-        const payload: any = { ...formData };
-        payload.dni = limpiarDNI(payload.dni);
-        payload.telefono = limpiarTelefono(payload.telefono);
-        payload.salario = Number(payload.salario);
-
-        if (payload.puesto === "ADMINISTRADOR") {
-          payload.rol = "ADMIN";
-        }
-
-        if (empleadoSeleccionado) {
-          delete payload.correo;
-          delete payload.password;
-
-          await actualizarEmpleado(
-            empleadoSeleccionado.personaId,
-            payload as ActualizarEmpleadoDTO
-          );
-
-          setNotification("Cambios guardados correctamente");
-        } else {
-          await crearEmpleado(payload as CrearEmpleadoDTO);
-          setNotification("Empleado creado con éxito");
-        }
-
-        onSaved();
-        onClose();
-      } catch (error: any) {
-        setNotification(
-          error.response?.data?.message || "Error al guardar empleado"
-        );
+      } else {
+        await crearEmpleado(payload as CrearEmpleadoDTO);
       }
-    };
 
-    if (empleadoSeleccionado) {
-      setConfirmAction(() => accionGuardar);
-      setConfirmMessage("¿Desea guardar los cambios?");
-    } else {
-      await accionGuardar();
-    }
-  };
+      onSaved();
+      onClose();
+    } catch (error: any) {
+  const mensaje = error.response?.data?.message;
 
-  // Confirmación activar/desactivar
-  const toggleActivo = () => {
-    setConfirmAction(() => () =>
-      handleChange("activo", !formData.activo)
-    );
-    setConfirmMessage(
-      formData.activo
-        ? "¿Seguro que desea desactivar este empleado? Esto negará el acceso al sistema."
-        : "¿Seguro que desea activar este empleado? Esto permitirá acceso al sistema."
-    );
+  if (Array.isArray(mensaje)) {
+    alert(mensaje.join("\n"));
+  } else {
+    alert(mensaje || "Error al guardar empleado");
+    console.log(error.reponse.data)
+    console.log(error.response.data)
+    alert(mensaje);
+    console.error("Error al guardar empleado:", error);
+  }
+}
   };
 
   if (!visible) return null;
 
   return (
     <div className="fixed inset-0 overlay-dark flex items-center justify-center z-50">
-      <div className="bg-light rounded-xl w-full max-w-4xl p-8 shadow-2xl border border-primary/10">
+  <div className="bg-light rounded-xl w-full max-w-4xl p-8 shadow-2xl border border-primary/10">
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-6 border-b border-primary/10 pb-3">
-          <h2 className="text-2xl font-extrabold text-primary">
-            {empleadoSeleccionado ? "Editar Empleado" : "Nuevo Empleado"}
-          </h2>
-          <button
-            onClick={onClose}
-            className="px-3 py-1 rounded-lg hover:bg-accent/10 text-primary text-lg transition"
-          >
-            ✕
-          </button>
+    {/* HEADER */}
+    <div className="flex justify-between items-center mb-6 border-b border-primary/10 pb-3">
+      <h2 className="text-2xl font-extrabold text-primary">
+        {empleadoSeleccionado ? "Editar Empleado" : "Nuevo Empleado"}
+      </h2>
+      <button
+        onClick={onClose}
+        className="px-3 py-1 rounded-lg hover:bg-accent/10 text-primary text-lg transition"
+      >
+        ✕
+      </button>
+    </div>
+
+    {/* FORM SCROLLABLE AREA */}
+    <div className="space-y-8 max-h-[70vh] overflow-y-auto pr-2 text-primary">
+
+      {/* --- DATOS PERSONALES --- */}
+      <section>
+        <h3 className="text-lg font-semibold text-primary mb-4">Datos Personales</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label className="text-sm font-medium text-primary/70">Nombre *</label>
+            <input
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              placeholder="Nombre"
+              value={formData.nombre}
+              onChange={(e) => handleChange('nombre', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-primary/70">Apellido *</label>
+            <input
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              placeholder="Apellido"
+              value={formData.apellido}
+              onChange={(e) => handleChange('apellido', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-primary/70">DNI *</label>
+            <input
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              placeholder="XXXX-XXXX-XXXXX"
+              value={formData.dni}
+              onChange={(e) => handleChange('dni', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-primary/70">Teléfono *</label>
+            <input
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              placeholder="+504 XXXX-XXXX"
+              value={formData.telefono}
+              onChange={(e) => handleChange('telefono', e.target.value)}
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="text-sm font-medium text-primary/70">Dirección *</label>
+            <input
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              placeholder="Dirección completa"
+              value={formData.direccion}
+              onChange={(e) => handleChange('direccion', e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-primary/70">Fecha de nacimiento *</label>
+            <input
+              type="date"
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              value={formData.fechaNac}
+              onChange={(e) => handleChange('fechaNac', e.target.value)}
+            />
+          </div>
         </div>
+      </section>
 
-        {/* FORMULARIO */}
-        <div className="space-y-8 max-h-[70vh] overflow-y-auto pr-2 text-primary">
+      {/* --- DATOS EMPLEADO --- */}
+      <section>
+        <h3 className="text-lg font-semibold text-primary mb-4">Datos del Empleado</h3>
 
-          {/* DATOS PERSONALES */}
-          <section>
-            <h3 className="text-lg font-semibold text-primary mb-4">
-              Datos Personales
-            </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label className="text-sm font-medium text-primary/70">Puesto *</label>
+            <select
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              value={formData.puesto}
+              onChange={(e) => handleChange('puesto', e.target.value)}
+            >
+              {puestos.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label className="text-sm font-medium text-primary/70">Salario *</label>
+            <input
+              type="number"
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              placeholder="Ej: 25000"
+              value={formData.salario}
+              onChange={(e) => handleChange('salario', e.target.value)}
+            />
+          </div>
 
-              {/* NOMBRE */}
-              <div>
-                <label className="text-sm">Nombre *</label>
-                <input
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.nombre}
-                  onChange={(e) =>
-                    handleChange("nombre", e.target.value)
-                  }
-                />
-                {errores.nombre && (
-                  <p className="text-alert text-xs">{errores.nombre}</p>
-                )}
-              </div>
+          <div>
+            <label className="text-sm font-medium text-primary/70">Fecha de contratación *</label>
+            <input
+              type="date"
+              className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+              value={formData.fechaIngreso}
+              onChange={(e) => handleChange('fechaIngreso', e.target.value)}
+            />
+          </div>
 
-              {/* APELLIDO */}
-              <div>
-                <label className="text-sm">Apellido *</label>
-                <input
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.apellido}
-                  onChange={(e) =>
-                    handleChange("apellido", e.target.value)
-                  }
-                />
-                {errores.apellido && (
-                  <p className="text-alert text-xs">{errores.apellido}</p>
-                )}
-              </div>
-
-              {/* DNI */}
-              <div>
-                <label className="text-sm">DNI *</label>
-                <input
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.dni}
-                  onChange={(e) =>
-                    handleChange("dni", e.target.value)
-                  }
-                />
-                {errores.dni && (
-                  <p className="text-alert text-xs">{errores.dni}</p>
-                )}
-              </div>
-
-              {/* Telefono */}
-              <div>
-                <label className="text-sm">Teléfono *</label>
-                <input
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.telefono}
-                  onChange={(e) =>
-                    handleChange("telefono", e.target.value)
-                  }
-                />
-                {errores.telefono && (
-                  <p className="text-alert text-xs">
-                    {errores.telefono}
-                  </p>
-                )}
-              </div>
-
-              {/* Direccion */}
-              <div className="md:col-span-2">
-                <label className="text-sm">Dirección *</label>
-                <input
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.direccion}
-                  onChange={(e) =>
-                    handleChange("direccion", e.target.value)
-                  }
-                />
-                {errores.direccion && (
-                  <p className="text-alert text-xs">
-                    {errores.direccion}
-                  </p>
-                )}
-              </div>
-
-              {/* Fecha nac */}
-              <div>
-                <label className="text-sm">Fecha nacimiento *</label>
-                <input
-                  type="date"
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.fechaNac}
-                  onChange={(e) =>
-                    handleChange("fechaNac", e.target.value)
-                  }
-                />
-                {errores.fechaNac && (
-                  <p className="text-alert text-xs">
-                    {errores.fechaNac}
-                  </p>
-                )}
-              </div>
+          {empleadoSeleccionado && (
+            <div className="flex items-center gap-2 mt-6">
+              <input
+                type="checkbox"
+                checked={formData.activo}
+                onChange={(e) => handleChange('activo', e.target.checked)}
+              />
+              <span className="text-sm text-primary/70">Empleado Activo</span>
             </div>
-          </section>
-
-          {/* DATOS EMPLEADO */}
-          <section>
-            <h3 className="text-lg font-semibold mb-4">
-              Datos del Empleado
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-              {/* Puesto */}
-              <div>
-                <label className="text-sm">Puesto *</label>
-                <select
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.puesto}
-                  onChange={(e) =>
-                    handleChange("puesto", e.target.value)
-                  }
-                >
-                  {puestos.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Salario */}
-              <div>
-                <label className="text-sm">Salario *</label>
-                <input
-                  type="number"
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.salario}
-                  onChange={(e) =>
-                    handleChange("salario", e.target.value)
-                  }
-                />
-                {errores.salario && (
-                  <p className="text-alert text-xs">{errores.salario}</p>
-                )}
-              </div>
-
-              {/* Fecha ingreso */}
-              <div>
-                <label className="text-sm">Fecha ingreso *</label>
-                <input
-                  type="date"
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.fechaIngreso}
-                  onChange={(e) =>
-                    handleChange("fechaIngreso", e.target.value)
-                  }
-                />
-                {errores.fechaIngreso && (
-                  <p className="text-alert text-xs">
-                    {errores.fechaIngreso}
-                  </p>
-                )}
-              </div>
-
-              {/* Check activo */}
-              {empleadoSeleccionado && (
-                <div className="flex items-center gap-2 mt-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.activo}
-                    onChange={toggleActivo}
-                  />
-                  <span className="text-sm">Empleado activo</span>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* CREAR USUARIO */}
-          {!empleadoSeleccionado && (
-            <section>
-              <h3 className="text-lg font-semibold mb-4">
-                Datos de usuario
-              </h3>
-
-              {/* Correo */}
-              <div>
-                <label className="text-sm">Correo *</label>
-                <input
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.correo}
-                  onChange={(e) =>
-                    handleChange("correo", e.target.value)
-                  }
-                />
-                {errores.correo && (
-                  <p className="text-alert text-xs">{errores.correo}</p>
-                )}
-              </div>
-
-              {/* Password */}
-              <div className="mt-4">
-                <label className="text-sm">Contraseña *</label>
-                <input
-                  type="password"
-                  className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1"
-                  value={formData.password}
-                  onChange={(e) =>
-                    handleChange("password", e.target.value)
-                  }
-                />
-                {errores.password && (
-                  <p className="text-alert text-xs">{errores.password}</p>
-                )}
-              </div>
-            </section>
           )}
         </div>
+      </section>
 
-        {/* FOOTER */}
-        <div className="flex justify-end gap-3 mt-6 border-t border-primary/10 pt-4">
-          <button
-            onClick={onClose}
-            className="btn-primary bg-primary/10 text-primary hover:bg-primary/20"
-          >
-            Cancelar
-          </button>
+      {/* --- CREDENCIALES SOLO CREAR --- */}
+      {!empleadoSeleccionado && (
+        <section>
+          <h3 className="text-lg font-semibold text-primary mb-4">Datos de usuario</h3>
 
-          <button
-            onClick={trySave}
-            className="btn-primary bg-success text-light hover:bg-success/90"
-          >
-            Guardar
-          </button>
-        </div>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-primary/70">Correo *</label>
+              <input
+                className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+                placeholder="correo@ejemplo.com"
+                value={formData.correo}
+                onChange={(e) => handleChange('correo', e.target.value)}
+              />
+            </div>
 
-      {/* CONFIRMACIÓN */}
-      {confirmAction && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60]">
-          <ConfirmDialog
-            message={confirmMessage}
-            onConfirm={() => {
-              confirmAction();
-              setConfirmAction(null);
-            }}
-            onCancel={() => setConfirmAction(null)}
-          />
-        </div>
-      )}
-
-      {/* NOTIFICACIÓN */}
-      {notification && (
-        <Notification
-          message={notification}
-          onClose={() => setNotification("")}
-        />
+            <div className="md:col-span-2">
+              <label className="text-sm font-medium text-primary/70">Contraseña *</label>
+              <input
+                type="password"
+                className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 bg-light text-primary focus:outline-none focus:border-info focus:ring-2 focus:ring-info/30 transition"
+                placeholder="********"
+                value={formData.password}
+                onChange={(e) => handleChange('password', e.target.value)}
+              />
+            </div>
+          </div>
+        </section>
       )}
     </div>
+
+    {/* FOOTER BUTTONS */}
+    <div className="flex justify-end gap-3 mt-6 border-t border-primary/10 pt-4">
+      <button
+        onClick={onClose}
+        className="btn-primary bg-primary/10 text-primary hover:bg-primary/20"
+      >
+        Cancelar
+      </button>
+      <button
+        onClick={handleSubmit}
+        className="btn-primary bg-success text-light hover:bg-success/90"
+      >
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
   );
 }

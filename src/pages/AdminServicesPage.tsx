@@ -5,7 +5,6 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import Notification from "../components/Notification";
 import { fetchServices, createService, updateService, deleteService } from "../services/service";
 import * as Service from "../types/Service";
-import HeaderMenu from "../components/HeaderMenu";
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<ServiceType.Service[]>([]);
@@ -114,9 +113,6 @@ export default function AdminServicesPage() {
         >
           Agregar Servicio
         </button>
-        <div className="absolute top-4 right-4">
-          <HeaderMenu />
-        </div>
       </div>
 
       <ServiceTable

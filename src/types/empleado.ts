@@ -22,6 +22,7 @@ export type EmpleadoResponse = {
   persona: EmpleadoPersona;
 };
 
+
 export type CrearEmpleadoDTO = {
   nombre: string;
   apellido: string;
@@ -37,5 +38,6 @@ export type CrearEmpleadoDTO = {
   salario: number;
   fechaIngreso: string;
 };
+
 
 export type ActualizarEmpleadoDTO = Partial<CrearEmpleadoDTO>;
