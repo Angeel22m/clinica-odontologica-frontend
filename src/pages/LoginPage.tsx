@@ -34,9 +34,11 @@ export default function LoginPage() {
 
       return { success: true };
     } else {
+      const retryAfter = data.retryAfter;
+      const code = data.code;
       const msg = data.message || "Error al iniciar sesión";
       setServerError(msg);
-      return { success: false, error: msg };
+      return { success: false, error: msg, code: code, retryAfter: retryAfter};
     }
   } catch (error: any) {
     const message =
