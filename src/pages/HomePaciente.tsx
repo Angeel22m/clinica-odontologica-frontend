@@ -14,6 +14,7 @@ export default function HomePaciente() {
   const [citasPendientes, setCitasPendientes] = useState<any[]>([]);
   const [citaEditando, setCitaEditando] = useState<any | null>(null);
 
+  // Notificaciones
   const [notification, setNotification] = useState("");
   const [confirmData, setConfirmData] = useState<{
     mensaje: string;
@@ -26,8 +27,12 @@ export default function HomePaciente() {
     return null;
   }
 
-  const esProximoDosDias = (fechaStr: string) => {
+  // ---- Helpers ----
+
+  // Detectar si está dentro de HOY, MAÑANA o PASADO MAÑANA
+  const esCitaProxima = (fechaStr: string) => {
     if (!fechaStr) return false;
+
     const hoy = new Date();
     const fecha = new Date(fechaStr);
 
@@ -36,6 +41,7 @@ export default function HomePaciente() {
       hoy.getMonth(),
       hoy.getDate()
     ).getTime();
+
     const fechaMid = new Date(
       fecha.getFullYear(),
       fecha.getMonth(),
@@ -43,7 +49,29 @@ export default function HomePaciente() {
     ).getTime();
 
     const diffDias = (fechaMid - hoyMid) / (1000 * 60 * 60 * 24);
-    return diffDias === 1 || diffDias === 2;
+
+    return diffDias === 0 || diffDias === 1 || diffDias === 2;
+  };
+
+  // Cancelación automática si faltan < 24 horas y aún está pendiente
+  const cancelarPorTiempoRestante = async (cita: any) => {
+    const ahora = new Date();
+    const fechaCita = new Date(`${cita.fecha}T${cita.hora}`);
+
+    const diffMs = fechaCita.getTime() - ahora.getTime();
+    const diffHoras = diffMs / (1000 * 60 * 60);
+
+    if (cita.estado === "PENDIENTE" && diffHoras <= 24) {
+      // cancelar en backend
+      try {
+        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`);
+        return "CANCELADA";
+      } catch {
+        return cita.estado;
+      }
+    }
+
+    return cita.estado;
   };
 
   const fetchCitasPendientes = async () => {
@@ -52,9 +80,19 @@ export default function HomePaciente() {
       const res = await axios.get(
         `http://localhost:3000/citas/paciente/${pacienteId}`
       );
-      setCitasPendientes(Array.isArray(res.data) ? res.data : []);
+
+      let citas = Array.isArray(res.data) ? res.data : [];
+
+      // aplicar cancelación automática
+      const nuevas = [];
+      for (let c of citas) {
+        const nuevoEstado = await cancelarPorTiempoRestante(c);
+        nuevas.push({ ...c, estado: nuevoEstado });
+      }
+
+      setCitasPendientes(nuevas);
     } catch (err) {
-      console.error("error al cargar las citas pendientes", err);
+      console.error("Error al cargar citas", err);
     }
   };
 
@@ -100,7 +138,7 @@ export default function HomePaciente() {
             `http://localhost:3000/citas/${cita.id}/confirmar`
           );
 
-          if (res.data?.status === "ok" || res.data?.estado === "CONFIRMADA") {
+          if (res.data?.estado === "CONFIRMADA") {
             setNotification("Cita confirmada correctamente");
           }
 
@@ -114,16 +152,16 @@ export default function HomePaciente() {
     });
   };
 
-  const citasProximosDosDias = citasPendientes.filter((c) =>
-    esProximoDosDias(c.fecha)
+  const citasProximas = citasPendientes.filter((c) =>
+    esCitaProxima(c.fecha)
   );
 
   const citasOtrasPendientes = citasPendientes.filter(
-    (c) => !esProximoDosDias(c.fecha)
+    (c) => !esCitaProxima(c.fecha)
   );
 
   const formatoHora = (hora: string) =>
-    hora.length === 6 ? hora.slice(1).replace("_", ":") : hora;
+    hora.length === 5 ? hora : hora.replace("_", ":");
 
   const puedeEditar = (cita: any) => cita.estado === "PENDIENTE";
   const puedeConfirmar = (cita: any) => cita.estado === "PENDIENTE";
@@ -149,6 +187,7 @@ export default function HomePaciente() {
           >
             Crear cita
           </button>
+
           <FiBell className="hover:text-info transition h-6 w-6 cursor-pointer" />
 
           <HeaderMenu />
@@ -175,7 +214,7 @@ export default function HomePaciente() {
                   </div>
 
                   <div className="mt-1 text-sm text-gray-600">
-                    Con:{" "}
+                    Con{" "}
                     <span className="font-medium text-dark">
                       {cita.doctor?.persona?.nombre}{" "}
                       {cita.doctor?.persona?.apellido}
@@ -196,10 +235,10 @@ export default function HomePaciente() {
                     </span>
                   </div>
 
-                  {/* 🔥 SI LA CITA ESTÁ CANCELADA → NO MOSTRAR BOTONES */}
+                  {/* Si CANCELADA → NO mostrar botones */}
                   {cita.estado === "CANCELADA" ? (
-                    <p className="mt-3 text-alert font-medium text-center">
-                      Esta cita ha sido cancelada. Programe una nueva cita.
+                    <p className="text-alert mt-3 font-medium">
+                      Esta cita fue cancelada. Por favor programe una nueva.
                     </p>
                   ) : (
                     <div className="mt-2 flex justify-center gap-3">
@@ -230,14 +269,12 @@ export default function HomePaciente() {
             )}
           </section>
 
-          {/* Citas próximos 2 días */}
+          {/* Citas próximas */}
           <section className="bg-white shadow-xl rounded-xl p-6 md:max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-medium mb-3">
-              Citas en los próximos 2 días
-            </h2>
+            <h2 className="text-xl font-medium mb-3">Citas próximas</h2>
 
-            {citasProximosDosDias.length > 0 ? (
-              citasProximosDosDias.map((cita) => (
+            {citasProximas.length > 0 ? (
+              citasProximas.map((cita) => (
                 <div
                   key={cita.id}
                   className="p-4 border-l-4 border-accent rounded-lg shadow-sm hover:shadow-lg transition mb-4"
@@ -267,6 +304,8 @@ export default function HomePaciente() {
                       className={`font-semibold ${
                         cita.estado === "CONFIRMADA"
                           ? "text-success"
+                          : cita.estado === "CANCELADA"
+                          ? "text-alert"
                           : "text-primary"
                       }`}
                     >
@@ -274,14 +313,14 @@ export default function HomePaciente() {
                     </span>
                   </div>
 
-                  {/* 🔥 CANCELADA → SOLO MENSAJE */}
+                  {/* Si CANCELADA → solo mensaje */}
                   {cita.estado === "CANCELADA" ? (
-                    <p className="mt-3 text-alert font-medium text-center">
-                      Esta cita ha sido cancelada. Programe una nueva cita.
+                    <p className="text-alert mt-3 font-medium">
+                      Esta cita fue cancelada. Por favor programe una nueva.
                     </p>
                   ) : (
                     <div className="mt-2 flex justify-center gap-3">
-                      {/* Confirmar cita */}
+                      {/* Confirmar */}
                       {cita.estado !== "CONFIRMADA" && (
                         <button
                           disabled={!puedeConfirmar(cita)}
@@ -292,7 +331,7 @@ export default function HomePaciente() {
                         </button>
                       )}
 
-                      {/* Confirmada → NO EDITAR */}
+                      {/* Editar solo si está pendiente */}
                       {cita.estado === "PENDIENTE" && (
                         <button
                           onClick={() => handleEditar(cita)}
@@ -302,6 +341,7 @@ export default function HomePaciente() {
                         </button>
                       )}
 
+                      {/* Cancelar */}
                       <button
                         onClick={() => handleEliminar(cita)}
                         className="px-3 py-1 rounded-lg btn-alert cursor-pointer"
@@ -313,7 +353,7 @@ export default function HomePaciente() {
                 </div>
               ))
             ) : (
-              <p>No tiene citas próximas en los siguientes 2 días</p>
+              <p>No tiene citas próximas</p>
             )}
           </section>
         </div>
