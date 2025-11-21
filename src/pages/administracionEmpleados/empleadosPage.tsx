@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { obtenerEmpleados } from "../../services/empleadosService";
 import {ListaEmpleados} from "../../components/listaEmpleados";
 import EmpleadoModal from "../../components/EmpleadoModal";
-import LogoutButton from "../../components/LogoutButton"
 import type { EmpleadoResponse } from "../../types/empleado";
+import HeaderMenu from "../../components/HeaderMenu";
 
 
 
@@ -35,7 +35,7 @@ export default function EmpleadosPage() {
       </p>
     </div>
 
-    <LogoutButton />
+     <HeaderMenu />
   </div>
 
   {/* Contenedor principal */}
