@@ -10,6 +10,7 @@ import LogoutButton from "../components/LogoutButton";
 import { FiSettings } from "react-icons/fi";
 import { FiUser } from "react-icons/fi";
 import { useAuth } from "../hooks/UseAuth";
+
 export default function HomePaciente() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -209,6 +210,7 @@ export default function HomePaciente() {
       setShowModal(false);
       fetchCitasPendientes();
       }} />}
+      
       {showModalEditar && citaEditando && (
         <ModalEditarCita 
           cita={citaEditando}
