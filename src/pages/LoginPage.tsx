@@ -2,6 +2,10 @@ import LoginForm from "../components/LoginForm";
 import axios from "axios";
 import { useState } from "react";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
+
 export default function LoginPage() {
   const [serverError, setServerError] = useState("");
   
@@ -13,7 +17,7 @@ export default function LoginPage() {
     const response = await axios.post("http://localhost:3000/auth/login", {
       correo: user,
       password: pass,
-    });
+    },headers);
 
     const data = response.data;
     console.log("Login response:", data);

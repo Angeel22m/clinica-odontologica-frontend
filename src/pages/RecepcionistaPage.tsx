@@ -23,6 +23,10 @@ import axios from "axios";
 import ModalEditarCita from "../components/ModalEditarCita";
 type SearchType = 'correo' | 'dni' | 'telefono';
 
+
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 // En RecepcionistaPage.tsx (o un archivo de utilidad)
 
 // Definimos las reglas para detectar el tipo de entrada
@@ -250,7 +254,7 @@ const handleSearch = () => {
   const fetchCitasPendientes = useCallback(async (id: number) => { 
         if (!id) return;
         try {
-            const res = await axios.get(`http://localhost:3000/citas/paciente/${id}`);
+            const res = await axios.get(`http://localhost:3000/citas/paciente/${id}`,headers);
             setCitasPendientes(Array.isArray(res.data) ? res.data : []);
         } catch (err) {
             console.error('Error al cargar las citas pendientes', err);
@@ -278,7 +282,7 @@ const handleSearch = () => {
     if (!confirm("Estas seguro de cancelar esta cita?")) return;
     
     try {
-      const res = await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`);
+      const res = await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`,{},headers);
       
       if (res.data.code === 0) {
         alert("Cita cancelada correctamente");

@@ -9,28 +9,28 @@ const API_URL = 'http://localhost:3000/servicios';
 
 // Obtener todos los servicios
 export const fetchServices = async (): Promise<Service[]> => {
-  const { data } = await api.get(API_URL);
+  const { data } = await api.get(API_URL,headers);
   return data;
 };
 
 // Crear un nuevo servicio
 export const createService = async (service: Service): Promise<Service> => {
-  const { data } = await api.post(API_URL, service);
+  const { data } = await api.post(API_URL, service,headers);
   return data;
 };
 
 // Actualizar un servicio
 export const updateService = async (id: number, service: Service): Promise<Service> => {
-  const { data } = await api.put(`${API_URL}/${id}`, {
+  const { data } = await api.patch(`${API_URL}/${id}`, {
   	nombre: service.nombre,
   	descripcion: service.descripcion,
   	precio: Math.floor(service.precio),
   	activo: service.activo
-  });
+  },headers);
   return data;
 };
 
 // Eliminar un servicio
 export const deleteService = async (id: number): Promise<void> => {
-  return await api.delete(`${API_URL}/${id}`);
+  return await api.delete(`${API_URL}/${id}`,headers);
 };

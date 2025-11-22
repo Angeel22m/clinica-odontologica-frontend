@@ -20,11 +20,16 @@ export async function createExpediente(pacienteId: number): Promise<boolean> {
       observaciones: "",
     };
 
-    const res = await fetch(`${BASE_URL}/expediente`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+  const token = localStorage.getItem("token"); // o desde tu contexto/global
+
+const res = await fetch(`${BASE_URL}/expediente`, {
+  method: "POST",
+  headers: { 
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify(body),
+});
 
     const json = await res.json().catch(() => null);
 

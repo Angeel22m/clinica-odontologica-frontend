@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import Notification from "../components/Notification";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
+
 export default function ModalAgendarCita({ onClose, pacienteId }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -22,7 +26,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/servicios");
+        const res = await axios.get("http://localhost:3000/servicios",headers);
         const data = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data.data)
@@ -44,7 +48,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
         return;
       }
       try {
-        const res = await axios.get(`http://localhost:3000/citas/doctores-disponibles?fecha=${formData.fecha}`);
+        const res = await axios.get(`http://localhost:3000/citas/doctores-disponibles?fecha=${formData.fecha}`,headers);
 
         const data = Array.isArray(res.data)
           ? res.data
@@ -76,7 +80,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
       }
 
       try {
-        const res = await axios.get(`http://localhost:3000/citas/horas-disponibles?doctorId=${formData.doctorId}&fecha=${formData.fecha}`);
+        const res = await axios.get(`http://localhost:3000/citas/horas-disponibles?doctorId=${formData.doctorId}&fecha=${formData.fecha}`,headers);
 
         const data = Array.isArray(res.data)
           ? res.data
@@ -121,7 +125,7 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
         doctorId: parseInt(formData.doctorId),
         pacienteId: parseInt(pacienteId) || parseInt(JSON.parse(localStorage.getItem('user')).persona.id),
       };
-      const res = await axios.post("http://localhost:3000/citas", payload);
+      const res = await axios.post("http://localhost:3000/citas", payload,headers);
         console.log(res.data);
       if (res.data.code === 0) {
       console.log("Cita creada:", res.data);

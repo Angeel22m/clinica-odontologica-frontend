@@ -8,10 +8,14 @@ const PublicServiciosPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
 
+  const headers= {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  };
+
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/servicios");
+        const response = await axios.get("http://localhost:3000/servicios",headers);
 	console.log(response.data)
         const data = Array.isArray(response.data)
           ? response.data

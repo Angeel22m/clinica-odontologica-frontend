@@ -12,7 +12,7 @@ const headers = {
 const BASE_URL = "/empleado";
 
 export const obtenerEmpleados = async (): Promise<EmpleadoResponse[]> => {
-  const res = await api.get(BASE_URL);
+  const res = await api.get(BASE_URL,headers);
   return res.data.data;
 };
 
@@ -22,7 +22,7 @@ export const crearEmpleado = async (data: CrearEmpleadoDTO) => {
     rol: data.puesto, // backend lo usa como rol
   };
   delete (payload as any).usuarioActivo;
-  return await api.post(BASE_URL, payload);
+  return await api.post(BASE_URL, payload,headers);
 };
 
 export const actualizarEmpleado = async (id: number, data: ActualizarEmpleadoDTO) => {
@@ -43,7 +43,7 @@ export const actualizarEmpleado = async (id: number, data: ActualizarEmpleadoDTO
 
   
 
-  const response = await api.put(`${BASE_URL}/${id}`, payload);
+  const response = await api.put(`${BASE_URL}/${id}`, payload, headers);
   return response.data;
 };
 

@@ -36,7 +36,7 @@ export const getExpedienteByIdPaciente = async (id: number): Promise<Expediente>
 };
 
 export const addDetalleConsulta = async (data: NewClinicalRecord): Promise<ClinicalRecord> => {
-  const response = await api.post(`/expediente/detalle/${data.expedienteId}`, data);
+  const response = await api.post(`/expediente/detalle/${data.expedienteId}`, data,headers);
   return response.data.data; // aquí accedemos a `data` dentro del response
 };
 
@@ -98,21 +98,21 @@ export const uploadFileToExpediente = async (
     // 2. Definir la URL de la petición POST
     const url = `/expediente/archivo/upload`;
 
-    // 3. Realizar la petición POST con Axios
-    const { data } = await api.post(url, formData, {
-      // IMPLEMENTACIÓN DE onUploadProgress
-      onUploadProgress: (progressEvent: any) => {
-        if (progressEvent.lengthComputable) {
-          // Calcula el porcentaje de subida
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          
-          // Llama al callback si se proporcionó
-          if (onProgress) {
-            onProgress(percent); 
-          }
-        }
-      },
-    });
+   const token = localStorage.getItem("token"); // o tu variable global
+
+const { data } = await api.post(url, formData, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "multipart/form-data", // importante para FormData
+  },
+  onUploadProgress: (progressEvent: any) => {
+    if (progressEvent.lengthComputable) {
+      const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+      if (onProgress) onProgress(percent);
+    }
+  },
+});
+
 
     return data;
   } catch (error: unknown) {
@@ -146,7 +146,7 @@ export const fetchExpedientesByDoctor = async (doctorId: number): Promise<Expedi
  */
 export const updateExpediente = async (id: number, payload: UpdateExpedienteDto): Promise<Expediente> => {
   try {
-    const { data } = await api.put<Expediente>(`/expediente/${id}`, payload);
+    const { data } = await api.put<Expediente>(`/expediente/${id}`, payload,headers);
     return data;
   } catch (error: unknown) {
     if (error instanceof AxiosError) {

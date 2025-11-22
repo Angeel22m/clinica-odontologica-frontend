@@ -21,7 +21,7 @@ export interface Paciente {
  */
 export async function getPacientes(): Promise<Paciente[]> {
   try {
-    const res = await fetch(`${BASE_URL}/expediente`);
+    const res = await fetch(`${BASE_URL}/expediente`,headers);
     const json = await res.json();
 
     // Manejar dos posibles formatos:

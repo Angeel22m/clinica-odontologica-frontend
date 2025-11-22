@@ -8,6 +8,10 @@ import HeaderMenu from "../components/HeaderMenu";
 import Notification from "../components/Notification";
 import ConfirmDialog from "../components/ConfirmDialog";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
+
 export default function HomePaciente() {
   const [showModal, setShowModal] = useState(false);
   const [showModalEditar, setShowModalEditar] = useState(false);
@@ -64,7 +68,7 @@ export default function HomePaciente() {
     if (cita.estado === "PENDIENTE" && diffHoras <= 24) {
       // cancelar en backend
       try {
-        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`);
+        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`,{},headers);
         return "CANCELADA";
       } catch {
         return cita.estado;
@@ -78,7 +82,7 @@ export default function HomePaciente() {
     try {
       const pacienteId = user.personaId;
       const res = await axios.get(
-        `http://localhost:3000/citas/paciente/${pacienteId}`
+        `http://localhost:3000/citas/paciente/${pacienteId}`,headers
       );
 
       let citas = Array.isArray(res.data) ? res.data : [];
@@ -106,12 +110,13 @@ export default function HomePaciente() {
   };
 
   const handleEliminar = (cita: any) => {
+    
     setConfirmData({
       mensaje: "¿Seguro que desea cancelar esta cita?",
       onConfirm: async () => {
         try {
           const res = await axios.patch(
-            `http://localhost:3000/citas/${cita.id}/cancelar`
+            `http://localhost:3000/citas/${cita.id}/cancelar`,{},headers
           );
 
           if (res.data.code === 0) {
@@ -135,7 +140,7 @@ export default function HomePaciente() {
       onConfirm: async () => {
         try {
           const res = await axios.patch(
-            `http://localhost:3000/citas/${cita.id}/confirmar`
+            `http://localhost:3000/citas/${cita.id}/confirmar`,{},headers
           );
 
           if (res.data?.estado === "CONFIRMADA") {

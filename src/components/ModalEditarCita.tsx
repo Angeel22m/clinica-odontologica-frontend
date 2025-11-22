@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};  
+
 export default function ModalEditarCita({ cita, onClose, onUpdated }) {
 
   // Normalizar hora proveniente del backend
@@ -23,7 +27,7 @@ export default function ModalEditarCita({ cita, onClose, onUpdated }) {
 
       try {
         const res = await axios.get(
-          `http://localhost:3000/citas/horas-disponibles?doctorId=${cita.doctorId}&fecha=${fecha}`
+          `http://localhost:3000/citas/horas-disponibles?doctorId=${cita.doctorId}&fecha=${fecha}`,headers
         );
 
         const data = Array.isArray(res.data)
@@ -74,7 +78,7 @@ export default function ModalEditarCita({ cita, onClose, onUpdated }) {
 
       const res = await axios.put(
         `http://localhost:3000/citas/${cita.id}`,
-        body
+        body,headers
       );
 
       if (res.data.code === 0) {

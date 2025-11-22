@@ -35,7 +35,7 @@ class ModificarInfoService {
     private async buscarGenerico(endpoint: string): Promise<PacienteRecepcionista> {
         try {
             // 1. Ejecutar la llamada a la API
-            const res = await api.get(endpoint);
+            const res = await api.get(endpoint,headers);
             const user = res.data?.data;
 
             if (!user || !user.persona) {
@@ -119,7 +119,7 @@ class ModificarInfoService {
           : null,
       };
 
-      await api.patch(`/Modificar/${correo}`, payload);
+      await api.patch(`/Modificar/${correo}`, payload,headers);
     } catch (error) {
       if (error instanceof AxiosError) {
         const status = error.response?.status;
