@@ -1,6 +1,9 @@
 // src/services/modificarInfoService.ts
 import { api } from "./axios";
 import { AxiosError } from "axios";
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 
 // Datos que el recepcionista puede modificar
 export interface PacienteModificarPayload {

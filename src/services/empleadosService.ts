@@ -6,6 +6,9 @@ import type {
   ActualizarEmpleadoDTO,
 } from "../types/empleado";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 const BASE_URL = "/empleado";
 
 export const obtenerEmpleados = async (): Promise<EmpleadoResponse[]> => {

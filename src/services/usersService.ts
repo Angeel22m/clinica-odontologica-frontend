@@ -4,6 +4,10 @@
 import type { User } from "../types/User";
 import type { Paciente } from "../types/Paciente";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
+
 const LS_KEY_USERS = "clinica_users_v1";
 
 function nowISO() {
@@ -41,7 +45,7 @@ export async function crearUserParaPaciente(paciente: Paciente): Promise<User> {
   const users = loadUsers();
 
   const exists = users.find(
-    (u) => u.correo.toLowerCase() === paciente.correo.toLowerCase()
+    (u) => u.correo.toLowerCase() === paciente.correo?.toLowerCase()
   );
   if (exists) {
     throw new Error("Ya existe un usuario con ese correo");
