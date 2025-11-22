@@ -71,39 +71,13 @@ const PublicServiciosPage = () => {
                   Precio: ${servicio.precio}
                 </p>
                 
-                <a className="btn-primary" onClick={()=>{setServicioSeleccionado(servicio);setModalOpen(true);}}>Agendar cita</a>
+                <a className="btn-primary" onClick={()=>{window.location.href='/home/paciente'}}>Agendar cita</a>
               </div>
             ))}
           </div>
         )}
       </div>
-      {modalOpen && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overlay-dark">
-    <div className="bg-light rounded-2xl p-6 max-w-md w-full relative border-1 shadow-xl">
-      <button
-        className="absolute top-3 right-3 text-primary text-2xl cursor-pointer"
-        onClick={() => setModalOpen(false)}
-      >
-        x
-      </button>
-      <h2 className="text-2xl font-bold mb-4 text-primary">
-        {servicioSeleccionado?.nombre}
-      </h2>
-      <p className="text-primary mb-4">{servicioSeleccionado?.descripcion}</p>
-      <div className="flex justify-center">
-      <button
-        className="btn-primary text-light py-2 px-4 rounded-xl hover:bg-green-600 transition-colors"
-        onClick={() => {
-          console.log("Cita agendada para", servicioSeleccionado.id);
-          setModalOpen(false);
-        }}
-      >
-        Agendar cita
-      </button>
-      </div>
-    </div>
-  </div>
-)}
+)
 
     </section>
   );
