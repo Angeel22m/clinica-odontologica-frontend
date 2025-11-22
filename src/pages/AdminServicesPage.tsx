@@ -5,6 +5,8 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import Notification from "../components/Notification";
 import { fetchServices, createService, updateService, deleteService } from "../services/service";
 import * as Service from "../types/Service";
+import { Link } from "react-router-dom";
+import { FiChevronLeft } from "react-icons/fi";
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<ServiceType.Service[]>([]);
@@ -103,6 +105,13 @@ export default function AdminServicesPage() {
 
   return (
     <div className="services-page bg-light p-6 min-h-screen">
+       <button>
+     <Link className="btn-primary w-32 flex items-center gap-1" to={"/dashboard"}>
+        <FiChevronLeft />
+        
+        Regresar</Link>
+
+        </button>
       <h1 className="text-3xl text-primary text-center mb-6 font-bold">Administrar Servicios</h1>
 
       <div className="flex justify-center mb-4">

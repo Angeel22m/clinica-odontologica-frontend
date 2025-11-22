@@ -1,4 +1,4 @@
-import type { Empleado } from "../types/empleado";
+import type { ActualizarEmpleadoDTO } from "../types/empleado";
 
 // Valida formato de correo básico
 export const validarCorreo = (correo: string): boolean => {
@@ -46,8 +46,8 @@ export const validarDNI = (dni: string): boolean => {
 
 // Revisa duplicados por campo, excluyendo el idActual si se pasa
 export const esDuplicado = (
-  lista: Empleado[],
-  campo: keyof Empleado,
+  lista: ActualizarEmpleadoDTO[],
+  campo: keyof ActualizarEmpleadoDTO,
   valor: string,
   idActual?: number
 ): boolean => {

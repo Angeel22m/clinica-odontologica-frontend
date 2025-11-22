@@ -116,7 +116,7 @@ class ModificarInfoService {
           : null,
       };
 
-      await api.put(`/Modificar/${correo}`, payload);
+      await api.patch(`/Modificar/${correo}`, payload);
     } catch (error) {
       if (error instanceof AxiosError) {
         const status = error.response?.status;

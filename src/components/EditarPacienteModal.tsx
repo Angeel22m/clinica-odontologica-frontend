@@ -102,47 +102,55 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
 
   // 4. Función de Validación Final (handleSubmit)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    let newErrors: FormErrors = {};
-    const fieldsToValidate: (keyof PacienteModificarPayload)[] = ['dni', 'telefono', 'direccion', 'password'];
+  let newErrors: FormErrors = {};
 
-    fieldsToValidate.forEach((field) => {
-      const value = form[field];
-      const pattern = regex[field as keyof typeof regex];
+  const fieldsToValidate: (keyof PacienteModificarPayload)[] = [
+    "dni",
+    "telefono",
+    "direccion",
+    "password",
+  ];
 
-      // La contraseña solo se valida si NO está vacía
-      if (field === 'password') {
-        if (value && !pattern.test(value)) {
-          newErrors.password = "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
-        }
-      } 
-      // DNI, Teléfono y Dirección son obligatorios y deben cumplir el formato
-      else {
-        if (!value) {
-          newErrors[field] = `El campo es obligatorio.`;
-        } else if (!pattern.test(value)) {
-          // Reutiliza los mensajes de error más detallados de handleChange
-          newErrors[field] = errors[field] || `El formato de ${field} es incorrecto.`;
-        }
+  fieldsToValidate.forEach((field) => {
+    const value = form[field];
+    const pattern = regex[field as keyof typeof regex];
+
+    // Si está vacío → no se valida, no hay error
+    if (!value) return;
+
+    // Validar password solo si se escribió
+    if (field === "password") {
+      if (!pattern.test(value)) {
+        newErrors.password =
+          "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
       }
-    });
-
-    setErrors(newErrors);
-
-    // Si hay errores, detenemos el envío
-    if (Object.keys(newErrors).length > 0) {
-      console.error("Errores de validación:", newErrors);
-      return; 
+      return;
     }
 
-    // 5. Preparar el payload para el servicio (excluir password si está vacía)
-    const payload: PacienteModificarPayload = form.password
-      ? form
-      : { ...form, password: undefined }; 
-      
-    await onSave(payload);
-  };
+    // Validación general para DNI, teléfono y dirección
+    if (!pattern.test(value)) {
+      newErrors[field] =
+        errors[field] || `El formato de ${field} es incorrecto.`;
+    }
+  });
+
+  setErrors(newErrors);
+
+  // Si hay errores no enviar
+  if (Object.keys(newErrors).length > 0) {
+    console.error("Errores de validación:", newErrors);
+    return;
+  }
+
+  // Crear payload solo con los campos llenados
+  const payload: PacienteModificarPayload = Object.fromEntries(
+    Object.entries(form).filter(([_, v]) => v && v !== "")
+  ) as PacienteModificarPayload;
+
+  await onSave(payload);
+};
 
   // 6. Actualizar el renderizado para mostrar errores
   const getClassName = (fieldName: keyof PacienteModificarPayload) => {
@@ -178,8 +186,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
           </label>
           <input
             type="password"
-            name="password"
-            value={form.password || ""}
+            name="password"            
             onChange={handleChange}
             placeholder="********"
             className={getClassName('password')}
@@ -226,8 +233,8 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             </label>
             <input
               type="text"
-              name="dni"
-              value={form.dni || ""}
+              name="dni"          
+              placeholder={form.dni}
               onChange={handleChange}
               className={getClassName('dni')}
             />
@@ -242,8 +249,8 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             </label>
             <input
               type="text"
-              name="telefono"
-              value={form.telefono || ""}
+              name="telefono"              
+              placeholder={form.telefono}
               onChange={handleChange}
               className={getClassName('telefono')}
             />
@@ -261,7 +268,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
           <input
             type="text"
             name="direccion"
-            value={form.direccion || ""}
+            placeholder={form.direccion}
             onChange={handleChange}
             className={getClassName('direccion')}
           />

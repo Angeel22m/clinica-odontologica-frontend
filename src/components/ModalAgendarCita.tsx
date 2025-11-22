@@ -122,14 +122,18 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
         pacienteId: parseInt(pacienteId) || parseInt(JSON.parse(localStorage.getItem('user')).persona.id),
       };
       const res = await axios.post("http://localhost:3000/citas", payload);
-      
+        console.log(res.data);
       if (res.data.code === 0) {
-      
-	onClose();
+      console.log("Cita creada:", res.data);
+	
         setNotification("Cita creada exitosamente");
-        
+
+setTimeout(() => {
+  onClose();
+}, 2000); // 2 segundos para que se vea
+
       } else {
-        setNotification("Error: " + res.data.message);
+        setNotification("Error: hola " + res.data.message);
       }
     } catch (err) {
       

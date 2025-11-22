@@ -5,6 +5,8 @@ import {ListaEmpleados} from "../../components/listaEmpleados";
 import EmpleadoModal from "../../components/EmpleadoModal";
 import type { EmpleadoResponse } from "../../types/empleado";
 import HeaderMenu from "../../components/HeaderMenu";
+import { Link } from "react-router-dom";
+import { FiChevronLeft } from "react-icons/fi";
 
 
 
@@ -24,19 +26,30 @@ export default function EmpleadosPage() {
 
   return (
     <div className="p-8 bg-light min-h-screen text-primary">
+      
   {/* Encabezado */}
   <div className="flex justify-between items-center mb-8">
     <div>
+      <button>
+           <Link className="btn-primary w-32 flex items-center gap-1" to={"/dashboard"}>
+              <FiChevronLeft />
+              
+              Regresar</Link>
+      
+              </button>
+    </div>
+    <div className="items-center flex flex-col text-center">
       <h1 className="text-4xl font-bold mb-2 text-primary">
         Administración de Empleados
       </h1>
-      <p className="text-primary/70">
+      <p className="text-primary/70 item">
         Crea, edita y gestiona los empleados de la clínica.
       </p>
     </div>
-
+    
      <HeaderMenu />
   </div>
+  
 
   {/* Contenedor principal */}
   <div className="bg-light border border-primary/10 shadow-md rounded-xl p-6">

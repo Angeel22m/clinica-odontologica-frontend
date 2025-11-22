@@ -32,7 +32,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
   
 
 
-  const { paciente, doctor } = expediente;
+  const { paciente } = expediente;
 
   return (
     <div className="p-6 bg-light rounded-xl shadow-xl h-full overflow-y-auto pt-0">
@@ -70,12 +70,13 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Stethoscope className="w-4 h-4 mr-2 text-secondary" />
-            <span className="font-semibold">Doctor:</span> 
-            <div className="w-24 break-words">
-            {doctor.persona.nombre} {doctor.persona.apellido}
+            <Pill className="w-4 h-4 mr-2 text-success" />
+            <span className="font-semibold">Observaciones:</span> 
+            <div className="w-16 break-words">
+            {expediente.observaciones || 'N/A'}
             </div>
           </div>
+          
         </div>
       </div>
 
@@ -126,9 +127,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
               </div>
             </div>
 
-            <p className="mt-3 pt-3 border-t text-xs text-secondary">
-              Registrado por el Doctor {record.doctor?.persona.nombre} {record.doctor?.persona.apellido} | Creado: {formatDate(record.createdAt)}
-            </p>
+            
           </div>
         ))}
       </div>

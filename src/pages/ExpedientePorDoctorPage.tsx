@@ -83,10 +83,16 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
 
   return (
   <div className="min-h-screen bg-light p-6 relative">
-      <button className="btn-primary flex items-center gap-1">
+      
+        <button>
+     <Link className="btn-primary flex items-center gap-1" to={"/citas/doctor"}>
         <FiChevronLeft />
-        <Link to={"/citas/doctor"}>Regresar</Link>
-      </button>
+        
+        Regresar</Link>
+
+        </button>
+   
+      
 
       <div className="max-w-6xl mx-auto bg-light rounded-xl shadow-2xl p-6">
         {!expedienteSeleccionado ? (

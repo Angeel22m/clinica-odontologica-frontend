@@ -28,7 +28,7 @@ type Props = {
   onSaved: () => void;
 };
 
-const puestos = ["DOCTOR", "RECEPCIONISTA", "ADMINISTRADOR"];
+const puestos = ["DOCTOR", "RECEPCIONISTA", "ADMIN"];
 
 export default function EmpleadoModal({
   visible,
@@ -123,7 +123,7 @@ export default function EmpleadoModal({
         payload.telefono = limpiarTelefono(payload.telefono);
         payload.salario = Number(payload.salario);
 
-        if (payload.puesto === "ADMINISTRADOR") {
+        if (payload.puesto === "ADMIN") {
           payload.rol = "ADMIN";
         }
 

@@ -55,7 +55,7 @@ const HistorialdelPaciente: React.FC<{ pacienteId: number}> = ({ pacienteId}) =>
         <div>
         
           <h2 className="text-3xl font-bold text-primary mb-2">{expediente.nombrePaciente}</h2>
-          <p className="text-md text-info">Atendido por {expediente.doctorNombre}</p>
+        
 
         </div>
         
@@ -97,12 +97,13 @@ const HistorialdelPaciente: React.FC<{ pacienteId: number}> = ({ pacienteId}) =>
     </div>
   </div>
   <div className="flex items-center gap-2">
-    <Stethoscope className="w-4 h-4 text-primary" />
-    <span className="font-semibold">Doctor:</span>
+    <Pill className="w-4 h-4 text-success" />
+    <span className="font-semibold">Observaciones:</span>
     <div className="w-28 break-words">
-    {expediente.doctorNombre || 'N/A'}
+    {expediente.Observaciones || 'N/A'}
     </div>
   </div>
+  
 </div>
 
       {/* Consultas */}

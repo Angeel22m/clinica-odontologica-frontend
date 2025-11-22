@@ -24,6 +24,7 @@ export type EmpleadoResponse = {
 
 
 export type CrearEmpleadoDTO = {
+  id?: number;
   nombre: string;
   apellido: string;
   dni: string;

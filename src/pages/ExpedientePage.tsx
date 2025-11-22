@@ -4,7 +4,8 @@ import type { Expediente, ClinicalRecord } from '../types/expediente';
 import { fetchExpedientes, fetchPatientHistory } from '../services/expedientesService';
 import PatientCard from '../components/PatientCard';
 import PatientDetails from '../components/PatientDetails';
-import LogoutButton from '../components/LogoutButton';
+import { Link } from 'react-router-dom';
+import { FiChevronLeft } from 'react-icons/fi';
 
 const ExpedientesPage: React.FC = () => {
   const [expedientes, setExpediente] = useState<Expediente[]>([]);
@@ -53,9 +54,16 @@ const ExpedientesPage: React.FC = () => {
 
   return (
     <div className="h-screen bg-light font-sans p-4 md:p-8 flex flex-col">
+      <button>
+     <Link className="btn-primary w-32 flex items-center gap-1" to={"/dashboard"}>
+        <FiChevronLeft />
+        
+        Regresar</Link>
+
+        </button>
   {/* Header fijo */}
   <header className="mb-4 text-center sticky top-0 bg-light z-20">
-    <LogoutButton  />
+      
     <h1 className="text-4xl font-extrabold text-primary tracking-tight">
       Sistema de Expedientes Clínicos
     </h1>
