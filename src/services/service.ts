@@ -1,6 +1,9 @@
 import * as Service from '../types/Service';
 import { api } from './axios';
 import { AxiosError } from 'axios';
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 
 const API_URL = 'http://localhost:3000/servicios';
 

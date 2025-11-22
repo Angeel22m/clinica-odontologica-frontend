@@ -1,10 +1,14 @@
 // src/services/expedienteService.ts
 const BASE_URL = "http://localhost:3000";
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 
 /**
  * Crea un expediente vacío para un paciente recién registrado.
  * No lanza error, retorna false si falla.
  */
+
 export async function createExpediente(pacienteId: number): Promise<boolean> {
   try {
     const body = {

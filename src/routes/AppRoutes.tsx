@@ -31,9 +31,27 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
-      <Route path="/empleados" element={<EmpleadosPage />} />
-      <Route path="/recepcionista" element={<RecepcionistaPage />} />
 
+
+      <Route 
+        path="/empleados" 
+          element={
+          <ProtectedRoute 
+            element={<EmpleadosPage />} 
+            allowedRoles={["ADMIN"]} 
+            />
+            }
+          />
+
+      <Route 
+      path="/recepcionista" 
+        element={
+        <ProtectedRoute
+        element={<RecepcionistaPage />}
+        allowedRoles={["RECEPCIONISTA"]}
+        />
+      }
+      />
       
           
       {/* Rutas protegidas por rol */}
@@ -42,7 +60,7 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<DashboardPage />}
-            allowedRoles={allUser}
+            allowedRoles={["ADMIN"]}
           />
         }
 
@@ -51,7 +69,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/home/paciente" 
         element={ <ProtectedRoute 
           element={<HomePaciente />}
-          allowedRoles={allUser}
+          allowedRoles={["CLIENTE"]}
       
       />
       } />
@@ -59,7 +77,7 @@ const AppRoutes: React.FC = () => {
        <Route path="/citas/doctor" 
        element={<ProtectedRoute 
         element={<DoctorPage/>} 
-        allowedRoles={allUser}
+        allowedRoles={["DOCTOR"]}
         />
       }
       />
@@ -69,7 +87,7 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<ExpedientesPagePorDoctor doctorId={idEmpleado} />}
-            allowedRoles={allUser}
+            allowedRoles={["DOCTOR"]}
           />
         }
       />
@@ -79,7 +97,7 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<EmpleadosPage />}
-            allowedRoles={allUser}
+            allowedRoles={["ADMIN"]}
           />
         }
       />
@@ -89,7 +107,7 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<HistorialdelPaciente pacienteId={idUser} />}
-            allowedRoles={allUser}
+            allowedRoles={["CLIENTE"]}
           />
         }
       />
@@ -100,14 +118,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<AdminServicesPage />}
-            allowedRoles={allUser}
+            allowedRoles={["ADMIN"]}
           />
         }
       />
 
       <Route path="/expedientes" 
       element={<ProtectedRoute element={<ExpedientesPage/>}
-      allowedRoles={allUser}
+      allowedRoles={["ADMIN"]}
       
       />} />
 

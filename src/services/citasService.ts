@@ -7,6 +7,9 @@ import type { Cita, EstadoCita } from "../types/cita";
 import type { DoctorBasic } from "../types/doctor";
 import type { ServicioClinico } from "../types/servicioClinico";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 const LS_KEY_CITAS = "clinica_citas_v1";
 
 function nowISO() {

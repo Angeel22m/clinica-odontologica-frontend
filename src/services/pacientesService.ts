@@ -1,6 +1,9 @@
 // src/services/pacientesService.ts
 const BASE_URL = "http://localhost:3000";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 export interface Paciente {
   id: number;
   nombre: string;

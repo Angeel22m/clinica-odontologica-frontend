@@ -19,6 +19,10 @@ export interface SignupPayload {
   password: string;
 }
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
+
 /**
  * LOGIN
  * Tipado estricto porque siempre devuelve la misma estructura

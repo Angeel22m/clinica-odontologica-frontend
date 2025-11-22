@@ -4,8 +4,14 @@
 import doctoresSeed from "../mock/doctores.json";
 import serviciosSeed from "../mock/servicios.json";
 
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
+
 /* Tipos locales (puedes moverlos a src/types si prefieres) */
 export type EstadoCita = "PENDIENTE" | "COMPLETADA" | "CANCELADA";
+
+
 
 export type Cita = {
   id: number;
