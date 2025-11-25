@@ -27,9 +27,8 @@ type SearchType = 'correo' | 'dni' | 'telefono';
 const headers = {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 };
-// En RecepcionistaPage.tsx (o un archivo de utilidad)
 
-// Definimos las reglas para detectar el tipo de entrada
+// Reglas de detección para cada tipo de búsqueda
 const detectionRules = [
     // 1. DNI (Ejemplo: 8 a 12 dígitos)
     { 
@@ -52,9 +51,7 @@ const detectionRules = [
         errorMessage: 'Formato de correo inválido.'
     },
     
-    // NOTA: El orden es importante. Aquí, si una entrada son solo dígitos,
-    // podríamos priorizar DNI si es más corto, o dejar que el backend lo maneje.
-    // Para simplificar, usaremos un método de detección claro.
+
 ];
 
 // Función para determinar el tipo de búsqueda
@@ -323,7 +320,7 @@ const handleSearch = () => {
           />
         </motion.button>
         </AnimatePresence>
-
+        
         {menuOpen && (
           <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50 border border-primary/10">
           
@@ -363,11 +360,10 @@ const handleSearch = () => {
       Registrar Cliente
     </button>
     <RegisterForm open={open} onClose={handleCloseModal}/>
-  
 
-    <button className="btn-accent shadow-md">
-      Generar Factura
-    </button>
+    <Link to="/facturacion" className="btn-accent shadow-md">
+          Generar Factura
+        </Link>
   </div>
 
   {/* Buscador de pacientes */}

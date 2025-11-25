@@ -16,6 +16,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import  DoctorPage from "../pages/DoctorPage";
 import { useAuth } from "../hooks/UseAuth";
 import RecepcionistaPage from '../pages/RecepcionistaPage';
+import FacturacionPage from '../pages/FacturacionPage';
+
 
 // solo es para pruebas luego se dejan los roles correspondientes
 const allUser  =['ADMIN',"CLIENTE","ADMINISTRADOR","DOCTOR"] 
@@ -32,7 +34,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
 
-
+      {/* Rutas protegidas por rol */}
       <Route 
         path="/empleados" 
           element={
@@ -53,8 +55,16 @@ const AppRoutes: React.FC = () => {
       }
       />
       
-          
-      {/* Rutas protegidas por rol */}
+      <Route 
+      path="/facturacion" 
+        element={
+        <ProtectedRoute
+        element={<FacturacionPage />}
+        allowedRoles={["RECEPCIONISTA"]}
+        />
+      }
+      />    
+  
       <Route
         path="/dashboard"
         element={
