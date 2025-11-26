@@ -166,7 +166,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
         }
         return;
       }
-      console.log(value);
+      
       // Validación general para DNI, teléfono y dirección
       if (!pattern.test(value)) {
         newErrors[field] =
@@ -196,7 +196,6 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
           value !== ""
       )
     ) as PacienteModificarPayload;
-    console.log("hola repollo", payload);
     await onSave(payload);
   };
 
