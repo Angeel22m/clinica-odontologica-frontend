@@ -26,6 +26,8 @@ type Props = {
   onClose: () => void;
   empleadoSeleccionado: EmpleadoResponse | null;
   onSaved: () => void;
+  allSpecialties:{ id: number; nombre: string }[];
+
 };
 
 const puestos = ["DOCTOR", "RECEPCIONISTA", "ADMIN"];
@@ -35,6 +37,7 @@ export default function EmpleadoModal({
   onClose,
   empleadoSeleccionado,
   onSaved,
+  allSpecialties
 }: Props) {
   const hoy = new Date().toISOString().split("T")[0];
 
@@ -65,27 +68,52 @@ export default function EmpleadoModal({
     null
   );
   const [confirmMessage, setConfirmMessage] = useState("");
+  const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<number[]>([]);
 
-  // Cargar datos si es edición
-  useEffect(() => {
-    if (empleadoSeleccionado) {
-      setFormData({
-        nombre: empleadoSeleccionado.persona.nombre,
-        apellido: empleadoSeleccionado.persona.apellido,
-        dni: empleadoSeleccionado.persona.dni,
-        telefono: empleadoSeleccionado.persona.telefono,
-        direccion: empleadoSeleccionado.persona.direccion,
-        fechaNac: empleadoSeleccionado.persona.fechaNac.split("T")[0],
-        correo: "",
-        password: "",
-        puesto: empleadoSeleccionado.puesto,
-        salario: empleadoSeleccionado.salario,
-        fechaIngreso: empleadoSeleccionado.fechaIngreso.split("T")[0],
-        activo: empleadoSeleccionado.activo,
-        usuarioActivo: empleadoSeleccionado.activo,
-      });
-    }
-  }, [empleadoSeleccionado]);
+
+   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const options = e.target.options;
+      const value: number[] = [];
+      
+      // Recorre las opciones seleccionadas y captura su valor (ID)
+      for (let i = 0; i < options.length; i++) {
+        if (options[i].selected) {
+          // Aseguramos que el valor sea numérico (el ID)
+          value.push(Number(options[i].value)); 
+        }
+      }
+      setSelectedSpecialtyIds(value);
+    };
+
+ 
+ // Cargar datos si es edición
+  useEffect(() => {
+    if (empleadoSeleccionado) {
+      // Mapear las especialidades del empleado a un array de IDs
+      const currentSpecialtyIds =
+        empleadoSeleccionado.especialidades?.map(
+          (detalle) => detalle.especialidad.id
+        ) || [];
+
+console.log(empleadoSeleccionado.correo)
+      setFormData({
+        nombre: empleadoSeleccionado.persona.nombre,
+        apellido: empleadoSeleccionado.persona.apellido,
+        dni: empleadoSeleccionado.persona.dni,
+        telefono: empleadoSeleccionado.persona.telefono,
+        direccion: empleadoSeleccionado.persona.direccion,
+        fechaNac: empleadoSeleccionado.persona.fechaNac.split("T")[0],
+        correo: empleadoSeleccionado.persona.user.correo , // Se usa || "" para evitar undefined si el campo es opcional
+        password: '', // La contraseña nunca debe cargarse, se deja vacía
+        puesto: empleadoSeleccionado.puesto,       
+        salario: empleadoSeleccionado.salario,
+        fechaIngreso: empleadoSeleccionado.fechaIngreso.split("T")[0],
+        activo: empleadoSeleccionado.activo,
+        usuarioActivo: empleadoSeleccionado.activo,
+      });
+      setSelectedSpecialtyIds(currentSpecialtyIds);
+    }
+  }, [empleadoSeleccionado]);
 
   // Manejar cambios
   const handleChange = (field: string, value: any) => {
@@ -96,6 +124,12 @@ export default function EmpleadoModal({
 
     const actualizado = { ...formData, [field]: nuevoValor };
     setFormData(actualizado);
+    
+    // Si cambia el puesto, restablecer la selección de especialidades
+    if (field === "puesto" && value !== "DOCTOR") {
+        setSelectedSpecialtyIds([]);
+    }
+
 
     if (intentadoGuardar) {
       setErrores(
@@ -103,61 +137,76 @@ export default function EmpleadoModal({
       );
     }
   };
+// Guardar
+const trySave = async () => {
+  setIntentadoGuardar(true);
 
-  // Guardar
-  const trySave = async () => {
-    setIntentadoGuardar(true);
+  const val = validarEmpleadoCampos(
+    formData,
+    !!empleadoSeleccionado // true si es actualización
+  );
 
-    const val = validarEmpleadoCampos(
-      formData,
-      !!empleadoSeleccionado
-    );
+  // Validación de especialidad si es DOCTOR
+  if (formData.puesto === "DOCTOR" && selectedSpecialtyIds.length === 0) {
+    val.especialidadIds = "Debe seleccionar al menos una especialidad.";
+  }
 
-    setErrores(val);
-    if (Object.keys(val).length > 0) return;
+  setErrores(val);
+  if (Object.keys(val).length > 0) return;
 
-    const accionGuardar = async () => {
-      try {
-        const payload: any = { ...formData };
-        payload.dni = limpiarDNI(payload.dni);
-        payload.telefono = limpiarTelefono(payload.telefono);
-        payload.salario = Number(payload.salario);
+  const accionGuardar = async () => {
+    try {
+      // 1. Preparar el Payload
+      let payload: any = { ...formData };
+      
+      // Limpieza y conversión de tipos
+      payload.dni = limpiarDNI(payload.dni);
+      payload.telefono = limpiarTelefono(payload.telefono);
+      payload.salario = Number(payload.salario);
 
-        if (payload.puesto === "ADMIN") {
-          payload.rol = "ADMIN";
-        }
+      // CORRECCIÓN: Asignación de rol para TODOS los puestos
+      // Asumimos que el rol es el mismo que el puesto, ya que solo habías cubierto ADMIN.
+      payload.rol = payload.puesto;
+      
+      // 2. Gestión de Especialidades (Se ejecuta para creación y actualización)
+      if (payload.puesto === "DOCTOR") {
+        // ESTA LÍNEA ASEGURA QUE SE ENVÍAN LOS NUEVOS IDs AL BACKEND
+        payload.especialidadIds = selectedSpecialtyIds;
+      } else {
+        // Eliminar la propiedad si no es doctor
+        delete payload.especialidadIds; 
+      }
 
-        if (empleadoSeleccionado) {
-          delete payload.correo;
-          delete payload.password;
+      // 3. Ejecutar Acción
+      if (empleadoSeleccionado) {
+            
+        await actualizarEmpleado(
+          empleadoSeleccionado.personaId,
+          payload as ActualizarEmpleadoDTO
+        );
 
-          await actualizarEmpleado(
-            empleadoSeleccionado.personaId,
-            payload as ActualizarEmpleadoDTO
-          );
+        setNotification("Cambios guardados correctamente");
+      } else {
+        await crearEmpleado(payload as CrearEmpleadoDTO);
+        setNotification("Empleado creado con éxito");
+      }
 
-          setNotification("Cambios guardados correctamente");
-        } else {
-          await crearEmpleado(payload as CrearEmpleadoDTO);
-          setNotification("Empleado creado con éxito");
-        }
+      onSaved();
+      onClose();
+    } catch (error: any) {
+      setNotification(
+        error.response?.data?.message || "Error al guardar empleado"
+      );
+    }
+  };
 
-        onSaved();
-        onClose();
-      } catch (error: any) {
-        setNotification(
-          error.response?.data?.message || "Error al guardar empleado"
-        );
-      }
-    };
-
-    if (empleadoSeleccionado) {
-      setConfirmAction(() => accionGuardar);
-      setConfirmMessage("¿Desea guardar los cambios?");
-    } else {
-      await accionGuardar();
-    }
-  };
+  if (empleadoSeleccionado) {
+    setConfirmAction(() => accionGuardar);
+    setConfirmMessage("¿Desea guardar los cambios?");
+  } else {
+    await accionGuardar();
+  }
+};
 
   // Confirmación activar/desactivar
   const toggleActivo = () => {
@@ -341,6 +390,32 @@ export default function EmpleadoModal({
                   <p className="text-alert text-xs">{errores.salario}</p>
                 )}
               </div>
+                
+              {/*  AÑADIDO: Especialidades (Solo si es DOCTOR)  */}
+            {formData.puesto === "DOCTOR" && (
+                <div className="mt-5">
+                    <label className="text-sm">Especialidades *</label>
+                    <select
+                        className="w-full border border-primary/20 rounded-lg px-3 py-2 mt-1 min-h-[120px] focus:ring-primary focus:border-primary"
+                        multiple
+                        // El valor debe ser un array de strings para un multiselect, 
+                        // incluso si los IDs son números.
+                        value={selectedSpecialtyIds.map(String)} 
+                        
+                        onChange={handleSelectChange}
+                    >
+                        {allSpecialties.map((s) => (
+                            <option key={s.id} value={s.id}>
+                                {s.nombre}
+                            </option>
+                        ))}
+                    </select>
+                    {errores.especialidadIds && (
+            <p className="text-alert text-xs">{errores.especialidadIds}</p>
+        )}
+                </div>
+            )}
+
 
               {/* Fecha ingreso */}
               <div>
@@ -372,10 +447,12 @@ export default function EmpleadoModal({
                 </div>
               )}
             </div>
+
+
           </section>
 
           {/* CREAR USUARIO */}
-          {!empleadoSeleccionado && (
+          
             <section>
               <h3 className="text-lg font-semibold mb-4">
                 Datos de usuario
@@ -412,7 +489,7 @@ export default function EmpleadoModal({
                 )}
               </div>
             </section>
-          )}
+          
         </div>
 
         {/* FOOTER */}
