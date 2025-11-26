@@ -149,6 +149,36 @@ class ModificarInfoService {
       };
     }
   }
+
+  async completarDatosPorCorreoUsuario(
+    correo: string,
+    data: PacienteModificarPayload
+  ): Promise<void> {
+    try {
+      // Convertir fecha YYYY-MM-DD → ISO antes de enviar
+      const payload = {
+        ...data,
+        fechaNac: data.fechaNac
+          ? new Date(data.fechaNac).toISOString()
+          : null,
+      };
+
+      await api.patch(`/Modificar/actualizar/${correo}`, payload,headers);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        const status = error.response?.status;
+        const message =
+          (error.response?.data as any)?.message ||
+          "Error al actualizar datos del usuario";
+        throw { status, message };
+      }
+
+      throw {
+        status: undefined,
+        message: "Error desconocido al actualizar datos del usuario",
+      };
+    }
+  }
 }
 
 const modificarInfoService = new ModificarInfoService();

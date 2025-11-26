@@ -8,7 +8,10 @@ import HeaderMenu from "../components/HeaderMenu";
 import Notification from "../components/Notification";
 import ConfirmDialog from "../components/ConfirmDialog";
 import EditarPacienteModal from "../components/EditarPacienteModal";
-import type { PacienteRecepcionista } from "../services/modificarInfoService";
+import modificarInfoService, {
+  type PacienteModificarPayload,
+  type PacienteRecepcionista,
+} from "../services/modificarInfoService";
 
 const headers = {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -20,6 +23,8 @@ export default function HomePaciente() {
   const [citasPendientes, setCitasPendientes] = useState<any[]>([]);
   const [citaEditando, setCitaEditando] = useState<any | null>(null);
   const [showEditarPacienteModal, setShowEditarPacienteModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Notificaciones
   const [notification, setNotification] = useState("");
@@ -46,7 +51,7 @@ export default function HomePaciente() {
     fechaNac: user.persona.fechaNac,
   };
 
-  
+
   // ---- Helpers ----
 
   // Detectar si está dentro de HOY, MAÑANA o PASADO MAÑANA
@@ -125,26 +130,6 @@ export default function HomePaciente() {
     setShowModalEditar(true);
   };
 
-  const handleUpdatePaciente = async (updatedData) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:3000/pacientes/${user.id}`,
-        updatedData
-      );
-
-      // Actualizar los datos en memoria
-      const newUser = { ...user, ...response.data };
-      setUser(newUser);
-      localStorage.setItem("userInfo", JSON.stringify(newUser));
-
-      setShowEditarPacienteModal(false);
-      setNotification("Datos actualizados correctamente.");
-    } catch (error) {
-      console.error("Error al actualizar paciente:", error);
-      setNotification("No se pudo actualizar.");
-    }
-  };
-
   const handleEliminar = (cita: any) => {
 
     setConfirmData({
@@ -191,6 +176,35 @@ export default function HomePaciente() {
         }
       },
     });
+  };
+
+
+  const handleUpdateUsuario = async (data: PacienteModificarPayload) => {
+    if (!user || user.notFound || user.error) return;
+
+    try {
+      setLoading(true);
+      await modificarInfoService.completarDatosPorCorreoUsuario(
+        user.correo,
+        data
+      );
+
+      setModalOpen(false);
+      alert("Información actualizada correctamente");
+      const updatedPersona = { ...user.persona, ...data };
+
+      const updatedUser = {
+        ...user,
+        persona: updatedPersona,
+      };
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (error: any) {
+      console.error(error);
+      alert(error?.message || "Error al actualizar la información del paciente");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const citasProximas = citasPendientes.filter((c) =>
@@ -431,8 +445,8 @@ export default function HomePaciente() {
           open={showEditarPacienteModal}
           paciente={persona}
           user={true}
-          onSave={handleUpdatePaciente}
-          onClose={() => setShowEditarPacienteModal(false)} 
+          onSave={handleUpdateUsuario}
+          onClose={() => setShowEditarPacienteModal(false)}
         />
       )}
 
