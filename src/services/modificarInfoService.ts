@@ -7,6 +7,20 @@ const headers = {
 
 // Datos que el recepcionista puede modificar
 export interface PacienteModificarPayload {
+  correo?: string;
+  nombre?: string;
+  apellido?: string;
+  dni?: string;
+  telefono?: string;
+  direccion?: string;
+  fechaNac?: string; // YYYY-MM-DD desde el input, convertimos antes de enviar
+  password?: string;
+}
+
+export interface ModificarUsuarioPayload{
+  correo?: string;
+  nombre?: string;
+  apellido?: string;
   dni?: string;
   telefono?: string;
   direccion?: string;

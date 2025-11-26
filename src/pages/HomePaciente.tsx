@@ -7,6 +7,8 @@ import axios from "axios";
 import HeaderMenu from "../components/HeaderMenu";
 import Notification from "../components/Notification";
 import ConfirmDialog from "../components/ConfirmDialog";
+import EditarPacienteModal from "../components/EditarPacienteModal";
+import type { PacienteRecepcionista } from "../services/modificarInfoService";
 
 const headers = {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -17,6 +19,7 @@ export default function HomePaciente() {
   const [showModalEditar, setShowModalEditar] = useState(false);
   const [citasPendientes, setCitasPendientes] = useState<any[]>([]);
   const [citaEditando, setCitaEditando] = useState<any | null>(null);
+  const [showEditarPacienteModal, setShowEditarPacienteModal] = useState(false);
 
   // Notificaciones
   const [notification, setNotification] = useState("");
@@ -31,6 +34,19 @@ export default function HomePaciente() {
     return null;
   }
 
+  const persona: PacienteRecepcionista = {
+    id: user.id,
+    correo: user.correo,
+    password: "",
+    nombre: user.persona.nombre,
+    apellido: user.persona.apellido,
+    dni: user.persona.dni,
+    telefono: user.persona.telefono,
+    direccion: user.persona.direccion,
+    fechaNac: user.persona.fechaNac,
+  };
+
+  
   // ---- Helpers ----
 
   // Detectar si está dentro de HOY, MAÑANA o PASADO MAÑANA
@@ -68,7 +84,7 @@ export default function HomePaciente() {
     if (cita.estado === "PENDIENTE" && diffHoras <= 24) {
       // cancelar en backend
       try {
-        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`,{},headers);
+        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`, {}, headers);
         return "CANCELADA";
       } catch {
         return cita.estado;
@@ -82,7 +98,7 @@ export default function HomePaciente() {
     try {
       const pacienteId = user.personaId;
       const res = await axios.get(
-        `http://localhost:3000/citas/paciente/${pacienteId}`,headers
+        `http://localhost:3000/citas/paciente/${pacienteId}`, headers
       );
 
       let citas = Array.isArray(res.data) ? res.data : [];
@@ -109,14 +125,34 @@ export default function HomePaciente() {
     setShowModalEditar(true);
   };
 
+  const handleUpdatePaciente = async (updatedData) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/pacientes/${user.id}`,
+        updatedData
+      );
+
+      // Actualizar los datos en memoria
+      const newUser = { ...user, ...response.data };
+      setUser(newUser);
+      localStorage.setItem("userInfo", JSON.stringify(newUser));
+
+      setShowEditarPacienteModal(false);
+      setNotification("Datos actualizados correctamente.");
+    } catch (error) {
+      console.error("Error al actualizar paciente:", error);
+      setNotification("No se pudo actualizar.");
+    }
+  };
+
   const handleEliminar = (cita: any) => {
-    
+
     setConfirmData({
       mensaje: "¿Seguro que desea cancelar esta cita?",
       onConfirm: async () => {
         try {
           const res = await axios.patch(
-            `http://localhost:3000/citas/${cita.id}/cancelar`,{},headers
+            `http://localhost:3000/citas/${cita.id}/cancelar`, {}, headers
           );
 
           if (res.data.code === 0) {
@@ -140,7 +176,7 @@ export default function HomePaciente() {
       onConfirm: async () => {
         try {
           const res = await axios.patch(
-            `http://localhost:3000/citas/${cita.id}/confirmar`,{},headers
+            `http://localhost:3000/citas/${cita.id}/confirmar`, {}, headers
           );
 
           if (res.data?.estado === "CONFIRMADA") {
@@ -191,6 +227,13 @@ export default function HomePaciente() {
             className="hover:text-info transition cursor-pointer"
           >
             Crear cita
+          </button>
+
+          <button
+            onClick={() => setShowEditarPacienteModal(true)}
+            className="hover:text-info transition cursor-pointer"
+          >
+            Modificar usuario
           </button>
 
           <FiBell className="hover:text-info transition h-6 w-6 cursor-pointer" />
@@ -250,11 +293,10 @@ export default function HomePaciente() {
                       <button
                         disabled={!puedeEditar(cita)}
                         onClick={() => handleEditar(cita)}
-                        className={`px-3 py-1 rounded-lg btn-nueva-consulta ${
-                          !puedeEditar(cita)
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
+                        className={`px-3 py-1 rounded-lg btn-nueva-consulta ${!puedeEditar(cita)
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                          }`}
                       >
                         Editar
                       </button>
@@ -306,13 +348,12 @@ export default function HomePaciente() {
                   <div className="mt-1 text-sm">
                     Estado:{" "}
                     <span
-                      className={`font-semibold ${
-                        cita.estado === "CONFIRMADA"
-                          ? "text-success"
-                          : cita.estado === "CANCELADA"
+                      className={`font-semibold ${cita.estado === "CONFIRMADA"
+                        ? "text-success"
+                        : cita.estado === "CANCELADA"
                           ? "text-alert"
                           : "text-primary"
-                      }`}
+                        }`}
                     >
                       {cita.estado}
                     </span>
@@ -342,7 +383,7 @@ export default function HomePaciente() {
                           onClick={() => handleEditar(cita)}
                           className="px-3 py-1 rounded-lg btn-nueva-consulta"
                         >
-                          Editar
+                          Modificar
                         </button>
                       )}
 
@@ -382,6 +423,16 @@ export default function HomePaciente() {
             setShowModalEditar(false);
             fetchCitasPendientes();
           }}
+        />
+      )}
+
+      {showEditarPacienteModal && (
+        <EditarPacienteModal
+          open={showEditarPacienteModal}
+          paciente={persona}
+          user={true}
+          onSave={handleUpdatePaciente}
+          onClose={() => setShowEditarPacienteModal(false)} 
         />
       )}
 

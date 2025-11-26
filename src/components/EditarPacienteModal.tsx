@@ -4,14 +4,25 @@ import React, { useEffect, useState } from "react";
 import type {
   PacienteRecepcionista,
   PacienteModificarPayload,
+  ModificarUsuarioPayload,
 } from "../services/modificarInfoService";
-import Modal from "./modal"; 
+import Modal from "./modal";
+import type { UserEditInfo } from "../services/usersService";
 
 
 // Tipo para el estado de errores (Parcial del payload, solo los campos editables)
 type FormErrors = Partial<Record<keyof PacienteModificarPayload, string>>;
 
 const regex = {
+  // Correo: valida que es un correo.
+  correo: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+
+  // Nombre: valida que es un nombre.
+  nombre: /^[\p{L}][\p{L}\s'’-]{1,49}$/u,
+
+  // Apellido: valida que es un apellido.
+  apellido: /^[\p{L}][\p{L}\s'’-]{1,49}$/u,
+
   // Contraseña: Mínimo 8 caracteres, al menos una mayúscula, un número, un carácter especial.
   password: /^(?=.*\d)(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
 
@@ -30,6 +41,7 @@ interface EditarPacienteModalProps {
   paciente: PacienteRecepcionista | null;
   onClose: () => void;
   onSave: (data: PacienteModificarPayload) => void | Promise<void>;
+  user?: boolean;
 }
 
 const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
@@ -37,8 +49,12 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
   paciente,
   onClose,
   onSave,
+  user,
 }) => {
   const [form, setForm] = useState<PacienteModificarPayload>({
+    correo: "",
+    nombre: "",
+    apellido: "",
     dni: "",
     telefono: "",
     direccion: "",
@@ -53,14 +69,17 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
     if (open && paciente) {
       // Inicializar el formulario
       setForm({
+        correo: paciente.correo ?? "",
+        nombre: paciente.nombre ?? "",
+        apellido: paciente.apellido ?? "",
         dni: paciente.dni ?? "",
         telefono: paciente.telefono ?? "",
         direccion: paciente.direccion ?? "",
         fechaNac: paciente.fechaNac ? paciente.fechaNac.slice(0, 10) : "",
         password: "",
       });
-     
-      setErrors({}); 
+
+      setErrors({});
     }
   }, [open, paciente]);
 
@@ -83,16 +102,22 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
 
       if (value.length > 0 && !pattern.test(value)) {
         if (key === 'password') {
-          error = "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
+          error = "Mín. 8 caracteres, incluyendo mayúscula, número y símbolo.";
         } else if (key === 'dni') {
           error = "El DNI debe tener exactamente 13 dígitos.";
         } else if (key === 'telefono') {
           error = "El Teléfono debe tener exactamente 8 dígitos.";
         } else if (key === 'direccion') {
           error = "La Dirección debe tener un formato válido (mín. 5 caracteres).";
+        } else if (key === 'correo') {
+          error = "El correo debe tener un formato válido.";
+        } else if (key === 'nombre') {
+          error = "El nombre solo puede contener letras, espacios y guiones.";
+        } else if (key === 'apellido') {
+          error = "El apellido solo puede contener letras, espacios y guiones.";
         }
       }
-      
+
       setErrors((prev) => ({
         ...prev,
         [key]: error,
@@ -102,81 +127,116 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
 
   // 4. Función de Validación Final (handleSubmit)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  let newErrors: FormErrors = {};
+    let newErrors: FormErrors = {};
 
-  const fieldsToValidate: (keyof PacienteModificarPayload)[] = [
-    "dni",
-    "telefono",
-    "direccion",
-    "password",
-  ];
+    let fieldsToValidate: (keyof PacienteModificarPayload)[];
 
-  fieldsToValidate.forEach((field) => {
-    const value = form[field];
-    const pattern = regex[field as keyof typeof regex];
+    if (user) {
+      fieldsToValidate = [
+        "correo",
+        "nombre",
+        "apellido",
+        "dni",
+        "telefono",
+        "direccion",
+      ];
+    } else {
+      fieldsToValidate = [
+        "dni",
+        "telefono",
+        "direccion",
+        "password",
+      ];
+    }
 
-    // Si está vacío → no se valida, no hay error
-    if (!value) return;
+    fieldsToValidate.forEach((field) => {
+      const value = form[field];
+      const pattern = regex[field as keyof typeof regex];
 
-    // Validar password solo si se escribió
-    if (field === "password") {
-      if (!pattern.test(value)) {
-        newErrors.password =
-          "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
+      // Si está vacío → no se valida, no hay error
+      if (!value) return;
+
+      // Validar password solo si se escribió
+      if (field === "password") {
+        if (!pattern.test(value)) {
+          newErrors.password =
+            "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
+        }
+        return;
       }
+      console.log(value);
+      // Validación general para DNI, teléfono y dirección
+      if (!pattern.test(value)) {
+        newErrors[field] =
+          errors[field] || `El formato de ${field} es incorrecto.`;
+      }
+    });
+
+    setErrors(newErrors);
+
+    // Si hay errores no enviar
+    if (Object.keys(newErrors).length > 0) {
+      console.error("Errores de validación:", newErrors);
       return;
     }
 
-    // Validación general para DNI, teléfono y dirección
-    if (!pattern.test(value)) {
-      newErrors[field] =
-        errors[field] || `El formato de ${field} es incorrecto.`;
-    }
-  });
+    // Crear payload solo con los campos llenados
+    const camposOmitir: (keyof PacienteModificarPayload)[] = user
+      ? [] // Si hay user, no omitimos nada
+      : ["correo", "nombre", "apellido"]; // Si no hay user, omitimos estos campos
 
-  setErrors(newErrors);
-
-  // Si hay errores no enviar
-  if (Object.keys(newErrors).length > 0) {
-    console.error("Errores de validación:", newErrors);
-    return;
-  }
-
-  // Crear payload solo con los campos llenados
-  const payload: PacienteModificarPayload = Object.fromEntries(
-    Object.entries(form).filter(([_, v]) => v && v !== "")
-  ) as PacienteModificarPayload;
-
-  await onSave(payload);
-};
+    const payload: PacienteModificarPayload = Object.fromEntries(
+      Object.entries(form).filter(
+        ([key, value]) =>
+          !camposOmitir.includes(key as keyof PacienteModificarPayload) &&
+          value !== null &&
+          value !== undefined &&
+          value !== ""
+      )
+    ) as PacienteModificarPayload;
+    console.log("hola repollo", payload);
+    await onSave(payload);
+  };
 
   // 6. Actualizar el renderizado para mostrar errores
   const getClassName = (fieldName: keyof PacienteModificarPayload) => {
     const baseClasses = "mt-1 w-full p-2 border rounded-lg";
     const focusClasses = "focus:border-blue-500 focus:ring-blue-500";
     const errorClass = "border-red-500";
-    
+
     return `${baseClasses} ${errors[fieldName] ? errorClass : focusClasses}`;
   };
 
 
   return (
-    <Modal open={open} onClose={onClose} title="Editar Paciente">
-      <form onSubmit={handleSubmit} className="space-y-4 pt-3"> 
+    <Modal open={open} onClose={onClose} title={user ? "Modificar Usuario" : "Modificar Paciente"}>
+      <form onSubmit={handleSubmit} className="space-y-4 pt-3">
         {/* CORREO (Deshabilitado) */}
         {/* ... (código del correo sin cambios) ... */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Correo
           </label>
-          <input
-            type="email"
-            value={paciente.correo}
-            disabled
-            className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-          />
+          {
+            user ? (
+              <input
+                type="email"
+                name="correo"
+                value={form.correo}
+                onChange={handleChange}
+                className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 "
+              />
+            ) : (
+              <input
+                type="email"
+                value={paciente.correo}
+                disabled
+                className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+              />
+            )
+          }
         </div>
 
         {/* CONTRASEÑA */}
@@ -184,13 +244,26 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
           <label className="block text-sm font-medium text-gray-700">
             Contraseña (Dejar vacío para no cambiar)
           </label>
-          <input
-            type="password"
-            name="password"            
-            onChange={handleChange}
-            placeholder="********"
-            className={getClassName('password')}
-          />
+          {
+            user ? (
+              <input
+                type="password"
+                name="password"
+                disabled
+                placeholder="********"
+                className={getClassName('password')}
+              />
+            ) : (
+              <input
+                type="password"
+                name="password"
+                onChange={handleChange}
+                placeholder="********"
+                className={getClassName('password')}
+              />
+            )
+          }
+
           {errors.password && (
             <p className=" text-xs text-alert mt-1">{errors.password}</p>
           )}
@@ -203,25 +276,51 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             <label className="block text-sm font-medium text-gray-700">
               Nombre
             </label>
-            <input
-              type="text"
-              name="nombre"
-              value={paciente.nombre || ""}
-              disabled
-              className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-            />
+            {
+              user ? (
+                <input
+                  type="text"
+                  name="nombre"
+                  value={form.nombre || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600"
+                />
+              ) : (
+                <input
+                  type="text"
+                  name="nombre"
+                  value={paciente.nombre || ""}
+                  disabled
+                  className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+              )
+            }
+
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Apellido
             </label>
-            <input
-              type="text"
-              name="apellido"
-              value={paciente.apellido || ""}
-              disabled
-              className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-            />
+            {
+              user ? (
+                <input
+                  type="text"
+                  name="apellido"
+                  value={form.apellido || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600"
+                />
+              ) : (
+                <input
+                  type="text"
+                  name="apellido"
+                  value={paciente.apellido || ""}
+                  disabled
+                  className="mt-1 w-full p-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+              )
+            }
+
           </div>
         </div>
 
@@ -233,7 +332,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             </label>
             <input
               type="text"
-              name="dni"          
+              name="dni"
               placeholder={form.dni}
               onChange={handleChange}
               className={getClassName('dni')}
@@ -249,7 +348,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             </label>
             <input
               type="text"
-              name="telefono"              
+              name="telefono"
               placeholder={form.telefono}
               onChange={handleChange}
               className={getClassName('telefono')}
@@ -286,8 +385,8 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
             type="date"
             name="fechaNac"
             value={form.fechaNac || ""}
-            onChange={handleChange}           
-            className={getClassName('fechaNac')} 
+            onChange={handleChange}
+            className={getClassName('fechaNac')}
           />
           {errors.fechaNac && (
             <p className=" text-xs text-alert text-alert/300 mt-1">{errors.fechaNac}</p>
