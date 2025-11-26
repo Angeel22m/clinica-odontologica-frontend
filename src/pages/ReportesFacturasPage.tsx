@@ -417,7 +417,7 @@ export default function ReporteFacturacionPage() {
                 className="p-3 border border-primary/20 rounded-lg w-full bg-white"
               />
               {docDropdownOpen && (
-                <div className="absolute z-40 bg-white border border-primary/10 rounded shadow max-h-48 overflow-y-auto w-full mt-1">
+                <div className="absolute z-40 bg-light border border-primary/10 rounded shadow max-h-48 overflow-y-auto w-full mt-1">
                   {doctores
                     .filter((d) =>
                       d.label.toLowerCase().includes((docQuery || "").toLowerCase())
@@ -455,10 +455,10 @@ export default function ReporteFacturacionPage() {
                   setServDropdownOpen(true);
                 }}
                 onFocus={() => setServDropdownOpen(true)}
-                className="p-3 border border-primary/20 rounded-lg w-full bg-white"
+                className="p-3 bg-light border border-primary/20 rounded-lg w-full "
               />
               {servDropdownOpen && (
-                <div className="absolute z-40 bg-white border border-primary/10 rounded shadow max-h-48 overflow-y-auto w-full mt-1">
+                <div className="absolute z-40 bg-light border border-primary/10 rounded shadow max-h-48 overflow-y-auto w-full mt-1">
                   {servicios
                     .filter((s) =>
                       s.label.toLowerCase().includes((servQuery || "").toLowerCase())

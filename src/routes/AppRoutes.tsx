@@ -19,6 +19,7 @@ import RecepcionistaPage from '../pages/RecepcionistaPage';
 import FacturacionPage from '../pages/FacturacionPage';
 import ReporteFacturacionPage from '../pages/ReportesFacturasPage';
 import HistorialFacturasPage from '../pages/HistorialFacturaspage';
+import AdminEspecialidadesPage from '../pages/Especialidades';
 
 
 const AppRoutes: React.FC = () => {
@@ -106,6 +107,16 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute
             element={<EmpleadosPage />}
+            allowedRoles={["ADMIN"]}
+          />
+        }
+      />
+
+      <Route
+        path="/especialidades"
+        element={
+          <ProtectedRoute
+            element={<AdminEspecialidadesPage />}
             allowedRoles={["ADMIN"]}
           />
         }

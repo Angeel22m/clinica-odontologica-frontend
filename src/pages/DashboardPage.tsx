@@ -60,6 +60,10 @@ export default function DashboardPage() {
         <Link to="/reportes" className="btn-accent shadow-md">
           Reportes
         </Link>
+
+        <Link to="/especialidades" className="btn-accent shadow-md">
+          Especialidades
+        </Link>
       </nav>
 
 
