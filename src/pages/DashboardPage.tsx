@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiMenu, FiSettings, FiUser } from "react-icons/fi";
-import LogoutButton from "../components/LogoutButton";
+import HeaderMenu from "../components/HeaderMenu";
 
 export default function DashboardPage() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,39 +32,10 @@ export default function DashboardPage() {
 
         {/* MENÚ HAMBURGUESA */}
         <div className="relative" ref={menuRef}>
-          <AnimatePresence mode="wait">
-            <motion.button
-              onClick={() => setMenuOpen(!menuOpen)}
-              animate={{ rotate: menuOpen ? -90 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="p-2"
-            >
-              <FiMenu className="text-primary hover:text-info transition h-7 w-7 cursor-pointer" />
-            </motion.button>
-          </AnimatePresence>
+          
+          <HeaderMenu />
 
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50 border border-primary/10">
-              
-              <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-                <FiUser />
-                <Link>Perfil</Link>
-              </div>
-
-              <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-                <FiSettings />
-                <Link>Configuración</Link>
-              </div>
-
-              <hr className="my-1 border-primary/10" />
-
-              <div className="w-full px-2 cursor-pointer">
-                <LogoutButton className="text-primary hover:text-alert">
-                  Cerrar sesión
-                </LogoutButton>
-              </div>
-            </div>
-          )}
+         
         </div>
       </header>
 
@@ -80,6 +51,14 @@ export default function DashboardPage() {
 
         <Link to="/empleados" className="btn-accent shadow-md">
           Empleados
+        </Link>
+
+        <Link to="/facturas/historial" className="btn-accent shadow-md">
+          Facturas
+        </Link>
+
+        <Link to="/reportes" className="btn-accent shadow-md">
+          Reportes
         </Link>
       </nav>
 

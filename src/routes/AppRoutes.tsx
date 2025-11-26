@@ -17,10 +17,9 @@ import  DoctorPage from "../pages/DoctorPage";
 import { useAuth } from "../hooks/UseAuth";
 import RecepcionistaPage from '../pages/RecepcionistaPage';
 import FacturacionPage from '../pages/FacturacionPage';
+import ReporteFacturacionPage from '../pages/ReportesFacturasPage';
+import HistorialFacturasPage from '../pages/HistorialFacturaspage';
 
-
-// solo es para pruebas luego se dejan los roles correspondientes
-const allUser  =['ADMIN',"CLIENTE","ADMINISTRADOR","DOCTOR"] 
 
 const AppRoutes: React.FC = () => {
   const { idUser, idEmpleado} = useAuth();
@@ -111,6 +110,28 @@ const AppRoutes: React.FC = () => {
           />
         }
       />
+
+
+      <Route
+        path="/facturas/historial"
+        element={
+          <ProtectedRoute
+            element={<HistorialFacturasPage />}
+            allowedRoles={["ADMIN"]}
+          />
+        }
+      />
+
+      <Route
+        path="/reportes"
+        element={
+          <ProtectedRoute
+            element={<ReporteFacturacionPage />}
+            allowedRoles={["ADMIN"]}
+          />
+        }
+      />
+
 
       <Route
         path="/Historial"

@@ -3,6 +3,7 @@ import { useState } from "react";
 import HeaderMenu from "../components/HeaderMenu";
 import { FiChevronLeft } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import BuscadorPacienteFactura from "../components/BuscadorPacienteFactura";
 
 export default function FacturaPage() {
   // Datos base (puedes conectar luego al backend)
@@ -29,36 +30,32 @@ export default function FacturaPage() {
           <h1 className="text-4xl font-bold mb-1 text-primary">
             Facturación
           </h1>
-          <p className="text-primary/70">Gestione y genere facturas de pacientes</p>
+          <p className="text-primary/70">Facturas</p>
         </div>
 
         <HeaderMenu />
       </header>
 
       {/* CONTENEDOR PRINCIPAL */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className=" gap-6">
         
         {/* BLOQUE: BUSCAR PACIENTE */}
-        <div className="lg:col-span-1 p-6 bg-light border border-primary/10 rounded-xl shadow">
-          <h2 className="text-xl font-semibold mb-4">Buscar paciente</h2>
+        
+        <BuscadorPacienteFactura
+        onPacienteSeleccionado={(p) => setPaciente(p)}
+      />
 
-          <input
-            type="email"
-            placeholder="Correo del paciente"
-            className="w-full p-3 border border-primary/20 rounded-xl bg-light text-primary focus:ring-info focus:border-info"
-          />
-
-          <button className="btn-accent mt-4 w-full">Buscar</button>
-
-          {/* Info del paciente */}
-          {paciente && (
-            <div className="mt-6 text-primary">
-              <p><strong>Nombre:</strong> {paciente.nombre}</p>
-              <p><strong>Identidad:</strong> {paciente.dni}</p>
-              <p><strong>Teléfono:</strong> {paciente.telefono}</p>
-            </div>
-          )}
+      {paciente && (
+        <div className="mt-6">
+          {/* Aquí irá el formulario de factura más adelante */}
+          <p className="text-primary font-medium">
+            Nombre Cliente: {paciente.nombre} {paciente.apellido} <br />
+            DNI: {paciente.dni}
+            
+          </p>
         </div>
+      )}
+        
 
         {/* BLOQUE: SERVICIOS */}
         <div className="lg:col-span-2 p-6 bg-light border border-primary/10 rounded-xl shadow">
@@ -140,6 +137,6 @@ export default function FacturaPage() {
           </button>
         </div>
       </div>
-    </div>
+    // </div>
   );
 }
