@@ -7,10 +7,13 @@ import type { EmpleadoResponse } from "../../types/empleado";
 import HeaderMenu from "../../components/HeaderMenu";
 import { Link } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
+import especialidadService from "../../services/especialidad/especialidadService";
+
 
 
 
 export default function EmpleadosPage() {
+  const [especialidades, setEspecialidades] = useState<EspecialidadItem[]>([]);
   const [empleados, setEmpleados] = useState<EmpleadoResponse[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [empleadoEdit, setEmpleadoEdit] = useState<EmpleadoResponse | null>(null);
@@ -22,7 +25,19 @@ export default function EmpleadosPage() {
  
   useEffect(() => {
     cargar();
+    cargarEspecialidades();
   }, []);
+
+  const cargarEspecialidades = async () => {
+    try {
+        const data = await especialidadService.list();
+        // Aseguramos que solo guardamos el ID y el nombre
+        setEspecialidades(data.map(e => ({ id: e.id, nombre: e.nombre })));
+    } catch (error) {
+        console.error("Error al cargar especialidades:", error);
+        // Manejo de errores si es necesario
+    }
+  };
 
   return (
     <div className="p-8 bg-light min-h-screen text-primary">
@@ -88,6 +103,7 @@ export default function EmpleadosPage() {
       <div className="bg-light rounded-xl p-6 shadow-xl animate-slide-in w-[90%] max-w-lg border border-primary/10">
         <EmpleadoModal
           empleadoSeleccionado={empleadoEdit}
+          allSpecialties={especialidades}
           onClose={() => setModalOpen(false)}
           onSaved={() => {
             setModalOpen(true);

@@ -6,8 +6,12 @@ import Notification from "../components/Notification";
 const headers = {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 };
+interface NotificationState {
+    message: string;
+    type: 'success' | 'alert' | 'info';
+}
 
-export default function ModalAgendarCita({ onClose, pacienteId }) {
+export default function ModalAgendarCita({ onClose }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     servicioId: "",
@@ -17,24 +21,32 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
     comentarios: "",
   });
 
-  const [notification, setNotification] = useState("");
+  const [notification, setNotification] = useState<NotificationState | null>(null);
   const [servicios, setServicios] = useState([]);
   const [doctoresDisponibles, setDoctoresDisponibles] = useState([]);
   const [horasDisponibles, setHorasDisponibles] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const extractData = (res) => {
+    const data = res.data;
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.data)) return data.data;
+    if (data && Array.isArray(data.message)) return data.message;
+    return [];
+  };
 
   // --- Cargar servicios activos ---
   useEffect(() => {
     const fetchServicios = async () => {
       try {
         const res = await axios.get("http://localhost:3000/servicios",headers);
-        const data = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data.data)
-          ? res.data.data
-          : [];
-        setServicios(data.filter(s => s.activo === true || s.activo === "activo"));
-      } catch (err) {
+        const data = extractData(res)
+
+        setServicios(data.filter(s => s.activo === true || s.activo === 'true'));
+      }catch(error)
+      {
         console.error("Error al cargar servicios:", err);
+        setNotification({message:"Error al cargar Servicios", type:'alert'})
       }
     };
     fetchServicios();
@@ -42,20 +54,22 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
 
   // --- Cargar doctores disponibles cuando se seleccione tipo de atención y fecha ---
   useEffect(() => {
+
+    const resetDoctorAndHours = () => {
+      setDoctoresDisponibles([]);
+      setHorasDisponibles([]);
+      setFormData(prev => ({ ...prev, doctorId: "", hora: "" }));
+    };
+
     const fetchDoctores = async () => {
       if (!formData.servicioId || !formData.fecha) {
-        setDoctoresDisponibles([]);
+        resetDoctorAndHours();
         return;
       }
       try {
-        const res = await axios.get(`http://localhost:3000/citas/doctores-disponibles?fecha=${formData.fecha}`,headers);
+        const res = await axios.get(`http://localhost:3000/citas/doctores-disponibles?fecha=${formData.fecha}&servicioId=${formData.servicioId}`,headers);
 
-        const data = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data.message)
-          ? res.data.message
-          : [];
-
+        const data = extractData(res)      
         setDoctoresDisponibles(data);
 
         // Reset doctorId si el seleccionado no está en la lista
@@ -65,93 +79,121 @@ export default function ModalAgendarCita({ onClose, pacienteId }) {
       } catch (err) {
         console.error("Error al obtener doctores disponibles:", err);
         setDoctoresDisponibles([]);
+        setNotification({message:"Fallo al cargar doctores", type:'alert'})
       }
     };
 
     fetchDoctores();
-  }, [formData.tipoAtencion, formData.fecha]);
+  }, [formData.servicioId, formData.fecha]);
 
   // --- Cargar horas disponibles cuando se seleccione doctor y fecha ---
   useEffect(() => {
     const fetchHoras = async () => {
+
+
       if (!formData.fecha || !formData.doctorId) {
         setHorasDisponibles([]);
+        setFormData(prev => ({...prev, hora:""}));
         return;
       }
 
       try {
         const res = await axios.get(`http://localhost:3000/citas/horas-disponibles?doctorId=${formData.doctorId}&fecha=${formData.fecha}`,headers);
 
-        const data = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data.message)
-          ? res.data.message
-          : [];
-
+        const data = extractData(res)
         setHorasDisponibles(data);
 
-        if (!data.includes(formData.hora)) {
-          setFormData(prev => ({ ...prev, hora: "" }));
-        }
+        if (formData.hora && !data.includes(formData.hora)) {
+          setFormData(prev => ({ ...prev, hora: "" }));
+         }
       } catch (err) {
         console.error("Error al obtener horas disponibles:", err);
         setHorasDisponibles([]);
+        setNotification({message:"Fallo al cargar horarios.",type:'alert'})
       }
     };
 
     fetchHoras();
   }, [formData.fecha, formData.doctorId]);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {// Si cambia servicioId o fecha, forzamos la limpieza de doctorId y hora
+    if (e.target.name === 'servicioId' || e.target.name === 'fecha') {
+      setFormData(prev => ({ 
+        ...prev, 
+        [e.target.name]: e.target.value,
+        doctorId: "",
+        hora: ""
+      }));
+      return;
+    }
+    // Si cambia doctorId, forzamos la limpieza de hora
+    if (e.target.name === 'doctorId') {
+      setFormData(prev => ({ 
+        ...prev, 
+        doctorId: e.target.value,
+        hora: ""
+      }));
+      return;
+    }
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleNext = () => {
-    if (!formData.servicioId || !formData.fecha || !formData.hora || !formData.doctorId) {
-      setNotification("Por favor completa todos los campos obligatorios.");
-      return;
-    }
-    setStep(2);
+   if (!formData.servicioId || !formData.fecha || !formData.hora || !formData.doctorId) {
+      setNotification({ message: "Por favor completa todos los campos obligatorios.", type: 'alert' });
+      return;
+    }
+    setStep(2);
   };
 
   const handleBack = () => setStep(1);
   
   const handleConfirm = async () => {
+    if (isSubmitting) {
+        return;
+    }
+    setIsSubmitting(true);
     try {
       const payload = {
         servicioId: parseInt(formData.servicioId),
         fecha: formData.fecha,
         hora: formData.hora,
         doctorId: parseInt(formData.doctorId),
-        pacienteId: parseInt(pacienteId) || parseInt(JSON.parse(localStorage.getItem('user')).persona.id),
+        pacienteId:parseInt(JSON.parse(localStorage.getItem('user')).persona.id),
       };
       const res = await axios.post("http://localhost:3000/citas", payload,headers);
         console.log(res.data);
       if (res.data.code === 0) {
+
       console.log("Cita creada:", res.data);
 	
-        setNotification("Cita creada exitosamente");
+        setNotification({message:"Cita creada exitosamente", type:'success'});
 
-setTimeout(() => {
-  onClose();
-}, 2000); // 2 segundos para que se vea
+      setTimeout(() => {
+        onClose();
+      }, 2000); // 2 segundos para que se vea
 
       } else {
-        setNotification("Error: hola " + res.data.message);
+        setNotification({message:res.data.message,type:'alert'});
+        setIsSubmitting(false);
       }
     } catch (err) {
       
       console.error("Error al crear cita:", err);
-      setNotification("Error al crear cita");
+      setNotification({ message: "Error al crear cita.", type: 'alert' });
+      setIsSubmitting(false);
     }
+    
   };
   
-    useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => setNotification(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
+    // Limpiar notificación
+  useEffect(() => {
+    if (notification) {
+      // Limpiar la notificación: null es mejor que "" para el chequeo
+      const timer = setTimeout(() => setNotification(null), 3000); 
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   return (
     <div className="fixed inset-0 overlay-dark flex items-center justify-center z-50">
@@ -268,7 +310,7 @@ setTimeout(() => {
 
               <div className="flex justify-between mt-6">
                 <button onClick={handleBack} className="btn-primary bg-primary/10 text-primary hover:bg-primary/20">← Volver</button>
-                <button onClick={handleConfirm} className="btn-primary bg-success text-light hover:bg-success/90">Confirmar cita</button>
+                <button onClick={handleConfirm} disabled={isSubmitting} className="btn-primary bg-success text-light hover:bg-success/90">Confirmar cita</button>
               </div>
               
             </motion.div>
@@ -276,8 +318,10 @@ setTimeout(() => {
         </AnimatePresence>
       </motion.div>
               {notification && (
-        	<Notification message={notification} 
-        	onClose={() => setNotification("")} />
+        	<Notification message={notification.message}
+          type={notification.type} 
+        	onClose={() => setNotification(null)} 
+          />
       		)}      
     </div>
   );

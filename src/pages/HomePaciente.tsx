@@ -8,6 +8,11 @@ import HeaderMenu from "../components/HeaderMenu";
 import Notification from "../components/Notification";
 import ConfirmDialog from "../components/ConfirmDialog";
 
+interface NotificationState {
+    message: string;
+    type: 'success' | 'alert' | 'info';
+}
+
 const headers = {
   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 };
@@ -19,7 +24,7 @@ export default function HomePaciente() {
   const [citaEditando, setCitaEditando] = useState<any | null>(null);
 
   // Notificaciones
-  const [notification, setNotification] = useState("");
+    const [notification, setNotification] = useState<NotificationState | null>(null);
   const [confirmData, setConfirmData] = useState<{
     mensaje: string;
     onConfirm: () => void;
@@ -120,13 +125,13 @@ export default function HomePaciente() {
           );
 
           if (res.data.code === 0) {
-            setNotification("Cita cancelada correctamente");
+            setNotification({message:"Cita cancelada correctamente",type:'success'});
             fetchCitasPendientes();
           } else {
-            setNotification(res.data.message);
+            setNotification({message:res.data.message,type:'alert'});
           }
         } catch {
-          setNotification("Error al cancelar la cita");
+          setNotification({message:"Error al cancelar la cita",type:'alert'});
         } finally {
           setConfirmData(null);
         }
@@ -144,12 +149,12 @@ export default function HomePaciente() {
           );
 
           if (res.data?.estado === "CONFIRMADA") {
-            setNotification("Cita confirmada correctamente");
+            setNotification({message:"Cita confirmada correctamente",type:'success'});
           }
 
           fetchCitasPendientes();
         } catch {
-          setNotification("Error al confirmar la cita");
+          setNotification({message:"Error al confirmar la cita",type:'alert'});
         } finally {
           setConfirmData(null);
         }
@@ -170,6 +175,14 @@ export default function HomePaciente() {
 
   const puedeEditar = (cita: any) => cita.estado === "PENDIENTE";
   const puedeConfirmar = (cita: any) => cita.estado === "PENDIENTE";
+
+  useEffect(() => {
+    if (notification) {
+      // Limpiar la notificación: null es mejor que "" para el chequeo
+      const timer = setTimeout(() => setNotification(null), 3000); 
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   return (
     <div className="min-h-screen bg-light text-primary">
@@ -366,7 +379,7 @@ export default function HomePaciente() {
 
       {/* MODALES */}
       {showModal && (
-        <ModalAgendarCita
+        <ModalAgendarCita      
           onClose={() => {
             setShowModal(false);
             fetchCitasPendientes();
@@ -399,8 +412,9 @@ export default function HomePaciente() {
       {/* NOTIFICACIONES */}
       {notification && (
         <Notification
-          message={notification}
-          onClose={() => setNotification("")}
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
         />
       )}
     </div>

@@ -40,7 +40,16 @@ export const actualizarEmpleado = async (id: number, data: ActualizarEmpleadoDTO
   if (data.fechaIngreso) payload.fechaIngreso = new Date(data.fechaIngreso);
 
   if (data.activo !== undefined) payload.activo = data.activo;
+  if (data.especialidadIds) {
+    payload.especialidadIds = data.especialidadIds;
+  }
 
+  if (data.correo) payload.correo = data.correo;
+  
+  // La contraseña solo se envía si tiene valor (evitamos enviar una cadena vacía al backend)
+  if (data.password && data.password.length > 0) {
+    payload.password = data.password;
+  }
   
 
   const response = await api.put(`${BASE_URL}/${id}`, payload, headers);

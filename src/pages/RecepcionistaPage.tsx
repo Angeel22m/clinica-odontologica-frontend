@@ -35,13 +35,13 @@ const detectionRules = [
         type: 'dni' as const, 
         //ocho digitos o menos 
 
-        regex:/^\d{13,15}$/,
+        regex:/^\d{12,15}$/,
         errorMessage: 'El DNI o Teléfono es incorrecto.'
     },
     // 2. Teléfono (Ejemplo: 7 a 15 dígitos)
     { 
         type: 'telefono' as const, 
-        regex: /^\d{8,11}$/,
+        regex: /^\d{7,11}$/,
         errorMessage: 'El Teléfono es incorrecto.'
     },
     // 3. Correo (Expresión para validar formato básico de email)

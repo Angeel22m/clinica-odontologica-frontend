@@ -45,6 +45,7 @@ export const ListaEmpleados = ({ empleados, filtro, onEditar }: Props) => {
               <th className="py-3 px-4">DNI</th>
               <th className="py-3 px-4">Teléfono</th>
               <th className="py-3 px-4">Puesto</th>
+              <th className="py-3 px-4">Especialidad</th>
               <th className="py-3 px-4">Salario</th>
               <th className="py-3 px-4">Estado</th>
               <th className="py-3 px-4 text-center">Acciones</th>
@@ -62,6 +63,15 @@ export const ListaEmpleados = ({ empleados, filtro, onEditar }: Props) => {
                 <td className="py-3 px-4">{e.persona.dni}</td>
                 <td className="py-3 px-4">{e.persona.telefono}</td>
                 <td className="py-3 px-4">{e.puesto}</td>
+                <td className="py-3 px-4">
+                  {/* Verifica que la lista existe y tiene elementos */}
+                  {e.especialidades && e.especialidades.length > 0
+                      ? e.especialidades
+                            .map(detalle => detalle.especialidad.nombre) // Extrae todos los nombres
+                            .join(', ') // Une los nombres con una coma y un espacio
+                      : 'N/A' // O un mensaje si no tiene especialidades
+                  }
+              </td>
                 <td className="py-3 px-4">{formatMoney(e.salario)}</td>
                 <td className="py-3 px-4">
                   <span

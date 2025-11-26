@@ -1,5 +1,3 @@
-import React from "react"
-//import { motion } from "framer-motion";
 
 export default function ServiceTable({ services, onEdit, onDelete }) {
   return (
@@ -11,6 +9,7 @@ export default function ServiceTable({ services, onEdit, onDelete }) {
           <th className="p-3 text-left">Nombre</th>
           <th className="p-3 text-left">Descripción</th>
           <th className="p-3 text-left">Precio</th>
+          <th className="p-3 text-left">Expecialidad</th>
           <th className="p-3 text-left">Estado</th>
           <th className="p-3 text-left">Acciones</th>
         </tr>
@@ -21,6 +20,13 @@ export default function ServiceTable({ services, onEdit, onDelete }) {
             <td className="service-name p-2 font-medium">{service.nombre}</td>
             <td className="service-desc p-2 truncate max-w-xs">{service.descripcion}</td>
             <td className="service-price p-2">${service.precio}</td>
+      
+<td className="service-price p-2">
+  {service.especialidades
+    ?.map(e => e.especialidad?.nombre)
+    .filter(Boolean)
+    .join(", ") || "N/A"}
+</td>
             <td className={`service-status p-2 font-semibold ${service.activo ? "text-success" : "text-accent"}`}>{service.activo ? "Activo" : "Inactivo"}</td>
             <td className="p-2 flex space-x-2">
               <button className="button button-edit btn-primary px-2 py-1 rounded mr-2" id={`edit-service-${service.id}`} onClick={() => onEdit(service)}>Editar</button>
