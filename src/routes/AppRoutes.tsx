@@ -16,9 +16,11 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import  DoctorPage from "../pages/DoctorPage";
 import { useAuth } from "../hooks/UseAuth";
 import RecepcionistaPage from '../pages/RecepcionistaPage';
+import FacturacionPage from '../pages/FacturacionPage';
+import ReporteFacturacionPage from '../pages/ReportesFacturasPage';
+import HistorialFacturasPage from '../pages/HistorialFacturaspage';
+import AdminEspecialidadesPage from '../pages/Especialidades';
 
-// solo es para pruebas luego se dejan los roles correspondientes
-const allUser  =['ADMIN',"CLIENTE","ADMINISTRADOR","DOCTOR"] 
 
 const AppRoutes: React.FC = () => {
   const { idUser, idEmpleado} = useAuth();
@@ -32,7 +34,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
 
-
+      {/* Rutas protegidas por rol */}
       <Route 
         path="/empleados" 
           element={
@@ -53,8 +55,16 @@ const AppRoutes: React.FC = () => {
       }
       />
       
-          
-      {/* Rutas protegidas por rol */}
+      <Route 
+      path="/facturacion" 
+        element={
+        <ProtectedRoute
+        element={<FacturacionPage />}
+        allowedRoles={["RECEPCIONISTA"]}
+        />
+      }
+      />    
+  
       <Route
         path="/dashboard"
         element={
@@ -101,6 +111,38 @@ const AppRoutes: React.FC = () => {
           />
         }
       />
+
+      <Route
+        path="/especialidades"
+        element={
+          <ProtectedRoute
+            element={<AdminEspecialidadesPage />}
+            allowedRoles={["ADMIN"]}
+          />
+        }
+      />
+
+
+      <Route
+        path="/facturas/historial"
+        element={
+          <ProtectedRoute
+            element={<HistorialFacturasPage />}
+            allowedRoles={["ADMIN"]}
+          />
+        }
+      />
+
+      <Route
+        path="/reportes"
+        element={
+          <ProtectedRoute
+            element={<ReporteFacturacionPage />}
+            allowedRoles={["ADMIN"]}
+          />
+        }
+      />
+
 
       <Route
         path="/Historial"
