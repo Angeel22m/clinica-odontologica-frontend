@@ -34,15 +34,28 @@ const ExpedientesPagePorDoctor: React.FC = () => {
     const currentExpedienteId = selectedId || urlExpedienteId;
 
 const handleSelectExpediente = (id: number | null) => {
-        setSelectedId(id);
-       
-        
-        if (id) {          
-            navigate(`${id}`); 
-        } else {          
-            navigate("..");          
+    // 1. Actualizamos el estado local
+    setSelectedId(id);
+    
+    // 2. Lógica de navegación
+    if (id) {
+        // CASO: Seleccionar un ID
+        if (urlExpedienteId) {
+            // Si YA estamos en una ruta con ID (ej: /expedientes/1) y queremos ir a otro (ej: /expedientes/2),
+            // usamos ".." para "salir" del 1 y entrar al 2.
+            navigate(`../${id}`, { relative: "path" });
+        } else {
+            // Si estamos en la ruta principal (ej: /expedientes) y entramos a uno
+            navigate(`${id}`);
         }
-    };
+    } else {
+        // CASO: Quitar el ID (Regresar a principal)
+        // Solo navegamos atrás si actualmente hay un ID en la URL
+        if (urlExpedienteId) {
+            navigate("..", { relative: "path" });
+        }
+    }
+};
   
 
   useEffect(() => {

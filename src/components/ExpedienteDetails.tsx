@@ -11,7 +11,7 @@ import { cargarCitasConfirmadasPorPaciente } from "../services/expedientesServic
 
 export const ExpedienteDetalle: React.FC<{pacienteId:number, doctorId:number ,expedienteId: number; onBack: () => void }> = 
 ({ expedienteId,
-     pacienteId,  // <--- AGREGAR ESTO
+     pacienteId, 
     doctorId,
      onBack }) => {
   const [expediente, setExpediente] = useState<any>(null);
@@ -90,7 +90,7 @@ const fetchCitas = async () => {
         <div>
           <h2 className="text-3xl font-bold text-primary mb-2">{expediente.nombrePaciente}</h2>          
         </div>
-        <button onClick={() => setShowEditModal(true)} className="btn-accent">
+        <button onClick={() => setShowEditModal(true)} className="btn-primary flex items-center">
           <Pencil className="w-4 h-4" /> Editar Expediente
         </button>
       </div>
@@ -99,7 +99,7 @@ const fetchCitas = async () => {
       <div className="mb-4 flex items-center gap-2">
         <button
   onClick={() => setShowNuevoDetalleModal(true)}
-  className="btn-accent"
+  className="btn-accent flex"
 >
   <Stethoscope className="w-4 h-4" /> Nueva Consulta
 </button>
@@ -108,7 +108,7 @@ const fetchCitas = async () => {
 
         <button
   onClick={() => setShowUploader(true)}
-  className="btn-accent"
+  className="btn-accent flex"
 >
   <Upload className="w-4 h-4" /> Adjuntar Archivo
 </button>

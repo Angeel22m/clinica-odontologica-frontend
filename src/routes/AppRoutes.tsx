@@ -23,7 +23,7 @@ import AdminEspecialidadesPage from '../pages/Especialidades';
 
 
 const AppRoutes: React.FC = () => {
-  const { idUser, idEmpleado} = useAuth();
+  const { idUser} = useAuth();
   return (
     <Routes>
       {/* Rutas públicas */}
@@ -96,7 +96,7 @@ const AppRoutes: React.FC = () => {
         path="/expedientes/doctor/:expedienteId?"
         element={
           <ProtectedRoute
-            element={<ExpedientesPagePorDoctor doctorId={idEmpleado} />}
+            element={<ExpedientesPagePorDoctor />}
             allowedRoles={["DOCTOR"]}
           />
         }
