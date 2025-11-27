@@ -16,6 +16,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import  DoctorPage from "../pages/DoctorPage";
 import { useAuth } from "../hooks/UseAuth";
 import RecepcionistaPage from '../pages/RecepcionistaPage';
+import UserProfile from '../pages/UserProfile';
 
 // solo es para pruebas luego se dejan los roles correspondientes
 const allUser  =['ADMIN',"CLIENTE","ADMINISTRADOR","DOCTOR"] 
@@ -31,6 +32,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
+      <Route path="/home/perfil" element={<UserProfile />} />
 
 
       <Route 

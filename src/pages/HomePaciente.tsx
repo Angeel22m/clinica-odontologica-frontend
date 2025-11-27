@@ -243,13 +243,6 @@ export default function HomePaciente() {
             Crear cita
           </button>
 
-          <button
-            onClick={() => setShowEditarPacienteModal(true)}
-            className="hover:text-info transition cursor-pointer"
-          >
-            Modificar usuario
-          </button>
-
           <FiBell className="hover:text-info transition h-6 w-6 cursor-pointer" />
 
           <HeaderMenu />

@@ -44,10 +44,10 @@ export default function HamburgerMenu() {
             exit={{ opacity: 0, y: -5 }}
             className="absolute right-0 mt-2 w-44 bg-light rounded-xl shadow-lg py-2 z-50 border border-primary/10"
           >
-            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+            <Link to="/home/perfil" className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
               <FiUser />
-              <Link to="/perfil">Perfil</Link>
-            </div>
+              <div>Perfil</div>
+            </Link>
 
             <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
               <FiSettings />
