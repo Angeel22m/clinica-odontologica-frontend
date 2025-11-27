@@ -60,49 +60,64 @@ export default function AdminEspecialidadesPage() {
   const paginated = filtered.slice(indexFirst, indexLast);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
-  const handleSave = async (
-    esp: Omit<EspecialidadType.Especialidad, "id"> &
-      Partial<Pick<EspecialidadType.Especialidad, "id">>
-  ) => {
-    try {
-      if (esp.id) {
-        // UPDATE
-        const { message, code } = await updateEspecialidad(esp.id, {
-          nombre: esp.nombre,
-          descripcion: esp.descripcion,
-        });
+ const handleSave = async (
+  esp: Omit<EspecialidadType.Especialidad, "id"> &
+    Partial<Pick<EspecialidadType.Especialidad, "id">>
+) => {
+  try {
+    // ---------------------------
+    // VALIDACIÓN DUPLICADOS (FRONT)
+    // ---------------------------
+    const nombreNormalizado = esp.nombre.trim().toLowerCase();
 
-        if (code === 2 || code === 6) {
-          setNotification(message);
-          return;
-        }
+    const yaExiste = especialidades.some(
+      (e) =>
+        e.nombre.trim().toLowerCase() === nombreNormalizado &&
+        e.id !== esp.id
+    );
 
-        setNotification("Especialidad actualizada correctamente");
-      } else {
-        // CREATE
-        const { message, code } = await createEspecialidad({
-          nombre: esp.nombre,
-          descripcion: esp.descripcion,
-        });
-
-        if (code === 3) {
-          setNotification(message);
-          return;
-        }
-
-        setNotification("Especialidad agregada correctamente");
-      }
-
-      const updated = await fetchEspecialidades();
-      setEspecialidades(updated.sort((a, b) => a.id - b.id));
-    } catch (error) {
-      console.error("Error al guardar especialidad:", error);
-      setNotification("Error al guardar la especialidad");
-    } finally {
-      setShowForm(false);
-      setSelectedEspecialidad(null);
+    if (yaExiste) {
+      setNotification("La especialidad ya existe.");
+      return;
     }
-  };
+
+    // ---------------------------
+    // GUARDAR (CREATE / UPDATE)
+    // ---------------------------
+    if (esp.id) {
+      // EDITAR
+      await updateEspecialidad(esp.id, {
+        nombre: esp.nombre,
+        descripcion: esp.descripcion,
+      });
+
+      setNotification("Especialidad actualizada correctamente");
+    } else {
+      // CREAR
+      await createEspecialidad({
+        nombre: esp.nombre,
+        descripcion: esp.descripcion,
+      });
+
+      setNotification("Especialidad agregada correctamente");
+    }
+
+    // Recargar lista
+    const updated = await fetchEspecialidades();
+    setEspecialidades(updated.sort((a, b) => a.id - b.id));
+
+  } catch (error: any) {
+    console.error("Error al guardar especialidad:", error);
+
+    // Mensaje genérico SIEMPRE que el backend falle
+    setNotification("Error al crear la especialidad. Intente de nuevo más tarde.");
+  } finally {
+    setShowForm(false);
+    setSelectedEspecialidad(null);
+  }
+};
+
+
 
   const handleDelete = async (id: number) => {
     try {
