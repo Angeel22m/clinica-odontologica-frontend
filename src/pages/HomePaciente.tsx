@@ -8,15 +8,9 @@ import axios from "axios";
 import HeaderMenu from "../components/HeaderMenu";
 import Notification from "../components/Notification";
 import ConfirmDialog from "../components/ConfirmDialog";
-// Imports de HEAD
 import { useAuth } from "../hooks/UseAuth";
 import ModalVerificacion from "../components/user/modalVerificacion";
-// Imports de Incoming
-import EditarPacienteModal from "../components/EditarPacienteModal";
-import modificarInfoService, {
-  type PacienteModificarPayload,
-  type PacienteRecepcionista,
-} from "../services/modificarInfoService";
+
 
 interface NotificationState {
   message: string;
@@ -49,9 +43,6 @@ export default function HomePaciente() {
   // Estados para verificación (HEAD logic)
   const [showModalVerificacion, setShowModalVerificacion] = useState(false);
 
-  // Estados para editar perfil (Incoming logic)
-  const [showEditarPacienteModal, setShowEditarPacienteModal] = useState(false);
-  const [loading, setLoading] = useState(false); // Para el guardado del perfil
 
   // Notificaciones y Confirmaciones
   const [notification, setNotification] = useState<NotificationState | null>(null);
@@ -59,20 +50,6 @@ export default function HomePaciente() {
     mensaje: string;
     onConfirm: () => void;
   } | null>(null);
-
-  // Construcción del objeto persona para el modal de edición (Incoming logic)
-  // Se protege con user? para evitar errores si aún carga
-  const persona: PacienteRecepcionista = user ? {
-    id: user.id,
-    correo: user.correo,
-    password: "",
-    nombre: user.persona?.nombre || "",
-    apellido: user.persona?.apellido || "",
-    dni: user.persona?.dni || "",
-    telefono: user.persona?.telefono || "",
-    direccion: user.persona?.direccion || "",
-    fechaNac: user.persona?.fechaNac || "",
-  } : {} as PacienteRecepcionista;
 
   // ---- Effects ----
 
@@ -249,30 +226,7 @@ export default function HomePaciente() {
     setShowModalVerificacion(true);
   };
 
-  // Actualización de perfil (Incoming)
-  const handleUpdateUsuario = async (data: PacienteModificarPayload) => {
-    if (!user) return;
 
-    try {
-      setLoading(true);
-      await modificarInfoService.completarDatosPorCorreoUsuario(
-        user.correo,
-        data
-      );
-
-      setShowEditarPacienteModal(false);
-      setNotification({ message: "Información actualizada correctamente", type: 'success' });
-      
-      // Actualizamos localmente el usuario si es necesario o forzamos un refresh
-      if (refreshAuth) refreshAuth(); 
-
-    } catch (error: any) {
-      console.error(error);
-      setNotification({ message: error?.message || "Error al actualizar la información", type: 'alert' });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Filtros de visualización
   const citasProximas = citasPendientes.filter((c) => esCitaProxima(c.fecha));
@@ -308,14 +262,7 @@ export default function HomePaciente() {
             className="hover:text-info transition cursor-pointer"
           >
             Historial clínico
-          </Link>
-
-          <button
-            onClick={() => setShowEditarPacienteModal(true)}
-            className="hover:text-info transition cursor-pointer"
-          >
-            Modificar usuario
-          </button>
+          </Link>      
 
           <button
             onClick={handleOpenModal}
@@ -542,17 +489,6 @@ export default function HomePaciente() {
           }}
           onCancelSubmit={handleCancelacionFinal}
           currentUser={{ id: idUser, role: rol }}
-        />
-      )}
-
-      {/* 5. Editar Perfil de Paciente (Incoming) */}
-      {showEditarPacienteModal && (
-        <EditarPacienteModal
-          open={showEditarPacienteModal}
-          paciente={persona}
-          user={true}
-          onSave={handleUpdateUsuario}
-          onClose={() => setShowEditarPacienteModal(false)}
         />
       )}
 

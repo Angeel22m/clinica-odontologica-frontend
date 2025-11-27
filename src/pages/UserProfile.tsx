@@ -3,6 +3,13 @@ import axios from "axios";
 import { FiUser, FiMail, FiPhone, FiCalendar, FiEdit, FiArrowLeft } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import Notification from "../components/Notification";
+
+interface NotificationState {
+  message: string;
+  type: 'success' | 'alert' | 'info';
+}
+
 
 export default function UserProfile() {
   const userCorreo = JSON.parse(localStorage.getItem("user")).correo;
@@ -12,6 +19,11 @@ export default function UserProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [changed, setChanged] = useState(false);
   const [loading, setLoading] = useState(false);
+    const [notification, setNotification] = useState<NotificationState | null>(null);
+    const [confirmData, setConfirmData] = useState<{
+      mensaje: string;
+      onConfirm: () => void;
+    } | null>(null);
   
   const editContainerRef = useRef(null);
 
@@ -87,7 +99,7 @@ export default function UserProfile() {
       const correoNuevo = formData.correo;
       
       if (correoNuevo && correoNuevo !== correoOriginal) {
-        alert("Acabas de actualizar tu correo! Debes iniciar sesion con su nuevo correo.");
+        setNotification({message:"Acabas de actualizar tu correo! Debes iniciar sesion con su nuevo correo.",type:'info'});
         
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -95,8 +107,8 @@ export default function UserProfile() {
         window.location.href = "/login";
         return;
       }
-
-      alert(res.data.message || "Datos actualizados.");
+     
+      setNotification( {message:'Datos actualizados.',type:'success'});
 
       // Actualiza el aside con los nuevos datos
       setOriginalData((prev) => ({
@@ -114,8 +126,8 @@ export default function UserProfile() {
       setChanged(false);
       setIsEditing(false);
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Error al actualizar datos");
+      
+      setNotification({message:"Error al actualizar datos",type:'alert'});
     }
     setLoading(false);
   };
@@ -218,7 +230,17 @@ export default function UserProfile() {
             </AnimatePresence>
           </section>
         </main>
+
+        
       </div>
+        {/* NOTIFICACIONES */}
+            {notification && (
+              <Notification
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification(null)}
+              />
+            )}
     </div>
   );
 }
