@@ -53,7 +53,7 @@ export default function FacturaPage() {
 
 const showApiError = (err: any) => {
   const data = err?.data;
-  console.log("API Error Data:", err);
+
   if (!data) {
     showNotification("Error desconocido.", "alert");
     return;
@@ -276,7 +276,7 @@ const showApiError = (err: any) => {
         }
         
       );
-      console.log("Factura PDF response:", resp);
+      
 
       
       const blob = new Blob([resp.data], { type: "application/pdf" });
