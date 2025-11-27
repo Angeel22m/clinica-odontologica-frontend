@@ -1,8 +1,13 @@
 // src/pages/HistorialFacturasPage.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import HeaderMenu from "../components/HeaderMenu";
 import { FiChevronLeft, FiFileText } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const headers = {
+  headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+};
 
 export default function HistorialFacturasPage() {
   // ---------------------------
@@ -21,45 +26,42 @@ export default function HistorialFacturasPage() {
   const [pagina, setPagina] = useState(1);
   const porPagina = 10;
 
+  // Debounce ref
+  const debounceRef = useRef<number | null>(null);
+
   // ---------------------------
-  // Colocar por defecto la fecha del día
+  // Cargar facturas desde backend
   // ---------------------------
   useEffect(() => {
-    const hoy = new Date().toISOString().split("T")[0];
-    setFechaInicio(hoy);
-    setFechaFin(hoy);
-  }, []);
+    const fetchHistorial = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get("http://localhost:3000/facturas/historial", headers);
+        const data = res.data?.data ?? [];
 
-  // ---------------------------
-  // Mock temporal (simula backend)
-  // ---------------------------
-  useEffect(() => {
-    setLoading(true);
+        // Normalizar: asegurar que cada factura tenga paciente, doctor, detalles, fechaEmision, subtotal, totalPagar
+        const normalized = data.map((f: any) => ({
+          ...f,
+          numeroFactura: f.numeroFactura ?? f.numero ?? String(f.id ?? ""),
+          fechaEmision: f.fechaEmision ?? f.createdAt ?? null,
+          subtotal: typeof f.subtotal === "number" ? f.subtotal : Number(f.subtotal ?? 0),
+          totalPagar: typeof f.totalPagar === "number" ? f.totalPagar : Number(f.totalPagar ?? 0),
+          paciente: f.paciente ?? { nombre: "", apellido: "", dni: "" },
+          doctor: f.doctor?.persona ? { nombre: f.doctor.persona.nombre, apellido: f.doctor.persona.apellido } : (f.doctor ?? null),
+        }));
 
-    setTimeout(() => {
-      const datosEjemplo = [
-        {
-          id: 1,
-          numeroFactura: "000-001-01-00000001",
-          paciente: { nombre: "Carlos", apellido: "López", dni: "0801190012345" },
-          subtotal: 500,
-          totalPagar: 575,
-          fechaEmision: "2025-02-13T12:00:00",
-        },
-        {
-          id: 2,
-          numeroFactura: "000-001-01-00000002",
-          paciente: { nombre: "Ana", apellido: "Martínez", dni: "0703198712345" },
-          subtotal: 800,
-          totalPagar: 920,
-          fechaEmision: "2025-02-12T09:00:00",
-        },
-      ];
+        setFacturas(normalized);
+        setFiltered(normalized);
+      } catch (err) {
+        console.error("Error cargando historial de facturas:", err);
+        setFacturas([]);
+        setFiltered([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setFacturas(datosEjemplo);
-      setFiltered(datosEjemplo);
-      setLoading(false);
-    }, 800);
+    fetchHistorial();
   }, []);
 
   // ---------------------------
@@ -68,37 +70,68 @@ export default function HistorialFacturasPage() {
   const aplicarFiltros = () => {
     let result = [...facturas];
 
-    if (!fechaInicio || !fechaFin) return; 
-
-    // Buscar
+    // Buscar (seguro: convertir a string antes de usar toLowerCase)
     if (busqueda.trim()) {
       const q = busqueda.toLowerCase();
-      result = result.filter((f) =>
-        f.numeroFactura.toLowerCase().includes(q) ||
-        `${f.paciente.nombre} ${f.paciente.apellido}`.toLowerCase().includes(q) ||
-        f.paciente.dni.includes(q)
-      );
+
+      result = result.filter((f) => {
+        const numero = String(f.numeroFactura ?? "").toLowerCase();
+        const nombre = `${String(f.paciente?.nombre ?? "")} ${String(f.paciente?.apellido ?? "")}`.toLowerCase();
+        const dni = String(f.paciente?.dni ?? "").toLowerCase();
+        const doctorName = f.doctor ? `${String(f.doctor?.nombre ?? "")} ${String(f.doctor?.apellido ?? "")}`.toLowerCase() : "";
+        // permitir buscar por fecha formateada también (opcional)
+        const fecha = f.fechaEmision ? new Date(f.fechaEmision).toLocaleDateString().toLowerCase() : "";
+
+        return (
+          numero.includes(q) ||
+          nombre.includes(q) ||
+          dni.includes(q) ||
+          doctorName.includes(q) ||
+          fecha.includes(q)
+        );
+      });
     }
 
-    // Filtro fechas
+    // Filtro fechas (si el usuario definió alguna)
     if (fechaInicio) {
-      result = result.filter(
-        (f) => new Date(f.fechaEmision) >= new Date(fechaInicio)
-      );
+      result = result.filter((f) => {
+        if (!f.fechaEmision) return false;
+        return new Date(f.fechaEmision) >= new Date(fechaInicio);
+      });
     }
     if (fechaFin) {
-      result = result.filter(
-        (f) => new Date(f.fechaEmision) <= new Date(fechaFin + "T23:59:59")
-      );
+      result = result.filter((f) => {
+        if (!f.fechaEmision) return false;
+        return new Date(f.fechaEmision) <= new Date(fechaFin + "T23:59:59");
+      });
     }
 
     setFiltered(result);
     setPagina(1);
   };
 
+  // Llamar aplicarFiltros cuando cambian busqueda/fechas
   useEffect(() => {
-    if (fechaInicio && fechaFin) aplicarFiltros();
-  }, [busqueda, fechaInicio, fechaFin]);
+    aplicarFiltros();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fechaInicio, fechaFin]);
+
+  // BÚSQUEDA EN VIVO: ejecutar aplicarFiltros mientras se escribe (debounce)
+  useEffect(() => {
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+    // debounce 300ms
+    // @ts-ignore
+    debounceRef.current = window.setTimeout(() => {
+      aplicarFiltros();
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busqueda]);
 
   // ---------------------------
   // Paginación
@@ -111,7 +144,6 @@ export default function HistorialFacturasPage() {
   // ---------------------------
   const verPDF = (factura: any) => {
     console.log("PDF de factura:", factura.id);
-    // Aquí luego llamarás a tu backend:
     // window.open(`http://localhost:3000/factura/pdf/${factura.id}`, "_blank");
   };
 
@@ -190,7 +222,7 @@ export default function HistorialFacturasPage() {
                 <th className="py-3 px-4">Fecha</th>
                 <th className="py-3 px-4">Subtotal</th>
                 <th className="py-3 px-4">Total</th>
-                <th className="py-3 px-4 text-center">PDF</th>
+                
               </tr>
             </thead>
 
@@ -202,25 +234,17 @@ export default function HistorialFacturasPage() {
                 >
                   <td className="py-3 px-4">{f.numeroFactura}</td>
                   <td className="py-3 px-4">
-                    {f.paciente.nombre} {f.paciente.apellido}
+                    {String(f.paciente?.nombre ?? "")} {String(f.paciente?.apellido ?? "")}
                   </td>
-                  <td className="py-3 px-4">{f.paciente.dni}</td>
+                  <td className="py-3 px-4">{String(f.paciente?.dni ?? "")}</td>
                   <td className="py-3 px-4">
-                    {new Date(f.fechaEmision).toLocaleDateString()}
+                    {f.fechaEmision ? new Date(f.fechaEmision).toLocaleDateString() : "-"}
                   </td>
-                  <td className="py-3 px-4">L {f.subtotal.toFixed(2)}</td>
-                  <td className="py-3 px-4 font-semibold">L {f.totalPagar.toFixed(2)}</td>
+                  <td className="py-3 px-4">L {Number(f.subtotal ?? 0).toFixed(2)}</td>
+                  <td className="py-3 px-4 font-semibold">L {Number(f.totalPagar ?? 0).toFixed(2)}</td>
 
-                  {/* BOTÓN PDF */}
-                  <td className="py-3 px-4 text-center">
-                    <button
-                      onClick={() => verPDF(f)}
-                      className="text-primary hover:text-info transition"
-                      title="Ver PDF"
-                    >
-                      <FiFileText size={22} />
-                    </button>
-                  </td>
+                  
+                  
                 </tr>
               ))}
             </tbody>
