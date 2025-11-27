@@ -389,7 +389,7 @@ const showApiError = (err: any) => {
           <button
             onClick={handleSearch}
             disabled={!!pdfUrl}
-            className="btn-accent px-4 py-3 disabled:opacity-60"
+            className="btn-accent flex px-4 py-3 disabled:opacity-60"
           >
             <Search size={18} /> Buscar
           </button>

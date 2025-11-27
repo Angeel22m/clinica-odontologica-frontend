@@ -406,7 +406,7 @@ const handleCancelacionFinal = async (data: {
     <RegisterForm open={open} onClose={handleCloseModal}/>
 
     <Link to="/facturacion" className="btn-accent shadow-md">
-          Generar Factura
+          Generar facturas
         </Link>
   </div>
 
@@ -536,10 +536,6 @@ const handleCancelacionFinal = async (data: {
               
               className="flex items-center gap-2 bg-success text-light px-4 py-2 rounded-lg hover:opacity-80 transition-opacity shadow-md">
                 <Calendar size={18} /> Crear Cita
-              </button>
-
-              <button className="flex items-center gap-2 bg-info text-light px-4 py-2 rounded-lg hover:opacity-80 transition-opacity shadow-md">
-                <ClipboardList size={18} /> Confirmarcitas Pendientes
               </button>
 
               <button

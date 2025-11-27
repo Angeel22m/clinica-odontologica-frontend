@@ -84,7 +84,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ history, expediente }) 
         <h3 className="text-2xl font-semibold text-primary">Historial de Consultas</h3>
         <button
           onClick={() => setAscending(!ascending)}
-          className="btn-accent"
+          className="btn-accent flex"
         >
           <ArrowUpDown className="w-4 h-4" />
           {ascending ? 'Más antiguas primero' : 'Más recientes primero'}
