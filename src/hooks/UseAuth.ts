@@ -7,8 +7,10 @@ interface AuthUser {
   token: string | null;
   user: Record<string, any> | null;
   isLoggedIn: boolean;
+  isVerificado: boolean;
+  isLoading:boolean;
 }
-export const useAuth = (): AuthUser & { nombre?: string; apellido?: string } => {
+export const useAuth = (): AuthUser & { nombre?: string; apellido?: string; refreshAuth: () => void } => {
   const [auth, setAuth] = useState<AuthUser & { nombre?: string; apellido?: string }>({
     idUser: 0,
     idEmpleado: 0,
@@ -18,6 +20,8 @@ export const useAuth = (): AuthUser & { nombre?: string; apellido?: string } => 
     isLoggedIn: false,
     nombre: undefined,
     apellido: undefined,
+    isVerificado: false,
+    isLoading: true,
   });
 
   const updateAuth = () => {
@@ -30,6 +34,7 @@ export const useAuth = (): AuthUser & { nombre?: string; apellido?: string } => 
     let user: Record<string, any> | null = null;
     let nombre: string | undefined;
     let apellido: string | undefined;
+    let isVerificado: boolean = false;
 
     if (storedUser) {
       try {
@@ -40,9 +45,9 @@ export const useAuth = (): AuthUser & { nombre?: string; apellido?: string } => 
         idEmpleado = userObj?.empleadoId ?? 0;
         rol = userObj?.rol ?? null;
 
-        // Agregar nombre y apellido directamente
         nombre = userObj?.persona?.nombre;
         apellido = userObj?.persona?.apellido;
+        isVerificado = !!userObj?.verificado;        
       } catch (error) {
         console.error("Error al parsear user del localStorage:", error);
       }
@@ -57,6 +62,8 @@ export const useAuth = (): AuthUser & { nombre?: string; apellido?: string } => 
       isLoggedIn: !!token && !!user,
       nombre,
       apellido,
+      isVerificado,
+      isLoading: false,
     });
   };
 
@@ -75,5 +82,6 @@ export const useAuth = (): AuthUser & { nombre?: string; apellido?: string } => 
     };
   }, []);
 
-  return auth;
+  // Agregamos refreshAuth al retorno
+  return { ...auth, refreshAuth: updateAuth };
 };

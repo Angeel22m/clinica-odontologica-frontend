@@ -40,6 +40,25 @@ export const addDetalleConsulta = async (data: NewClinicalRecord): Promise<Clini
   return response.data.data; // aquí accedemos a `data` dentro del response
 };
 
+ export const cargarCitasConfirmadasPorPaciente = async (pacienteId:number, doctorId:number) => {
+    
+    // 1. Construir la ruta con los Path Parameters
+    const ruta = `/citas/confirmadas/${pacienteId}/${doctorId}`;
+    
+    // 2. Usar la instancia api.get()
+    try {
+        // Axios se encarga de la llamada GET, el manejo de errores HTTP y devuelve la data.
+        const data = await api.get(ruta);
+        
+        // Devolver el objeto de respuesta del backend (que incluye mensaje, fecha, data)
+        return data; 
+        
+    } catch (error) {
+        // El error ya fue manejado y relanzado por el apiClient.js
+        console.error("Fallo al obtener citas confirmadas.");
+        throw error;
+    }
+};
 
 /**
  * Obtiene el historial clínico de un paciente por su ID

@@ -11,7 +11,13 @@ interface NotificationState {
     type: 'success' | 'alert' | 'info';
 }
 
-export default function ModalAgendarCita({ onClose }) {
+interface ModalProps {
+    onClose: () => void;
+    /** ID del paciente pasado desde un componente padre (ej: Recepcionista). Prioritario. */
+    pacienteId?: number; 
+}
+
+export default function ModalAgendarCita({ onClose, pacienteId }:ModalProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     servicioId: "",
@@ -20,6 +26,7 @@ export default function ModalAgendarCita({ onClose }) {
     doctorId: "",
     comentarios: "",
   });
+
 
   const [notification, setNotification] = useState<NotificationState | null>(null);
   const [servicios, setServicios] = useState([]);
@@ -35,6 +42,32 @@ export default function ModalAgendarCita({ onClose }) {
     return [];
   };
 
+const getPacienteId = (): number | null => {
+        // 1. Prioridad: la prop pacienteId
+        if (pacienteId) {
+            return pacienteId;
+        }
+
+        // 2. Respaldo: localStorage (para clientes logueados)
+        const userString = localStorage.getItem('user');
+        if (userString) {
+            try {
+                const user = JSON.parse(userString);
+                // Asume que el ID está en user.persona.id
+                const idFromStorage = user?.persona?.id;
+                if (idFromStorage) {
+                    // Asegurarse de que sea un número entero
+                    return parseInt(idFromStorage);
+                }
+            } catch (error) {
+                console.error("Error parseando 'user' de localStorage:", error);
+            }
+        }
+        
+        // 3. No se encontró ID
+        return null;
+    };
+    
   // --- Cargar servicios activos ---
   useEffect(() => {
     const fetchServicios = async () => {
@@ -152,6 +185,14 @@ export default function ModalAgendarCita({ onClose }) {
     if (isSubmitting) {
         return;
     }
+
+    const currentPacienteId = getPacienteId();
+        
+        if (!currentPacienteId) {
+            setNotification({ message: "Error: No se pudo identificar al paciente. Por favor, inicie sesión de nuevo.", type: 'alert' });
+            setIsSubmitting(false);
+            return;
+        }
     setIsSubmitting(true);
     try {
       const payload = {
@@ -159,7 +200,7 @@ export default function ModalAgendarCita({ onClose }) {
         fecha: formData.fecha,
         hora: formData.hora,
         doctorId: parseInt(formData.doctorId),
-        pacienteId:parseInt(JSON.parse(localStorage.getItem('user')).persona.id),
+        pacienteId:currentPacienteId,
       };
       const res = await axios.post("http://localhost:3000/citas", payload,headers);
         console.log(res.data);
@@ -185,6 +226,17 @@ export default function ModalAgendarCita({ onClose }) {
     }
     
   };
+ 
+const getLocalTodayDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+
+  const day = now.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
   
     // Limpiar notificación
   useEffect(() => {
@@ -240,7 +292,7 @@ export default function ModalAgendarCita({ onClose }) {
                   className="w-full border rounded-lg p-2 mt-1"
                   value={formData.fecha}
                   onChange={handleChange}
-                  min={new Date().toISOString().split("T")[0]}
+                  min={getLocalTodayDate()}
                 />
               </div>
 

@@ -21,7 +21,15 @@ import { useAuth } from "../hooks/UseAuth";
 import ModalAgendarCita from "../components/ModalAgendarCita";
 import axios from "axios";
 import ModalEditarCita from "../components/ModalEditarCita";
+import ModalCancelarCita from "../components/modalCancelacion";
+import Notification from "../components/Notification";
+
 type SearchType = 'correo' | 'dni' | 'telefono';
+
+interface NotificationState {
+    message: string;
+    type: 'success' | 'alert' | 'info';
+}
 
 
 const headers = {
@@ -80,7 +88,7 @@ const determineSearchType = (value: string): SearchType | null => {
 
 export default function RecepcionistaPage() {
 
-  const { nombre,apellido} = useAuth();
+  const { nombre,apellido,idUser,rol} = useAuth();
   const [open, setOpen] = useState(false);
   const [paciente, setPaciente] = useState<PacienteRecepcionista | any | null>(
     null
@@ -96,10 +104,24 @@ export default function RecepcionistaPage() {
 
   const [searchValue, setSearchValue] = useState(""); // Valor del input
   const [refreshKey, setRefreshKey] = useState(0);
+  
+const [showModalCancelar, setShowModalCancelar] = useState(false);
+  const [citaToCancel, setCitaToCancel] = useState<any | null>(null);
 
   const [validationError, setValidationError] = useState<string | null>(null);
   
 const [pacienteId, setPacienteId] = useState<number | null>(null); // Nuevo estado
+
+ // Notificaciones
+    const [notification, setNotification] = useState<NotificationState | null>(null);
+
+  useEffect(() => {
+    if (notification) {
+      // Limpiar la notificación: null es mejor que "" para el chequeo
+      const timer = setTimeout(() => setNotification(null), 3000); 
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const menuRef = useRef<HTMLDivElement>(null);
   
@@ -251,7 +273,7 @@ const handleSearch = () => {
   }, [menuOpen]);
 
 
-  const fetchCitasPendientes = useCallback(async (id: number) => { 
+  const fetchCitasPendientes = useCallback(async (id: number|null) => { 
         if (!id) return;
         try {
             const res = await axios.get(`http://localhost:3000/citas/paciente/${id}`,headers);
@@ -277,23 +299,45 @@ const handleSearch = () => {
     
   };
   
-  const handleEliminar = async (cita) => {
-  
-    if (!confirm("Estas seguro de cancelar esta cita?")) return;
+ 
+const handleCancelacionFinal = async (data: {
+    citaId: number;
+    motivoCancelacion: string;
+    usuarioCancelaId: number; // user.personaId
+    rolCancela: string; // 'PACIENTE'
+  }) => {
+    const { citaId, motivoCancelacion, usuarioCancelaId, rolCancela } = data;
     
     try {
-      const res = await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`,{},headers);
-      
+      const res = await axios.patch(
+        `http://localhost:3000/citas/${citaId}/cancelar`,
+        { 
+          motivoCancelacion, 
+          usuarioCancelaId, 
+          rolCancela 
+        },
+        headers
+      );
+
       if (res.data.code === 0) {
-        alert("Cita cancelada correctamente");
-        setRefreshKey(prev => prev + 1);
+        // La notificación de éxito se manejará en el ModalCancelarCita
+        return true; 
       } else {
-        alert(res.data.message);
+        // Lanzar error para que el ModalCancelarCita lo muestre
+        throw new Error(res.data.message || 'Error desconocido al cancelar.'); 
       }
-    }  catch (err) {
-        console.error("Error al cancelar cita:", err);
-        alert("Ocurrio un error al cancelar la cita");
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || "Error al cancelar la cita";
+      // Opcional: Mostrar una notificación global además del error en el modal
+      setNotification({ message: message, type: 'alert' });
+      throw new Error(message); 
     }
+  };
+
+  const handleEliminar = (cita: any) => {
+    // Ya no usamos ConfirmDialog. Abrimos el modal con el campo de texto.
+    setCitaToCancel(cita);
+    setShowModalCancelar(true);
   };
 
   return (
@@ -393,7 +437,7 @@ const handleSearch = () => {
 
       <button
         onClick={handleSearch}
-        className="btn-accent px-4 py-3" // Usamos btn-accent y ajustamos el padding
+        className="btn-accent flex  px-4 py-3" // Usamos btn-accent y ajustamos el padding
       >
         <Search size={18} /> Buscar
       </button>
@@ -592,6 +636,22 @@ const handleSearch = () => {
                    />
                  )}
 
+                 
+{/* 5. Renderizar el nuevo modal de cancelación */}
+      {showModalCancelar && citaToCancel && (
+        <ModalCancelarCita
+          cita={citaToCancel}
+          onClose={() => setShowModalCancelar(false)}
+          onSuccess={() => {
+            setShowModalCancelar(false);
+            fetchCitasPendientes(pacienteId); // Recargar la lista después de la cancelación exitosa
+            setNotification({message:"Cita cancelada correctamente",type:'success'}); // Notificación global
+          }}
+          onCancelSubmit={handleCancelacionFinal}
+          currentUser={{ id:idUser ,role:rol }} // Pasa los datos del usuario
+        />
+      )}
+
 
   {/* Modal para editar/completar datos */}
   <EditarPacienteModal
@@ -600,6 +660,15 @@ const handleSearch = () => {
     onClose={() => setModalOpen(false)}
     onSave={guardarCambios}
   />
+
+    {/* NOTIFICACIONES */}
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onClose={() => setNotification(null)}
+          />
+        )}
   
 </div>
   );

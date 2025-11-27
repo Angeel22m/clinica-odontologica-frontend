@@ -6,17 +6,13 @@ import { fetchExpedientesByDoctor } from "../services/expedientesService";
 import type { Expediente } from "../types/expediente";
 import { Link,useParams, useNavigate } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
-
-
-interface Props {
-  doctorId: number;
-}
+import { useAuth } from "../hooks/UseAuth";
 
 type ExpedienteConNombres = Expediente & {
   nombrePaciente: string;
 };
 
-const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
+const ExpedientesPagePorDoctor: React.FC = () => {
   const [expedientes, setExpedientes] = useState<ExpedienteConNombres[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,8 +20,10 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
   const { expedienteId } = useParams<{ expedienteId: string }>();
   const navigate = useNavigate();
   const urlExpedienteId = expedienteId ? parseInt(expedienteId) : null;
+  const {idEmpleado} =useAuth();
 
   const initialSelectedId = expedienteId ? parseInt(expedienteId) : null;
+
   useEffect(() => {
         // Si el ID de la URL es diferente al ID actual seleccionado, actualízalo.
         if (urlExpedienteId !== selectedId) {
@@ -35,27 +33,33 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
 
     const currentExpedienteId = selectedId || urlExpedienteId;
 
-  const handleSelectExpediente = (id: number | null) => {
-    setSelectedId(id);
-    
-    // Construye la nueva URL
-    const baseUrl = `/expedientes/doctor`;
-    
-    if (id) {
-        // Navega a /expedientes/doctor/123
-        navigate(`${baseUrl}/${id}`);
-    } else {
-        // Navega de vuelta a /expedientes/doctor
-        navigate(baseUrl);
-    }
-  };
+const handleSelectExpediente = (id: number | null) => {
+        setSelectedId(id);
+       
+        
+        if (id) {          
+            navigate(`${id}`); 
+        } else {          
+            navigate("..");          
+        }
+    };
   
 
   useEffect(() => {
     const loadExpedientes = async () => {
+
+        if (!idEmpleado || idEmpleado <= 0) {
+          console.log('Esperando ID de empleado para cargar expedientes...');
+          setLoading(false);
+          return;
+      }
+
+
+
       try {
         setLoading(true);
-        const data = await fetchExpedientesByDoctor(doctorId);
+        console.log(idEmpleado)
+        const data = await fetchExpedientesByDoctor(idEmpleado);
 
         const mapped: ExpedienteConNombres[] = data.map((exp) => ({
     ...exp,
@@ -73,8 +77,9 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
     };
 
     loadExpedientes();
-  }, [doctorId]);
-
+  }, [idEmpleado]);
+  console.log('id de la ruta')
+  console.log(currentExpedienteId)
   const expedienteSeleccionado = expedientes.find((e) => e.id === currentExpedienteId);
 
   if (loading) return <div className="p-6 text-center">Cargando expedientes...</div>;
@@ -112,7 +117,9 @@ const ExpedientesPagePorDoctor: React.FC<Props> = ({ doctorId }) => {
             </button>
 
             <ExpedienteDetalle 
-                expedienteId={expedienteSeleccionado.id} 
+                expedienteId={expedienteSeleccionado.id}
+                pacienteId={expedienteSeleccionado.pacienteId} 
+                doctorId={idEmpleado}
                 // 6. Usar el nuevo handler para el botón de regreso
                 onBack={() => handleSelectExpediente(null)} 
             />

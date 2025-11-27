@@ -12,7 +12,7 @@ import { useAuth } from '../hooks/UseAuth';
 const DoctorPage: React.FC = () => {
     
     const [menuOpen, setMenuOpen] = useState(false);
-    const {nombre,apellido} = useAuth();  
+    const {nombre,apellido,idUser} = useAuth();  
 
     return (
         <div className="w-full mx-auto p-6 bg-light border border-primary/20 rounded-2xl shadow-xl font-inter">
@@ -28,8 +28,8 @@ const DoctorPage: React.FC = () => {
     <div className="flex w-full sm:w-auto items-center gap-2 sm:gap-3">
 
         {/* Enlace "Ver Pacientes" */}
-        <Link
-            to={'/expedientes/doctor'} 
+        <Link 
+            to={`/expedientes/doctor`} 
             className="btn-primary flex-shrink-0 px-4 py-2 text-sm sm:text-base rounded-lg shadow hover:shadow-md transition duration-200"
             title="Ver expedientes y datos de pacientes"
         >

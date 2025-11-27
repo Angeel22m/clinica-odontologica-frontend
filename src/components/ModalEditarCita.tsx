@@ -93,7 +93,16 @@ export default function ModalEditarCita({ cita, onClose, onUpdated }) {
       alert("No se pudo actualizar la cita");
     }
   };
+const getLocalTodayDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
 
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+
+  const day = now.getDate().toString().padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
 
   return (
     <div className="fixed inset-0 overlay-dark flex justify-center items-center z-50">
@@ -111,7 +120,7 @@ export default function ModalEditarCita({ cita, onClose, onUpdated }) {
             value={fecha}
             onChange={(e) => setFecha(e.target.value)}
             className="border rounded-md px-3 py-2"
-            min={new Date().toISOString().split("T")[0]}
+            min={getLocalTodayDate()}
           />
 
           <label>Hora</label>

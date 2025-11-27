@@ -4,15 +4,17 @@ import { addDetalleConsulta } from "../services/expedientesService"; // función
 
 
 interface NuevoDetalleFormProps {
-  expedienteId: number;
-  doctorId: number;
-  open: boolean;
-  onClose: () => void;
-  onSuccess: () => void; // callback al guardar
+    expedienteId: number;
+    doctorId: number;
+    open: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+    citasConfirmadas: { id: number; hora: string; servicio: { nombre: string } }[]; // Definir mejor el tipo de dato
 }
 
-const NuevoDetalleForm: React.FC<NuevoDetalleFormProps> = ({ expedienteId, doctorId, open, onClose, onSuccess }) => {
+const NuevoDetalleForm: React.FC<NuevoDetalleFormProps> = ({ expedienteId, doctorId, open,citasConfirmadas, onClose, onSuccess }) => {
   const [fecha, setFecha] = useState("");
+  const [citaSeleccionadaId, setCitaSeleccionadaId] = useState<number | null>(null); // Nuevo estado para la cita elegida
   const [motivo, setMotivo] = useState("");
   const [diagnostico, setDiagnostico] = useState("");
   const [tratamiento, setTratamiento] = useState("");
@@ -28,6 +30,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     const nuevoDetalle = await addDetalleConsulta({
       expedienteId,
       doctorId,
+      ...(citaSeleccionadaId && { citaId: citaSeleccionadaId }),
       fecha: new Date(fecha).toISOString(),
       motivo,
       diagnostico,
@@ -47,10 +50,34 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 };
 
+const handleCloseAndReset = () => {
+        // ... limpiar otros estados
+        setCitaSeleccionadaId(null);
+        onClose();
+    };
+
 
   return (
-    <Modal open={open} onClose={onClose} title="Nuevo Detalle de Consulta">
+    <Modal open={open} onClose={handleCloseAndReset} title="Nuevo Detalle de Consulta">
       <form onSubmit={handleSubmit} className="space-y-3">
+        {/* Campo de Selección de Cita (Condicional) */}
+            {citasConfirmadas.length > 0 && (
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Vincular a Cita Confirmada</label>
+                    <select
+                        value={citaSeleccionadaId || ""}
+                        onChange={(e) => setCitaSeleccionadaId(Number(e.target.value) || null)}
+                        className="mt-1 block w-full border rounded p-2"
+                    >
+                        <option value="">-- Crear sin vincular --</option>
+                        {citasConfirmadas.map((cita) => (
+                            <option key={cita.id} value={cita.id}>
+                                Cita ID {cita.id} | {cita.hora} | Servicio: {cita.servicio.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
         <div>
           <label className="block text-sm font-medium text-gray-700">Fecha</label>
           <input

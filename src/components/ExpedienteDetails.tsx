@@ -6,16 +6,26 @@ import EditExpedienteForm from "../components/EditarExpedienteForm";
 import { getExpedienteById } from "../services/expedientesService"; // tu función para fetch backend
 import type { Archivo } from "../types/expediente";
 import NuevoDetalleForm from "./NuevoDetalleForm";
+import { cargarCitasConfirmadasPorPaciente } from "../services/expedientesService";
 
 
-export const ExpedienteDetalle: React.FC<{ expedienteId: number; onBack: () => void }> = ({ expedienteId, onBack }) => {
+export const ExpedienteDetalle: React.FC<{pacienteId:number, doctorId:number ,expedienteId: number; onBack: () => void }> = 
+({ expedienteId,
+     pacienteId,  // <--- AGREGAR ESTO
+    doctorId,
+     onBack }) => {
   const [expediente, setExpediente] = useState<any>(null);
   const [ascending, setAscending] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [imagenAbierta, setImagenAbierta] = useState<string | null>(null);
   const [showNuevoDetalleModal, setShowNuevoDetalleModal] = useState(false);
+  const [citasConfirmadas, setCitasConfirmadas] = useState<any[]>([]);
 
+  useEffect(() => {
+    fetchExpediente();
+    fetchCitas();
+  }, [expedienteId,pacienteId, doctorId]);
 
   // Cargar expediente
   const fetchExpediente = async () => {
@@ -26,10 +36,27 @@ export const ExpedienteDetalle: React.FC<{ expedienteId: number; onBack: () => v
       console.error("Error al obtener expediente:", err);
     }
   };
+    // Cargar citas
+const fetchCitas = async () => {
+        try {
+            // USAR VARIABLES DINÁMICAS (pacienteId y doctorId)
+            console.log(pacienteId)          
+            const response = await cargarCitasConfirmadasPorPaciente(pacienteId, doctorId);
+            
+            //ACCESO CORRECTO A LOS DATOS (response.data)
+            // Ya que el backend responde { mensaje: ..., data: [...] }, el array está en 'response.data'.
+            const citasArray = response.data;
+            
+            console.log('Citas confirmadas encontradas:', citasArray.data);
+            
+            setCitasConfirmadas(citasArray.data || []); 
 
-  useEffect(() => {
-    fetchExpediente();
-  }, [expedienteId]);
+        } catch (err) {
+            console.error("Error al obtener citas confirmadas:", err);
+            setCitasConfirmadas([]);
+        }
+    };
+
 
   // Ordenar consultas
   const sorted = useMemo(() => {
@@ -181,12 +208,14 @@ export const ExpedienteDetalle: React.FC<{ expedienteId: number; onBack: () => v
 )}    
 
 <NuevoDetalleForm
-  expedienteId={expedienteId}
-  doctorId={1} // reemplazar con el doctor actual
-  open={showNuevoDetalleModal}
-  onClose={() => setShowNuevoDetalleModal(false)}
-  onSuccess={fetchExpediente}
-/>
+            expedienteId={expedienteId}
+            doctorId={doctorId}       
+            citasConfirmadas={citasConfirmadas} // CORRECCIÓN: Pasar el array de datos cargado
+            open={showNuevoDetalleModal}
+            onClose={() => setShowNuevoDetalleModal(false)}
+            // Al guardar, recargar el expediente Y las citas (para que desaparezca la usada)
+            onSuccess={() => { fetchExpediente(); fetchCitas(); setShowNuevoDetalleModal(false); }}
+        />
 
 
 
