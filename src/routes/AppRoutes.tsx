@@ -20,6 +20,7 @@ import FacturacionPage from '../pages/FacturacionPage';
 import ReporteFacturacionPage from '../pages/ReportesFacturasPage';
 import HistorialFacturasPage from '../pages/HistorialFacturaspage';
 import AdminEspecialidadesPage from '../pages/Especialidades';
+import UserProfile from '../pages/UserProfile';
 
 
 const AppRoutes: React.FC = () => {
@@ -33,6 +34,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/services" element={<PublicServicesPage />} />
+      <Route path="/home/perfil" element={<UserProfile />} />
 
       {/* Rutas protegidas por rol */}
       <Route 
