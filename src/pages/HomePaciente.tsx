@@ -2,309 +2,337 @@ import { useState, useEffect } from "react";
 import ModalAgendarCita from "../components/ModalAgendarCita";
 import ModalEditarCita from "../components/ModalEditarCita";
 import ModalCancelarCita from "../components/modalCancelacion";
-import { FiBell,FiAlertTriangle } from "react-icons/fi";
+import { FiBell, FiAlertTriangle } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import HeaderMenu from "../components/HeaderMenu";
 import Notification from "../components/Notification";
 import ConfirmDialog from "../components/ConfirmDialog";
+// Imports de HEAD
 import { useAuth } from "../hooks/UseAuth";
 import ModalVerificacion from "../components/user/modalVerificacion";
+// Imports de Incoming
+import EditarPacienteModal from "../components/EditarPacienteModal";
+import modificarInfoService, {
+  type PacienteModificarPayload,
+  type PacienteRecepcionista,
+} from "../services/modificarInfoService";
 
 interface NotificationState {
-    message: string;
-    type: 'success' | 'alert' | 'info';
+  message: string;
+  type: 'success' | 'alert' | 'info';
 }
 
 export default function HomePaciente() {
-  const { 
-        user, 
-        isLoggedIn, 
-        isVerificado, 
-        token,
-        isLoading,
-        idUser,
-        rol,
-        refreshAuth,
-    } = useAuth();
+  // 1. Hook de Autenticación (HEAD)
+  const {
+    user,
+    isLoggedIn,
+    isVerificado,
+    token,
+    isLoading,
+    idUser,
+    rol,
+    refreshAuth,
+  } = useAuth();
 
-  const [showModal, setShowModal] = useState(false);
-  const [showModalEditar, setShowModalEditar] = useState(false);
-
-const [showModalCancelar, setShowModalCancelar] = useState(false);
+  // 2. Estados unificados
+  const [showModal, setShowModal] = useState(false); // Modal Agendar
+  const [showModalEditar, setShowModalEditar] = useState(false); // Modal Editar Cita
+  const [citasPendientes, setCitasPendientes] = useState<any[]>([]);
+  const [citaEditando, setCitaEditando] = useState<any | null>(null);
+  
+  // Estados para cancelación (HEAD logic)
+  const [showModalCancelar, setShowModalCancelar] = useState(false);
   const [citaToCancel, setCitaToCancel] = useState<any | null>(null);
 
-  const [citasPendientes, setCitasPendientes] = useState<any[]>([]);
-  const [citaEditando, setCitaEditando] = useState<any | null>(null);
-const [showModalVerificacion, setShowModalVerificacion] = useState(false);
+  // Estados para verificación (HEAD logic)
+  const [showModalVerificacion, setShowModalVerificacion] = useState(false);
 
+  // Estados para editar perfil (Incoming logic)
+  const [showEditarPacienteModal, setShowEditarPacienteModal] = useState(false);
+  const [loading, setLoading] = useState(false); // Para el guardado del perfil
 
-  // Notificaciones
-    const [notification, setNotification] = useState<NotificationState | null>(null);
-  const [confirmData, setConfirmData] = useState<{
-    mensaje: string;
-    onConfirm: () => void;
-  } | null>(null);
+  // Notificaciones y Confirmaciones
+  const [notification, setNotification] = useState<NotificationState | null>(null);
+  const [confirmData, setConfirmData] = useState<{
+    mensaje: string;
+    onConfirm: () => void;
+  } | null>(null);
 
-  useEffect(() => {
-    if (notification) {
-      // Limpiar la notificación: null es mejor que "" para el chequeo
-      const timer = setTimeout(() => setNotification(null), 3000); 
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
+  // Construcción del objeto persona para el modal de edición (Incoming logic)
+  // Se protege con user? para evitar errores si aún carga
+  const persona: PacienteRecepcionista = user ? {
+    id: user.id,
+    correo: user.correo,
+    password: "",
+    nombre: user.persona?.nombre || "",
+    apellido: user.persona?.apellido || "",
+    dni: user.persona?.dni || "",
+    telefono: user.persona?.telefono || "",
+    direccion: user.persona?.direccion || "",
+    fechaNac: user.persona?.fechaNac || "",
+  } : {} as PacienteRecepcionista;
 
- useEffect(() => {
-   if (isLoggedIn && user && user.personaId) {
-      fetchCitasPendientes();
-    }
-  }, [isLoggedIn, user?.personaId, token]);
+  // ---- Effects ----
 
- 
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
-  if (isLoading) {
-    // Mostrar un loader mientras se lee localStorage
-    return <div className="text-center p-10">Cargando sesión...</div>; 
-  }
+  useEffect(() => {
+    if (isLoggedIn && user && user.personaId) {
+      fetchCitasPendientes();
+    }
+  }, [isLoggedIn, user?.personaId, token]);
 
-if (!isLoggedIn || !user || !user.id) { 
-    // Si no está logueado, redirigir.
-    window.location.href = "http://localhost:5173/login";
-    return null;
-  }
+  // ---- Early Returns ----
 
-const headers = {
-      headers: { Authorization: `Bearer ${token}` },
-  };
+  if (isLoading) {
+    return <div className="text-center p-10">Cargando sesión...</div>;
+  }
 
-  // ---- Helpers ----
+  if (!isLoggedIn || !user || !user.id) {
+    window.location.href = "http://localhost:5173/login";
+    return null;
+  }
 
-  // Detectar si está dentro de HOY, MAÑANA o PASADO MAÑANA
-  const esCitaProxima = (fechaStr: string) => {
-    // ... (lógica sin cambios)
-    if (!fechaStr) return false;
+  const headers = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
 
-    const hoy = new Date();
-    const fecha = new Date(fechaStr);
+  // ---- Helpers ----
 
-    const hoyMid = new Date(
-      hoy.getFullYear(),
-      hoy.getMonth(),
-      hoy.getDate()
-    ).getTime();
+  // Detectar si está dentro de HOY, MAÑANA o PASADO MAÑANA
+  const esCitaProxima = (fechaStr: string) => {
+    if (!fechaStr) return false;
+    const hoy = new Date();
+    const fecha = new Date(fechaStr);
+    const hoyMid = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+    const fechaMid = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()).getTime();
+    const diffDias = (fechaMid - hoyMid) / (1000 * 60 * 60 * 24);
+    return diffDias === 0 || diffDias === 1 || diffDias === 2;
+  };
 
-    const fechaMid = new Date(
-      fecha.getFullYear(),
-      fecha.getMonth(),
-      fecha.getDate()
-    ).getTime();
+  const formatoHora = (hora: string) =>
+    hora.length === 5 ? hora : hora.replace("_", ":");
 
-    const diffDias = (fechaMid - hoyMid) / (1000 * 60 * 60 * 24);
+  const puedeEditar = (cita: any) => cita.estado === "PENDIENTE";
+  const puedeConfirmar = (cita: any) => cita.estado === "PENDIENTE";
 
-    return diffDias === 0 || diffDias === 1 || diffDias === 2;
-  };
+  // Cancelación automática si faltan < 24 horas y aún está pendiente
+  const cancelarPorTiempoRestante = async (cita: any) => {
+    const ahora = new Date();
+    const fechaCita = new Date(`${cita.fecha} ${cita.hora}`);
+    const diffMs = fechaCita.getTime() - ahora.getTime();
+    const diffHoras = diffMs / (1000 * 60 * 60);
 
-  // Cancelación automática si faltan < 24 horas y aún está pendiente
-  const cancelarPorTiempoRestante = async (cita: any) => {
-    // ... (lógica sin cambios)
-    const ahora = new Date();
-    const fechaCita = new Date(`${cita.fecha} ${cita.hora}`);
+    if (cita.estado === "PENDIENTE" && diffHoras <= 24) {
+      try {
+        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`, {}, headers);
+        return "CANCELADA";
+      } catch {
+        return cita.estado;
+      }
+    }
+    return cita.estado;
+  };
 
-    const diffMs = fechaCita.getTime() - ahora.getTime();
-    const diffHoras = diffMs / (1000 * 60 * 60);
+  // ---- API Calls ----
 
-    if (cita.estado === "PENDIENTE" && diffHoras <= 24) {
-      // cancelar en backend
-      try {
-        await axios.patch(`http://localhost:3000/citas/${cita.id}/cancelar`,{},headers);
-        return "CANCELADA";
-      } catch {
-        return cita.estado;
-      }
-    }
+  const fetchCitasPendientes = async () => {
+    try {
+      const pacienteId = user.personaId;
+      const res = await axios.get(
+        `http://localhost:3000/citas/paciente/${pacienteId}`, headers
+      );
 
-    return cita.estado;
-  };
+      let citas = Array.isArray(res.data) ? res.data : [];
 
-  const fetchCitasPendientes = async () => {
-    try {
-      // user.personaId está garantizado aquí
-      const pacienteId = user.personaId; 
-      const res = await axios.get(
-        `http://localhost:3000/citas/paciente/${pacienteId}`,headers
-      );
+      // aplicar cancelación automática
+      const nuevas = [];
+      for (let c of citas) {
+        const nuevoEstado = await cancelarPorTiempoRestante(c);
+        nuevas.push({ ...c, estado: nuevoEstado });
+      }
 
-      let citas = Array.isArray(res.data) ? res.data : [];
+      setCitasPendientes(nuevas);
+    } catch (err) {
+      console.error("Error al cargar citas", err);
+    }
+  };
 
-      // aplicar cancelación automática
-      const nuevas = [];
-      for (let c of citas) {
-        const nuevoEstado = await cancelarPorTiempoRestante(c);
-        nuevas.push({ ...c, estado: nuevoEstado });
-      }
+  // ---- Handlers ----
 
-      setCitasPendientes(nuevas);
-    } catch (err) {
-      console.error("Error al cargar citas", err);
-    }
-  };
+  const handleEditar = (cita: any) => {
+    setCitaEditando(cita);
+    setShowModalEditar(true);
+  };
 
-
-
-  const handleEditar = (cita: any) => {
-    setCitaEditando(cita);
-    setShowModalEditar(true);
-  };
-
-const handleCancelacionFinal = async (data: {
+  // Handler unificado usando la lógica de HEAD (PATCH con motivo)
+  const handleCancelacionFinal = async (data: {
     citaId: number;
     motivoCancelacion: string;
-    usuarioCancelaId: number; // user.personaId
-    rolCancela: string; // 'PACIENTE'
+    usuarioCancelaId: number;
+    rolCancela: string;
   }) => {
     const { citaId, motivoCancelacion, usuarioCancelaId, rolCancela } = data;
-    
+
     try {
       const res = await axios.patch(
         `http://localhost:3000/citas/${citaId}/cancelar`,
-        { 
-          motivoCancelacion, 
-          usuarioCancelaId, 
-          rolCancela 
+        {
+          motivoCancelacion,
+          usuarioCancelaId,
+          rolCancela
         },
         headers
       );
 
-      if (res.data.code === 0) {
-        // La notificación de éxito se manejará en el ModalCancelarCita
-        return true; 
+      if (res.data.code === 0 || res.status === 200) {
+        return true;
       } else {
-        // Lanzar error para que el ModalCancelarCita lo muestre
-        throw new Error(res.data.message || 'Error desconocido al cancelar.'); 
+        throw new Error(res.data.message || 'Error desconocido al cancelar.');
       }
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || "Error al cancelar la cita";
-      // Opcional: Mostrar una notificación global además del error en el modal
       setNotification({ message: message, type: 'alert' });
-      throw new Error(message); 
+      throw new Error(message);
     }
   };
 
-  const handleEliminar = (cita: any) => {
-    // Ya no usamos ConfirmDialog. Abrimos el modal con el campo de texto.
+  const handleEliminar = (cita: any) => {
+    // Usamos el ModalCancelarCita (HEAD) en lugar del ConfirmDialog simple
     setCitaToCancel(cita);
     setShowModalCancelar(true);
   };
 
-  const handleConfirmar = (cita: any) => {
-    // ... (lógica sin cambios)
-    setConfirmData({
-      mensaje: "¿Desea confirmar su asistencia a esta cita?",
-      onConfirm: async () => {
-        try {
-          const res = await axios.patch(
-            `http://localhost:3000/citas/${cita.id}/confirmar`,{},headers
-          );
+  const handleConfirmar = (cita: any) => {
+    setConfirmData({
+      mensaje: "¿Desea confirmar su asistencia a esta cita?",
+      onConfirm: async () => {
+        try {
+          const res = await axios.patch(
+            `http://localhost:3000/citas/${cita.id}/confirmar`, {}, headers
+          );
 
-          if (res.data?.estado === "CONFIRMADA") {
-            setNotification({message:"Cita confirmada correctamente",type:'success'});
-          }
+          if (res.data?.estado === "CONFIRMADA") {
+            setNotification({ message: "Cita confirmada correctamente", type: 'success' });
+          }
 
-          fetchCitasPendientes();
-        } catch {
-          setNotification({message:"Error al confirmar la cita",type:'alert'});
-        } finally {
-          setConfirmData(null);
-        }
-      },
-    });
-  };
-    
-  // Nuevo handler para abrir el modal (con check de verificación)
+          fetchCitasPendientes();
+        } catch {
+          setNotification({ message: "Error al confirmar la cita", type: 'alert' });
+        } finally {
+          setConfirmData(null);
+        }
+      },
+    });
+  };
+
+  // Validaciones de cuenta (HEAD)
   const handleOpenModal = () => {
     if (!isVerificado) {
-        setNotification({ 
-            message: "¡Verificación Requerida! Debes verificar tu correo electrónico para agendar citas.", 
-            type: 'alert' 
-        });
-        return;
+      setNotification({
+        message: "¡Verificación Requerida! Debes verificar tu correo electrónico para agendar citas.",
+        type: 'alert'
+      });
+      return;
     }
     setShowModal(true);
   }
 
-  const citasProximas = citasPendientes.filter((c) =>
-    esCitaProxima(c.fecha)
-  );
-
-  const citasOtrasPendientes = citasPendientes.filter(
-    (c) => !esCitaProxima(c.fecha)
-  );
-
-  const formatoHora = (hora: string) =>
-    hora.length === 5 ? hora : hora.replace("_", ":");
-
-  const puedeEditar = (cita: any) => cita.estado === "PENDIENTE";
-  const puedeConfirmar = (cita: any) => cita.estado === "PENDIENTE";
-
-const handleOpenVerificacion = () => {
+  const handleOpenVerificacion = () => {
     setShowModalVerificacion(true);
-};
+  };
 
+  // Actualización de perfil (Incoming)
+  const handleUpdateUsuario = async (data: PacienteModificarPayload) => {
+    if (!user) return;
 
+    try {
+      setLoading(true);
+      await modificarInfoService.completarDatosPorCorreoUsuario(
+        user.correo,
+        data
+      );
 
+      setShowEditarPacienteModal(false);
+      setNotification({ message: "Información actualizada correctamente", type: 'success' });
+      
+      // Actualizamos localmente el usuario si es necesario o forzamos un refresh
+      if (refreshAuth) refreshAuth(); 
+
+    } catch (error: any) {
+      console.error(error);
+      setNotification({ message: error?.message || "Error al actualizar la información", type: 'alert' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtros de visualización
+  const citasProximas = citasPendientes.filter((c) => esCitaProxima(c.fecha));
+  const citasOtrasPendientes = citasPendientes.filter((c) => !esCitaProxima(c.fecha));
 
   return (
     <div className="min-h-screen bg-light text-primary">
-   
-      {/* ALERTA DE VERIFICACIÓN */}
-      {!isVerificado && (
-        <div className="bg-alert-light text-alert p-3 flex items-center justify-center gap-2">
-            <FiAlertTriangle className="h-5 w-5" />
-            <p className="font-semibold">
-                ¡ALERTA! Tu correo aún no está verificado. Debes verificar tu cuenta para poder crear citas.
-            </p>
-<button
-        onClick={handleOpenVerificacion}
-        className=" btn-primary"
-      >
-        Verificar
-      </button>
-        </div>
-      )}
 
-      {/* NOTIFICACIONES Y MODALES (Aquí irían ModalAgendarCita, ModalEditarCita, ConfirmDialog) */}
+      {/* ALERTA DE VERIFICACIÓN */}
+      {!isVerificado && (
+        <div className="bg-alert-light text-alert p-3 flex items-center justify-center gap-2">
+          <FiAlertTriangle className="h-5 w-5" />
+          <p className="font-semibold">
+            ¡ALERTA! Tu correo aún no está verificado. Debes verificar tu cuenta para poder crear citas.
+          </p>
+          <button
+            onClick={handleOpenVerificacion}
+            className="btn-primary"
+          >
+            Verificar
+          </button>
+        </div>
+      )}
 
-      {/* HEADER */}
-      <header className="w-full bg-white shadow-sm py-3 px-6 flex items-center justify-between">
-        <div className="text-success text-3xl font-bold mb-3">
-          {/* CORRECCIÓN DE ERROR: Usar encadenamiento opcional */}
-          {`Hola, ${user?.persona?.nombre || 'Paciente'}`} 
-        </div>
-        <nav className="flex items-center gap-8">
-          <Link
-            to={"/Historial"}
-            className="hover:text-info transition cursor-pointer"
-          >
-            Historial clínico
-          </Link>
+      {/* HEADER: Fusión de HEAD (Saludo) e Incoming (Botón Modificar) */}
+      <header className="w-full bg-white shadow-sm py-3 px-6 flex items-center justify-between">
+        <div className="text-success text-3xl font-bold mb-3">
+          {`Hola, ${user?.persona?.nombre || 'Paciente'}`}
+        </div>
+        <nav className="flex items-center gap-8">
+          <Link
+            to={"/Historial"}
+            className="hover:text-info transition cursor-pointer"
+          >
+            Historial clínico
+          </Link>
 
-          <button
-            onClick={handleOpenModal}
-            disabled={!isVerificado}
-            className={`transition cursor-pointer ${
-                !isVerificado 
-                    ? 'text-gray-400 cursor-not-allowed' 
-                    : 'hover:text-info'
-            }`}
-          >
-            Crear cita
-          </button>
+          <button
+            onClick={() => setShowEditarPacienteModal(true)}
+            className="hover:text-info transition cursor-pointer"
+          >
+            Modificar usuario
+          </button>
 
-          <FiBell className="hover:text-info transition h-6 w-6 cursor-pointer" />
+          <button
+            onClick={handleOpenModal}
+            disabled={!isVerificado}
+            className={`transition cursor-pointer ${!isVerificado
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'hover:text-info'
+              }`}
+          >
+            Crear cita
+          </button>
 
-          <HeaderMenu />
-        </nav>
-      </header>
+          <FiBell className="hover:text-info transition h-6 w-6 cursor-pointer" />
+
+          <HeaderMenu />
+        </nav>
+      </header>
 
       {/* CONTENIDO PRINCIPAL */}
       <main className="p-5 max-w-7xl mx-auto">
@@ -347,7 +375,6 @@ const handleOpenVerificacion = () => {
                     </span>
                   </div>
 
-                  {/* Si CANCELADA → NO mostrar botones */}
                   {cita.estado === "CANCELADA" ? (
                     <p className="text-alert mt-3 font-medium">
                       Esta cita fue cancelada. Por favor programe una nueva.
@@ -357,11 +384,10 @@ const handleOpenVerificacion = () => {
                       <button
                         disabled={!puedeEditar(cita)}
                         onClick={() => handleEditar(cita)}
-                        className={`px-3 py-1 rounded-lg btn-nueva-consulta ${
-                          !puedeEditar(cita)
+                        className={`px-3 py-1 rounded-lg btn-nueva-consulta ${!puedeEditar(cita)
                             ? "opacity-50 cursor-not-allowed"
                             : ""
-                        }`}
+                          }`}
                       >
                         Editar
                       </button>
@@ -413,26 +439,23 @@ const handleOpenVerificacion = () => {
                   <div className="mt-1 text-sm">
                     Estado:{" "}
                     <span
-                      className={`font-semibold ${
-                        cita.estado === "CONFIRMADA"
+                      className={`font-semibold ${cita.estado === "CONFIRMADA"
                           ? "text-success"
                           : cita.estado === "CANCELADA"
-                          ? "text-alert"
-                          : "text-primary"
-                      }`}
+                            ? "text-alert"
+                            : "text-primary"
+                        }`}
                     >
                       {cita.estado}
                     </span>
                   </div>
 
-                  {/* Si CANCELADA → solo mensaje */}
                   {cita.estado === "CANCELADA" ? (
                     <p className="text-alert mt-3 font-medium">
                       Esta cita fue cancelada. Por favor programe una nueva.
                     </p>
                   ) : (
                     <div className="mt-2 flex justify-center gap-3">
-                      {/* Confirmar */}
                       {cita.estado !== "CONFIRMADA" && (
                         <button
                           disabled={!puedeConfirmar(cita)}
@@ -443,17 +466,15 @@ const handleOpenVerificacion = () => {
                         </button>
                       )}
 
-                      {/* Editar solo si está pendiente */}
                       {cita.estado === "PENDIENTE" && (
                         <button
                           onClick={() => handleEditar(cita)}
                           className="px-3 py-1 rounded-lg btn-nueva-consulta"
                         >
-                          Editar
+                          Modificar
                         </button>
                       )}
 
-                      {/* Cancelar */}
                       <button
                         onClick={() => handleEliminar(cita)}
                         className="px-3 py-1 rounded-lg btn-alert cursor-pointer"
@@ -472,8 +493,10 @@ const handleOpenVerificacion = () => {
       </main>
 
       {/* MODALES */}
+      
+      {/* 1. Agendar Cita */}
       {showModal && (
-        <ModalAgendarCita      
+        <ModalAgendarCita
           onClose={() => {
             setShowModal(false);
             fetchCitasPendientes();
@@ -481,6 +504,7 @@ const handleOpenVerificacion = () => {
         />
       )}
 
+      {/* 2. Editar Cita */}
       {showModalEditar && citaEditando && (
         <ModalEditarCita
           cita={citaEditando}
@@ -492,35 +516,47 @@ const handleOpenVerificacion = () => {
         />
       )}
 
+      {/* 3. Verificación de Usuario (HEAD) */}
       {showModalVerificacion && (
-  <ModalVerificacion
-    clienteid={user.personaId}
-    token={token}
-    setNotification={setNotification}
-    onSuccess={() => {
-        setShowModalVerificacion(false);
-    }}
-    refreshAuth={refreshAuth}
-    onClose={() => setShowModalVerificacion(false)}
-  />
-)}
+        <ModalVerificacion
+          clienteid={user.personaId}
+          token={token}
+          setNotification={setNotification}
+          onSuccess={() => {
+            setShowModalVerificacion(false);
+          }}
+          refreshAuth={refreshAuth}
+          onClose={() => setShowModalVerificacion(false)}
+        />
+      )}
 
-{/* 5. Renderizar el nuevo modal de cancelación */}
+      {/* 4. Cancelar Cita con Motivo (HEAD) */}
       {showModalCancelar && citaToCancel && (
         <ModalCancelarCita
           cita={citaToCancel}
           onClose={() => setShowModalCancelar(false)}
           onSuccess={() => {
             setShowModalCancelar(false);
-            fetchCitasPendientes(); // Recargar la lista después de la cancelación exitosa
-            setNotification({message:"Cita cancelada correctamente",type:'success'}); // Notificación global
+            fetchCitasPendientes();
+            setNotification({ message: "Cita cancelada correctamente", type: 'success' });
           }}
           onCancelSubmit={handleCancelacionFinal}
-          currentUser={{ id:idUser ,role:rol }} // Pasa los datos del usuario
+          currentUser={{ id: idUser, role: rol }}
         />
       )}
 
-      {/* CONFIRMACIONES */}
+      {/* 5. Editar Perfil de Paciente (Incoming) */}
+      {showEditarPacienteModal && (
+        <EditarPacienteModal
+          open={showEditarPacienteModal}
+          paciente={persona}
+          user={true}
+          onSave={handleUpdateUsuario}
+          onClose={() => setShowEditarPacienteModal(false)}
+        />
+      )}
+
+      {/* CONFIRMACIONES (Usado para confirmar asistencia) */}
       {confirmData && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
           <ConfirmDialog
