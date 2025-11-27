@@ -1,12 +1,9 @@
 import React from 'react';
 import { useState } from "react";
 import CitasDoctor from '../components/DoctorComponentes/CitasDoctor'; 
-import { FiMenu } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import HeaderMenu from '../components/HeaderMenu';
 import { Link } from 'react-router-dom';
-import LogoutButton from "../components/LogoutButton";
-import { FiSettings } from "react-icons/fi";
-import { FiUser } from "react-icons/fi";
+
 import { useAuth } from '../hooks/UseAuth';
 
 const DoctorPage: React.FC = () => {
@@ -37,44 +34,7 @@ const DoctorPage: React.FC = () => {
         </Link>
         
         {/* MENÚ DESPLEGABLE */}
-          <div className="relative">
-            <AnimatePresence mode="wait">
-            <motion.button
-            onClick={() => setMenuOpen(!menuOpen)}
-            animate={{rotate: menuOpen ? -90 : 0}}
-            transition = {{ duration: 0.2}}
-            className="p-2">
-            <FiMenu
-              className="hover:text-info transition h-7 w-7 cursor-pointer"
-            />
-            </motion.button>
-            </AnimatePresence>
-
-            {menuOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50">
-              
-                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-                <FiUser />
-                <button>
-                  Perfil
-                </button>
-                </div>
-                
-                <div className="w-full text-left px-4 py-2 hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-                <FiSettings />
-                <button>
-                  Configuración
-                </button>
-                </div>
-                
-                <button className="w-full px-2 cursor-pointer">
-                <LogoutButton>
-                  Cerrar sesión
-                </LogoutButton>
-                </button>
-              </div>
-            )}
-          </div>
+          <HeaderMenu/>
     </div>
 </header>
 

@@ -49,10 +49,10 @@ export default function HamburgerMenu() {
               <div>Perfil</div>
             </Link>
 
-            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
+            <Link to="/home/perfil" className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
               <FiSettings />
-              <Link to="/configuracion">Configuración</Link>
-            </div>
+              <div>Configuración</div>
+            </Link>
 
             <hr className="my-1 border-primary/10" />
 

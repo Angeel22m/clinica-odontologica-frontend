@@ -55,7 +55,7 @@ const showApiError = (err: any) => {
   const data = err?.data;
 
   if (!data) {
-    showNotification("Error desconocido.", "alert");
+    
     return;
   }
 

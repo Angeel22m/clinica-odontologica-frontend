@@ -23,8 +23,6 @@ const regex = {
   // Apellido: valida que es un apellido.
   apellido: /^[\p{L}][\p{L}\s'’-]{1,49}$/u,
 
-  // Contraseña: Mínimo 8 caracteres, al menos una mayúscula, un número, un carácter especial.
-  password: /^(?=.*\d)(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
 
   // DNI: Exactamente 13 dígitos.
   dni: /^\d{13}$/,
@@ -59,7 +57,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
     telefono: "",
     direccion: "",
     fechaNac: "",
-    password: "",
+    
   });
 
   // Nuevo estado para los errores
@@ -76,7 +74,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
         telefono: paciente.telefono ?? "",
         direccion: paciente.direccion ?? "",
         fechaNac: paciente.fechaNac ? paciente.fechaNac.slice(0, 10) : "",
-        password: "",
+        
       });
 
       setErrors({});
@@ -101,9 +99,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
       let error = "";
 
       if (value.length > 0 && !pattern.test(value)) {
-        if (key === 'password') {
-          error = "Mín. 8 caracteres, incluyendo mayúscula, número y símbolo.";
-        } else if (key === 'dni') {
+        if (key === 'dni') {
           error = "El DNI debe tener exactamente 13 dígitos.";
         } else if (key === 'telefono') {
           error = "El Teléfono debe tener exactamente 8 dígitos.";
@@ -146,8 +142,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
       fieldsToValidate = [
         "dni",
         "telefono",
-        "direccion",
-        "password",
+        "direccion",        
       ];
     }
 
@@ -158,14 +153,7 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
       // Si está vacío → no se valida, no hay error
       if (!value) return;
 
-      // Validar password solo si se escribió
-      if (field === "password") {
-        if (!pattern.test(value)) {
-          newErrors.password =
-            "Mín. 8 caracteres, incluyendo Mayúscula, número y símbolo.";
-        }
-        return;
-      }
+     
       
       // Validación general para DNI, teléfono y dirección
       if (!pattern.test(value)) {
@@ -236,36 +224,6 @@ const EditarPacienteModal: React.FC<EditarPacienteModalProps> = ({
               />
             )
           }
-        </div>
-
-        {/* CONTRASEÑA */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Contraseña (Dejar vacío para no cambiar)
-          </label>
-          {
-            user ? (
-              <input
-                type="password"
-                name="password"
-                disabled
-                placeholder="********"
-                className={getClassName('password')}
-              />
-            ) : (
-              <input
-                type="password"
-                name="password"
-                onChange={handleChange}
-                placeholder="********"
-                className={getClassName('password')}
-              />
-            )
-          }
-
-          {errors.password && (
-            <p className=" text-xs text-alert mt-1">{errors.password}</p>
-          )}
         </div>
 
         {/* NOMBRE Y APELLIDO (Deshabilitados) */}

@@ -13,8 +13,7 @@ export interface PacienteModificarPayload {
   dni?: string;
   telefono?: string;
   direccion?: string;
-  fechaNac?: string; // YYYY-MM-DD desde el input, convertimos antes de enviar
-  password?: string;
+  fechaNac?: string; // YYYY-MM-DD desde el input, convertimos antes de enviar  
 }
 
 export interface ModificarUsuarioPayload{

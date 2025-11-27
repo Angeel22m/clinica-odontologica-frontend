@@ -23,7 +23,7 @@ import axios from "axios";
 import ModalEditarCita from "../components/ModalEditarCita";
 import ModalCancelarCita from "../components/modalCancelacion";
 import Notification from "../components/Notification";
-
+import HeaderMenu from "../components/HeaderMenu";
 type SearchType = 'correo' | 'dni' | 'telefono';
 
 interface NotificationState {
@@ -239,10 +239,10 @@ const handleSearch = () => {
       );
       setRefreshKey(prev => prev + 1);
       setModalOpen(false);
-      alert("Información actualizada correctamente");
+      setNotification({message:"Información actualizada correctamente",type:'success'});
     } catch (error: any) {
       console.error(error);
-      alert(error?.message || "Error al actualizar la información del paciente");
+      setNotification({message:`Error al actualizar la información del paciente ${error?.message}`,type:'alert'});
     } finally {
       setLoading(false);
     }
@@ -350,49 +350,7 @@ const handleCancelacionFinal = async (data: {
 
     <div className="flex items-center gap-4 relative">    
 
-      {/* MENÚ DESPLEGABLE */}
-      <div className="relative" ref={menuRef}>
-        <AnimatePresence mode="wait">
-        <motion.button
-          onClick={() => setMenuOpen(!menuOpen)}
-          animate={{rotate: menuOpen ? -90 : 0}}
-          transition = {{ duration: 0.2}}
-          className="p-2"
-        >
-          <FiMenu
-            className="text-primary hover:text-info transition h-7 w-7 cursor-pointer"
-          />
-        </motion.button>
-        </AnimatePresence>
-        
-        {menuOpen && (
-          <div className="absolute right-0 mt-2 w-40 bg-light rounded-xl shadow-lg py-2 z-50 border border-primary/10">
-          
-            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-            <FiUser />
-            <Link>
-              Perfil
-            </Link>
-            </div>
-            
-            <div className="w-full text-left px-4 py-2 text-primary hover:bg-primary/10 cursor-pointer flex items-center gap-2">
-            <FiSettings />
-            <Link>
-              Configuración
-            </Link>
-            </div>
-            
-            {/* Se agrega un separador visual */}
-            <hr className="my-1 border-primary/10" />
-
-            <div className="w-full px-2 cursor-pointer">
-            <LogoutButton className="text-primary hover:text-alert">
-              Cerrar sesión
-            </LogoutButton>
-            </div>
-          </div>
-        )}
-      </div>
+      <HeaderMenu/>
     </div>
   </header>
 
