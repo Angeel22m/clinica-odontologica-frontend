@@ -51,6 +51,43 @@ export default function FacturaPage() {
     setNotification({ msg, type });
   };
 
+const showApiError = (err: any) => {
+  const data = err?.data;
+  console.log("API Error Data:", err);
+  if (!data) {
+    showNotification("Error desconocido.", "alert");
+    return;
+  }
+
+  if (typeof data === "string") {
+    showNotification(data, "alert");
+    return;
+  }
+
+  if (data.message) {
+    showNotification(data.message, "alert");
+    return;
+  }
+
+  if (data.error) {
+    showNotification(data.error, "alert");
+    return;
+  }
+
+  if (data.msg) {
+    showNotification(data.msg, "alert");
+    return;
+  }
+
+  if (data.detail) {
+    showNotification(data.detail, "alert");
+    return;
+  }
+
+  showNotification("Error inesperado.", "alert");
+};
+
+
   const normalizePacienteResponse = (resp: any) => {
     let raw: any = resp;
 
@@ -124,12 +161,13 @@ export default function FacturaPage() {
           showNotification("No se encontraron citas para facturar.", "info");
         }
       } catch (err: any) {
-        showNotification(err?.response?.data?.message || "Error al obtener citas.", "alert");
+        showApiError(err);
       }
     } catch (error: any) {
+      showApiError(error);
       const status = error?.response?.status ?? error?.status;
       if (status === 404) setPaciente({ notFound: true });
-      else setPaciente({ error: true, message: error?.response?.data?.message ?? error?.message });
+      else setPaciente({ error: true, message: error?.response?.data?.message });
     } finally {
       setLoading(false);
     }
@@ -184,7 +222,7 @@ export default function FacturaPage() {
 
       if (data?.message) showNotification(data.message, "info");
     } catch (err: any) {
-      showNotification(err?.response?.data?.message || "Error al obtener preview.", "alert");
+      showApiError(err);
     }
   };
 
@@ -236,14 +274,35 @@ export default function FacturaPage() {
             Accept: "application/pdf",
           },
         }
+        
       );
+      console.log("Factura PDF response:", resp);
 
+      
       const blob = new Blob([resp.data], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
       showNotification("Factura generada correctamente.", "success");
     } catch (err: any) {
-      showNotification(err?.response?.data?.message || "Error al generar la factura.", "alert");
+      const data = err?.response?.data;
+
+  // Si viene un Blob (X viene SIEMPRE blob porque pediste PDF)
+  if (data instanceof Blob) {
+    // Convertir blob → texto → JSON
+    data.text().then((text: string) => {
+      try {
+        const json = JSON.parse(text);
+        const msg = json.message || json.error || "Error al generar factura.";
+        showNotification(msg, "alert");
+      } catch {
+        showNotification("Error al procesar la respuesta del servidor.", "alert");
+      }
+    });
+  } else {
+    // Si no es blob, manejar normalmente
+    const msg = err?.response?.data?.message || "Error al generar factura.";
+    showNotification(msg, "alert");
+  }
     } finally {
       setGenerando(false);
     }
@@ -290,6 +349,9 @@ export default function FacturaPage() {
           </div>
         </>
       )}
+
+
+      
 
       <header className="flex justify-between items-center mb-8 border-b border-primary/10 pb-4">
         <button>
