@@ -1,86 +1,58 @@
-# React + TypeScript + Vite
+# Clínica Odontológica — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Descripción
+Frontend desarrollado con **React y TypeScript**, que se conecta con el backend de la clínica odontológica. Permite a los usuarios interactuar con el sistema, gestionar **pacientes, citas y tratamientos**, y visualizar la información de manera intuitiva y responsiva.
 
-Currently, two official plugins are available:
+## Tecnologías
+- **React**  
+- **TypeScript**  
+- **Vite**  
+- **CSS / Tailwind / librerías UI** (según uses)  
+- **Axios / Fetch** para consumir APIs REST  
+- Integración con **backend NestJS / Node.js**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Instalación / Ejecución
 
-## Project setup
-
+### Clonar el repositorio
 ```bash
-$ npm install
+git clone https://github.com/Angeel22m/clinica-odontologica-frontend.git
+cd clinica-odontologica-frontend
 ```
 
-## Run the project
-
+### Instalar dependencias
 ```bash
-# development
-$ npm run dev
+npm install
 ```
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Ejecutar en desarrollo
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Compilar para producción
+```bash
+npm run build
 ```
+
+### Conectar con backend
+Asegúrate de que el backend esté corriendo y actualiza la variable de entorno o archivo de configuración de la API (por ejemplo `.env`) con la URL correcta:  
+```
+VITE_API_URL=http://localhost:3000
+```
+
+## Funcionalidades principales
+- **Gestión de pacientes**: crear, editar.  
+- **Gestión de citas**: agendar, modificar y visualizar citas.  
+- **Visualización de tratamientos**: historial y seguimiento.  
+- **Autenticación**: login de usuarios y control de acceso mediante tokens JWT.  
+
+
+## Estado del proyecto
+**MVP funcional
+
+## Integración con Backend
+Este frontend se conecta con el backend:  
+[Clinica Odontológica — Backend](https://github.com/Angeel22m/clinica-odontologica-backend)  
+
+## Contacto
+**Moises Martinez** — mmoises.martinez0139@gmail.com
